@@ -69,6 +69,14 @@ if ! command -v lspci &> /dev/null; then
   exit 1
 fi
 
+# Check for python3 (required for helper scripts)
+if ! command -v python3 &> /dev/null; then
+  print_error "python3 is not installed."
+  echo -e "Please install python3, then re-run the install script."
+  echo -e "Example: nix-shell -p python3"
+  exit 1
+fi
+
 if [ -n "$(grep -i nixos < /etc/os-release)" ]; then
   echo -e "${GREEN}Verified this is NixOS.${NC}"
 else
