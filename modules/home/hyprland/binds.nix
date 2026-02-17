@@ -44,8 +44,6 @@ in {
       ++ rofiBind
       ++ rofiClipboardBind
       ++ [
-        # Force quit the compositor even if locked/frozen
-        "$modifier CONTROL, BACKSPACE, exec, killall -9 Hyprland"
         # ============= WORKSPACE OVERVIEW =============
         "$modifier CTRL,D, Toggle Dock, exec, dock"
         "$modifier, TAB, QS Overview, exec, qs ipc -c overview call overview toggle"
