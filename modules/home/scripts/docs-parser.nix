@@ -16,7 +16,7 @@ pkgs.writeShellScriptBin "docs-parser" ''
   Usage: docs-parser [MODE] [CATEGORY] [LANGUAGE]
 
   MODE: files|content
-  CATEGORY: AI|Hyprpanel|Zed|ddubsos|etc.
+  CATEGORY: AI|Zed|ddubsos|etc.
   LANGUAGE: en|es
 
   Examples:

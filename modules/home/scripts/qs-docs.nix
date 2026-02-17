@@ -12,7 +12,7 @@ pkgs.writeShellScriptBin "qs-docs" ''
   Usage: qs-docs [options]
 
   Options:
-    -c CATEGORY   Category to display (AI|Hyprpanel|Zed|ddubsos) (default: AI)
+    -c CATEGORY   Category to display (AI|Zed|ddubsos) (default: AI)
     -l LANGUAGE   Language (en|es) (default: en)
     -h            Show this help
   EOF
@@ -316,7 +316,7 @@ pkgs.writeShellScriptBin "qs-docs" ''
               win.availableCategories = result;
             } catch (e) {
               console.error("Failed to parse categories JSON:", e);
-              win.availableCategories = ["AI", "Hyprpanel", "Zed", "ddubsos"];
+              win.availableCategories = ["AI", "Zed", "ddubsos"];
             }
           }
         }

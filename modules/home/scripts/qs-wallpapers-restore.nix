@@ -51,19 +51,6 @@ pkgs.writeShellScriptBin "qs-wallpapers-restore" ''
   }
 
   start_swww() {
-    # Honor Hyprpanel requirement: do not start swww-daemon before Hyprpanel
-    local wait_sec="''${QS_RESTORE_WAIT_HYPRPANEL_SECONDS:-15}"
-    if ${pkgs.procps}/bin/pgrep -x hyprpanel >/dev/null 2>&1; then
-      log "hyprpanel detected; proceeding"
-    else
-      # If waybar is already running, it's fine to proceed immediately
-      if ${pkgs.procps}/bin/pgrep -x waybar >/dev/null 2>&1; then
-        log "waybar detected; proceeding without waiting for hyprpanel"
-      else
-        log "Waiting up to ''${wait_sec}s for hyprpanel before starting swww-daemon"
-        wait_for_proc hyprpanel "$wait_sec" || log "hyprpanel not detected after ''${wait_sec}s; proceeding"
-      fi
-    fi
 
     # Stop conflicting daemons if we intend to use swww
     ${pkgs.procps}/bin/pkill -x mpvpaper >/dev/null 2>&1 || true

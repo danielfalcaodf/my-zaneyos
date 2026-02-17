@@ -5,7 +5,6 @@ pkgs.writeShellScriptBin "qs-panels" ''
 
     # Detect current active panel/bar (robust matching, no regex metachar)
     active=""
-    if pgrep -x hyprpanel >/dev/null 2>&1; then active="hyprpanel"; fi
     if pgrep -x waybar >/dev/null 2>&1; then active="waybar"; fi
     if pgrep -x dms >/dev/null 2>&1 || pgrep -fa dms | grep -q "\bdms\b.*\brun\b"; then active="dms"; fi
   if pgrep -fa quickshell | grep -q "noctalia-shell"; then active="noctalia"; fi
@@ -66,8 +65,7 @@ pkgs.writeShellScriptBin "qs-panels" ''
             model: [
               { key: "noctalia", label: "Noctalia" },
               { key: "dms",      label: "DMS" },
-              { key: "waybar",   label: "Waybar" },
-              { key: "hyprpanel",label: "Hyprpanel" }
+              { key: "waybar",   label: "Waybar" }
             ]
             delegate: Rectangle {
               width: 180; height: 52
@@ -149,7 +147,6 @@ pkgs.writeShellScriptBin "qs-panels" ''
     noctalia) run_and_exit noctalia-run ;;
     dms)      run_and_exit dms-run ;;
     waybar)   run_and_exit waybar-run ;;
-    hyprpanel)run_and_exit hyprpanel-run ;;
     *)        exit 0 ;;
   esac
 ''
