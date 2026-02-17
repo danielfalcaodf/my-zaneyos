@@ -7,6 +7,18 @@
 
 # 🚀 **Current Release - ZaneyOS v2.5.6**
 
+#### 📅 **Updated: February 16th, 2026**
+
+- `webkitgtk` being built from source
+  - Removed audacity is called `wxwidgets`
+  - Created overlay for `tumbler` to disable `libepub`
+    - These caused the build from source issue
+    - Building `webkitgtk` takes hours every rebuild/update
+- Removed `hyprpanel`
+  - Not being maintained
+    - Vendor is building it's replacement `wayle`
+  - It's been replaced by `noctalia-shell`
+
 #### 📅 **Updated: January 6th, 2026**
 
 - Disabled `noctalia-shell` service
