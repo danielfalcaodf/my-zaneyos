@@ -9,6 +9,13 @@
 
 #### 📅 **Updated: February 16th, 2026**
 
+- Added Binding to kill hyprland if hung
+
+```
+ # Force quit the compositor even if locked/frozen
+"$modifier CONTROL, BACKSPACE, exec, killall -9 Hyprland"
+```
+
 - `webkitgtk` being built from source
   - Removed audacity is called `wxwidgets`
   - Created overlay for `tumbler` to disable `libepub`
