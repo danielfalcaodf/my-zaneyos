@@ -7,6 +7,10 @@
 
 # 🚀 **Current Release - ZaneyOS v2.5.6**
 
+#### 📅 **Updated: February 19th, 2026**
+
+- Updated `zcli` GPU detection for newer AMD GPUs 
+
 #### 📅 **Updated: February 16th, 2026**
 
 - `webkitgtk` being built from source

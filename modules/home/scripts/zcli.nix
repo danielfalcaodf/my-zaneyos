@@ -222,18 +222,18 @@ in
       local has_vm=false
 
       if ${pkgs.pciutils}/bin/lspci &> /dev/null; then # Check if lspci is available
-        if ${pkgs.pciutils}/bin/lspci | ${pkgs.gnugrep}/bin/grep -qi 'vga\|3d'; then
+        if ${pkgs.pciutils}/bin/lspci | ${pkgs.gnugrep}/bin/grep -qi 'vga\|3d\|display'; then
           while read -r line; do
             if echo "$line" | ${pkgs.gnugrep}/bin/grep -qi 'nvidia'; then
               has_nvidia=true
-            elif echo "$line" | ${pkgs.gnugrep}/bin/grep -qi 'amd'; then
+            elif echo "$line" | ${pkgs.gnugrep}/bin/grep -qi 'amd\|ati\|advanced micro devices'; then
               has_amd=true
             elif echo "$line" | ${pkgs.gnugrep}/bin/grep -qi 'intel'; then
               has_intel=true
             elif echo "$line" | ${pkgs.gnugrep}/bin/grep -qi 'virtio\|vmware'; then
               has_vm=true
             fi
-          done < <(${pkgs.pciutils}/bin/lspci | ${pkgs.gnugrep}/bin/grep -i 'vga\|3d')
+          done < <(${pkgs.pciutils}/bin/lspci | ${pkgs.gnugrep}/bin/grep -i 'vga\|3d\|display')
 
           if "$has_vm"; then
             detected_profile="vm"
