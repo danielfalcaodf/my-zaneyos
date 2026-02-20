@@ -10,6 +10,11 @@
 #### 📅 **Updated: February 19th, 2026**
 
 - Updated `zcli` GPU detection for newer AMD GPUs 
+- `nixvim.nix` Changes: 
+   - Disabled Zig Language Server 
+     - Wasn't using it 
+   - Disabled Marksmand Language Server 
+     - Caused dotnet libs to build from source (takes hours)
 
 #### 📅 **Updated: February 16th, 2026**
 
