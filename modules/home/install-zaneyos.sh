@@ -110,18 +110,18 @@ has_intel=false
 has_amd=false
 has_vm=false
 
-if lspci | grep -qi 'vga\|3d'; then
+if lspci | grep -qi 'vga\|3d\|display'; then
   while read -r line; do
     if echo "$line" | grep -qi 'nvidia'; then
       has_nvidia=true
-    elif echo "$line" | grep -qi 'amd'; then
+    elif echo "$line" | grep -qi 'amd\|ati\|advanced micro devices'; then
       has_amd=true
     elif echo "$line" | grep -qi 'intel'; then
       has_intel=true
     elif echo "$line" | grep -qi 'virtio\|vmware'; then
       has_vm=true
     fi
-  done < <(lspci | grep -i 'vga\|3d')
+  done < <(lspci | grep -i 'vga\|3d\|display')
 
   if $has_vm; then
     DETECTED_PROFILE="vm"
