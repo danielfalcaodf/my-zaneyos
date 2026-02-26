@@ -74,7 +74,7 @@ in {
         # ============= WINDOW MANAGEMENT =============
         "$modifier,Q, Kill Active Window, killactive,"
         "$modifier,P, Pseudo Tile, pseudo,"
-        "$modifier SHIFT,I, Toggle Split, layoutmgr, togglesplit,"
+        "$modifier SHIFT,I, Toggle Split, layoutmsg, togglesplit,"
         "$modifier,F, Maximize, fullscreen,"
         "$modifier SHIFT,F, Toggle Floating, togglefloating,"
         "$modifier ALT,F, Float All Windows, workspaceopt, allfloat"
