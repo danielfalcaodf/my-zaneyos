@@ -17,7 +17,7 @@ _: {
     # would be common
     hostName = "zaneyos-next";
 
-    gpuProfile = "amd";
+    gpuProfile = "vm";
 
     # Set Display Manager
     # `tui` for Text login
