@@ -220,6 +220,11 @@ in
       local has_intel=false
       local has_amd=false
       local has_vm=false
+      # Prefer hypervisor detection first to avoid misclassifying VMs as AMD
+      if ${pkgs.systemd}/bin/systemd-detect-virt -q; then
+        echo "vm"
+        return
+      fi
 
       if ${pkgs.pciutils}/bin/lspci &> /dev/null; then # Check if lspci is available
         if ${pkgs.pciutils}/bin/lspci | ${pkgs.gnugrep}/bin/grep -qi 'vga\|3d\|display'; then
@@ -230,7 +235,7 @@ in
               has_amd=true
             elif echo "$line" | ${pkgs.gnugrep}/bin/grep -qi 'intel'; then
               has_intel=true
-            elif echo "$line" | ${pkgs.gnugrep}/bin/grep -qi 'virtio\|vmware'; then
+            elif echo "$line" | ${pkgs.gnugrep}/bin/grep -qi 'virtio\|vmware\|qxl\|qemu\|virtualbox\|bochs\|hyper-v\|microsoft'; then
               has_vm=true
             fi
           done < <(${pkgs.pciutils}/bin/lspci | ${pkgs.gnugrep}/bin/grep -i 'vga\|3d\|display')
