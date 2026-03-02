@@ -10,6 +10,11 @@
         config.allowUnfree = true;
       };
     })
+    # Prefer stable mpv-with-scripts and yt-dlp to avoid deno source builds
+    (final: _prev: {
+      mpv-with-scripts = inputs.nixpkgs-stable.legacyPackages.${final.stdenv.hostPlatform.system}.mpv-with-scripts;
+      yt-dlp = inputs.nixpkgs-stable.legacyPackages.${final.stdenv.hostPlatform.system}.yt-dlp;
+    })
 
     # Build tumbler without EPUB thumbnailer (libgepub) to avoid webkitgtk
     (_final: prev: {
