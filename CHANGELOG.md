@@ -7,14 +7,33 @@
 
 # 🚀 **Current Release - ZaneyOS v2.5.6**
 
+#### 📅 **Updated: March 4th, 2026**
+
+- Fixed eval warnings
+  - for XORG name changes
+  - `nixfmt-rfc-style` moved to `nixfmt`
+  - ZSH `dotDir` change in Home Manager
+- Ported `DropTerminal` from KoolDots
+  - Replaces pyprland
+- Moved to unstable branch, v26.05
+  - Recent upstream issues kept forcing me to patch to resolve
+  - Otherwise many large packages would build from source
+- Fixed "Float All Windows" with Hyprland v0.54+
+- Remapped `legacy keybinds menu` binding to Quickshell menu
+- Fixed windowrule for Picture-in-Picture
+- `$modifier` was in wrong location in config file.
+  - It was in the `general{}` section needs to be outside
+- Updated the Window Rules for the new format in Hyprland v0.53+
+- Removed the overlays and fixes needed when on Stable branch
+
 #### 📅 **Updated: February 19th, 2026**
 
-- Updated `zcli` GPU detection for newer AMD GPUs 
-- `nixvim.nix` Changes: 
-   - Disabled Zig Language Server 
-     - Wasn't using it 
-   - Disabled Marksmand Language Server 
-     - Caused dotnet libs to build from source (takes hours)
+- Updated `zcli` GPU detection for newer AMD GPUs
+- `nixvim.nix` Changes:
+  - Disabled Zig Language Server
+    - Wasn't using it
+  - Disabled Marksmand Language Server
+    - Caused dotnet libs to build from source (takes hours)
 
 #### 📅 **Updated: February 16th, 2026**
 

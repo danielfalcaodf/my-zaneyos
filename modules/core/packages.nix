@@ -18,9 +18,6 @@
       ]
     else [];
 
-  # bleeding edge packages from nixpkgs-unstable
-  unstablePkgs = with pkgs.unstable; [
-  ];
 in {
   programs = {
     neovim = {
@@ -47,7 +44,6 @@ in {
 
   environment.systemPackages = with pkgs;
     noctaliaPkgs
-    ++ unstablePkgs
     ++ [
       alejandra # nix formatter
       amfora # Fancy Terminal Browser For Gemini Protocol
@@ -82,7 +78,7 @@ in {
       mdcat # CLI markdown parser
       mpv # Incredible Video Player
       ncdu # Disk Usage Analyzer With Ncurses Interface
-      nixfmt-rfc-style # Nix Formatter
+      nixfmt # Nix Formatter
       nwg-displays # configure monitor configs via GUI
       nwg-drawer # Application launcher for wayland
       nwg-dock-hyprland # Dock for hyprland

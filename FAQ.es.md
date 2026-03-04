@@ -164,7 +164,7 @@ fácil referencia.
 - `$modifier + C` → Ejecutar `hyprpicker -a`
 - `$modifier + G` → Abrir `GIMP`
 - `$modifier + V` → Mostrar historial de portapapeles vía `cliphist`
-- `$modifier + T` → Alternar terminal con `pypr`
+- `$modifier + Shift + T` → Alternar terminal desplegable con `DropTerminal`
 - `$modifier + M` → Abrir `pavucontrol`
 
 ## Gestión de Ventanas
@@ -481,7 +481,7 @@ agrega tus paquetes.
     ncdu
     nvtopPackages.full
     oh-my-posh
-    pyprland
+    DropTerminal
     shellcheck
     multimarkdown
     nodejs_23
@@ -840,7 +840,7 @@ settings = {
         "killall -q swaync;sleep .5 && swaync"
         "nm-applet --indicator"
         "lxqt-policykit-agent"
-        "pypr &"
+        "DropTerminal --spawn-only"
         #"sleep 1.5 && swww img /home/${username}/Pictures/Wallpapers/zaney-wallpaper.jpg"
         "sleep 1 && wallsetter"
       ];

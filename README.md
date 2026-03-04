@@ -156,7 +156,7 @@ when `barChoice = "noctalia"`).
 - `$modifier + O` → Launch `OBS Studio`
 - `$modifier + Alt + C` → Color Picker
 - `$modifier + G` → Open `GIMP`
-- `$modifier + T` → Toggle terminal with `pypr`
+- `$modifier + Shift + T` → Toggle dropdown terminal with `DropTerminal`
 - `$modifier + Alt + M` → Open `pavucontrol`
 
 ### Window Management

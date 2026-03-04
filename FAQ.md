@@ -160,7 +160,7 @@ Below are the keybindings for Hyprland, formatted for easy reference.
 - `$modifier + C` → Run `hyprpicker -a`
 - `$modifier + G` → Open `GIMP`
 - `$modifier + V` → Show clipboard history via `cliphist`
-- `$modifier + T` → Toggle terminal with `pypr`
+- `$modifier + Shift + T` → Toggle dropdown terminal with `DropTerminal`
 - `$modifier + M` → Open `pavucontrol`
 
 ## Window Management
@@ -469,7 +469,7 @@ packages.
     ncdu
     nvtopPackages.full
     oh-my-posh
-    pyprland
+    DropTerminal
     shellcheck
     multimarkdown
     nodejs_23
@@ -826,7 +826,7 @@ settings = {
        "killall -q swaync;sleep .5 && swaync"
        "nm-applet --indicator"
        "lxqt-policykit-agent"
-       "pypr &"
+       "DropTerminal --spawn-only"
        #"sleep 1.5 && swww img /home/${username}/Pictures/Wallpapers/zaney-wallpaper.jpg"
        "sleep 1 && wallsetter"
      ];
@@ -1664,7 +1664,7 @@ packages.
     ncdu
     nvtopPackages.full
     oh-my-posh
-    pyprland
+    DropTerminal
     shellcheck
     multimarkdown
     nodejs_23
@@ -2017,7 +2017,7 @@ settings = {
        "killall -q swaync;sleep .5 && swaync"
        "nm-applet --indicator"
        "lxqt-policykit-agent"
-       "pypr &"
+       "DropTerminal --spawn-only"
        #"sleep 1.5 && swww img /home/${username}/Pictures/Wallpapers/zaney-wallpaper.jpg"
        "sleep 1 && wallsetter"
      ];

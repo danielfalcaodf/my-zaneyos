@@ -18,9 +18,8 @@ pkgs.writeShellScriptBin "dock" ''
   MENU="nwg-drawer -mb 100 -mt 100 -ml 300 -mr 300"
 
   # Masked apps won't show in DOCK.
-  # I am running pyprland scratchpads
-  # They don't show up correctly so I mask it off
-  MASK_APPS="kitty-dropterm"
+  # Dropdown terminal doesn't show correctly in the dock, so mask it off
+  MASK_APPS="dropterminal"
 
   ICON_SIZE=32
   MARGIN_BOTTOM=10
