@@ -15,7 +15,7 @@
       "$modifier,V, Noctalia Clipboard, exec,  noctalia-shell ipc call launcher clipboard"
       "$modifier ALT,P, Noctalia Settings, exec,  noctalia-shell ipc call settings toggle"
       "$modifier SHIFT,comma, Noctalia Settings, exec,  noctalia-shell ipc call settings toggle"
-      "$modifier ALT,L, Noctalia Lock Screen, exec,  noctalia-shell ipc call sessionMenu lockAndSuspend"
+      "$modifier CTRL,L, Noctalia Lock Screen, exec,  noctalia-shell ipc call sessionMenu lockscreen lock"
       "$modifier SHIFT,W, Noctalia Wallpaper, exec,  noctalia-shell ipc call wallpaper toggle"
       "$modifier,X, Noctalia Power Menu, exec,  noctalia-shell ipc call sessionMenu toggle"
       "$modifier,C, Noctalia Control Center, exec,  noctalia-shell ipc call controlCenter toggle"
@@ -78,6 +78,12 @@ in {
         "$modifier,F, Maximize, fullscreen,"
         "$modifier SHIFT,F, Toggle Floating, togglefloating,"
         "$modifier ALT,F, Float All Windows, exec, hyprland-float-all"
+        # ============= LAYOUTS =============
+        "$modifier ALT,L, Toggle Layouts, exec, hyprland-change-layout toggle"
+        "$modifier ALT,1, Layout Dwindle, exec, hyprland-change-layout dwindle"
+        "$modifier ALT,2, Layout Master, exec, hyprland-change-layout master"
+        "$modifier ALT,3, Layout Scrolling, exec, hyprland-change-layout scrolling"
+        "$modifier ALT,4, Layout Monocle, exec, hyprland-change-layout monocle"
         "$modifier SHIFT,C, Exit/Logout of Hyprland, exit,"
         # ============= WINDOW MOVEMENT (ARROW KEYS) =============
         "$modifier SHIFT,left, Move Left, movewindow, l"

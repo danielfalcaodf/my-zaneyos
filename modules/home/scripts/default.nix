@@ -45,6 +45,7 @@
     (import ./qs-docs.nix {inherit pkgs;})
     (import ./docs-parser.nix {inherit pkgs;})
     (import ./hyprland-float-all.nix {inherit pkgs;})
+    (import ./hyprland-change-layout.nix {inherit pkgs;})
     (import ./launch-nwg-menu.nix {inherit pkgs;})
     (import ./hyprland-dock.nix {inherit pkgs;})
     (import ./zcli.nix {
