@@ -139,7 +139,7 @@ A continuación los atajos de Hyprland, en formato de referencia rápida. La col
 - `$modifier + O` → Lanzar `OBS Studio`
 - `$modifier + Alt + C` → Selector de color
 - `$modifier + G` → Abrir `GIMP`
-- `$modifier + T` → Alternar terminal con `pypr`
+- `$modifier + Shift + T` → Alternar terminal desplegable con `DropTerminal`
 - `$modifier + Alt + M` → Abrir `pavucontrol`
 
 ### Gestión de ventanas

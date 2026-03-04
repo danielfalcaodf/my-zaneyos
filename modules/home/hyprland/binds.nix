@@ -52,7 +52,7 @@ in {
         # ============= APPLICATION LAUNCHERS =============
         "$modifier,K, Keybinds Search Tool, exec, qs-keybinds"
         "$modifier CTRL,C, Cheatsheets Viewer, exec, qs-cheatsheets"
-        "$modifier SHIFT,K, Legacy Keybinds Menu, exec, list-keybinds"
+        "$modifier SHIFT,K, Keybinds Search Tool, exec, qs-keybinds"
         "$modifier SHIFT,D, Discord, exec, discord"
         "$modifier ALT,W, Web Search, exec, web-search"
         "$modifier SHIFT,W, QS Wallpaper Setter, exec, qs-wallpapers-apply"
@@ -68,7 +68,7 @@ in {
         "$modifier,O, OBS Studio, exec, obs"
         "$modifier ALT,C, Color Picker, exec, hyprpicker -a"
         "$modifier,G, GIMP, exec, gimp"
-        "$modifier shift,T, Dropdown Terminal, exec, pypr toggle term"
+        "$modifier shift,T, Dropdown Terminal, exec, sh -lc 'DropTerminal \${TERM:-kitty}'"
         "$modifier,T, Thunar, exec, thunar"
         "$modifier ALT,M, Audio Control, exec, pavucontrol"
         # ============= WINDOW MANAGEMENT =============
@@ -77,7 +77,7 @@ in {
         "$modifier SHIFT,I, Toggle Split, layoutmsg, togglesplit"
         "$modifier,F, Maximize, fullscreen,"
         "$modifier SHIFT,F, Toggle Floating, togglefloating,"
-        "$modifier ALT,F, Float All Windows, workspaceopt, allfloat"
+        "$modifier ALT,F, Float All Windows, exec, hyprland-float-all"
         "$modifier SHIFT,C, Exit/Logout of Hyprland, exit,"
         # ============= WINDOW MOVEMENT (ARROW KEYS) =============
         "$modifier SHIFT,left, Move Left, movewindow, l"

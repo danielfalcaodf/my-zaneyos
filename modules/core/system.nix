@@ -6,10 +6,6 @@
   inherit (config.zaneyos) consoleKeyMap;
 in {
   nix = {
-    registry = {
-      # allow `nix run unstable#package` in terminal
-      unstable.flake = inputs.nixpkgs-unstable;
-    };
     settings = {
       download-buffer-size = 200000000;
       auto-optimise-store = true;
