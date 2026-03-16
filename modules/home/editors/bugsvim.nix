@@ -27,7 +27,7 @@ in {
     nodePackages.vscode-langservers-extracted # html, css, json, eslint
     nil # Nix LSP
     hyprls
-    gcc-unwrapped
+    stdenv.cc
 
     # Formatters
     stylua
