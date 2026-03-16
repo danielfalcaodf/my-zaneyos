@@ -36,6 +36,8 @@ _: {
     helixEnable = true;
     #To install: Enable here, zcli rebuild, then run zcli doom install
     doomEmacsEnable = true;
+    # Neovim config: "nixvim" | "nvf" | "bugsvim"
+    neovimConfig = "nixvim";
 
     # Python development tools
     pythonEnable = true;

@@ -36,6 +36,8 @@ _: {
     helixEnable = false;
     #To install: Enable here, zcli rebuild, then run zcli doom install
     doomEmacsEnable = false;
+    # Neovim config: "nixvim" | "nvf" | "bugsvim"
+    neovimConfig = "nixvim";
 
     # Bar/Shell Settings
     # Choose between noctalia or waybar

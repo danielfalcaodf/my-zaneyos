@@ -1,5 +1,6 @@
 {zaneyos, ...}: let
   inherit (zaneyos) barChoice waybarChoice;
+  neovimConfig = zaneyos.neovimConfig or "nixvim";
 
   # Select bar module based on barChoice
   barModule =
@@ -7,7 +8,8 @@
     then ./noctalia.nix
     else waybarChoice;
 in {
-  imports = [
+  imports =
+    [
     ./terminals/alacritty.nix
     ./amfora.nix
     ./editors/antigravity.nix
@@ -35,8 +37,6 @@ in {
     ./terminals/kitty.nix
     ./cli/lazygit.nix
     ./obs-studio.nix
-    #./editors/nvf.nix
-    ./editors/nixvim.nix
     ./editors/nano.nix
     ./rofi
     ./qt.nix
@@ -57,5 +57,12 @@ in {
     ./zen-browser.nix
     ./zoxide.nix
     ./zsh
-  ];
+    ]
+    ++ (
+      if neovimConfig == "nixvim"
+      then [./editors/nixvim.nix]
+      else if neovimConfig == "bugsvim"
+      then [./editors/bugsvim.nix]
+      else [./editors/nvf.nix]
+    );
 }

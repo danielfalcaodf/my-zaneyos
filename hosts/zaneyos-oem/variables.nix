@@ -31,6 +31,8 @@ _: {
     helixEnable = true;
     #To install rebuild, then run zcli doom install
     doomEmacsEnable = false;
+    # Neovim config: "nixvim" | "nvf" | "bugsvim"
+    neovimConfig = "nixvim";
 
     # Hyprland Settings
     extraMonitorSettings = "monitor=Virtual-1,1920x1080@75,auto,1";
