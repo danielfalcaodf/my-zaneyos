@@ -49,9 +49,8 @@ in {
     git
     gnumake
 
-    # Compilers (use unwrapped to avoid /bin/cc collisions)
+    # Compiler (avoid /bin/cc collisions)
     gcc-unwrapped
-    llvmPackages.clang-unwrapped
   ];
 
   # Ensure writable config and clear HM symlink remnants during transitions
