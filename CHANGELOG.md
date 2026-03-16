@@ -5,7 +5,14 @@
 
 ---
 
-# 🚀 **Current Release - ZaneyOS v2.5.6**
+# 🚀 **Current Release - ZaneyOS v2.6.1**
+
+#### 📅 **Updated: March 16th, 2026**
+
+- Fixed issues with `qs-wallpaper,qs-wlogout`
+  - Forced Qt/QML logs to console in qs-wallpapers, qs-vid-wallpapers, and qs-wlogout
+  - Soo the wrapper scripts can parse selections/commands when launched from Waybar/Rofi.
+  - Made disown non‑fatal in qs-wallpapers-apply, qs-vid-wallpapers-apply, and qs-wallpapers-restore.
 
 #### 📅 **Updated: March 4th, 2026**
 
