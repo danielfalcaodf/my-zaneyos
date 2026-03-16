@@ -27,7 +27,6 @@ in {
     nodePackages.vscode-langservers-extracted # html, css, json, eslint
     nil # Nix LSP
     hyprls
-    llvmPackages.clang-unwrapped
     gcc-unwrapped
 
     # Formatters
@@ -49,8 +48,6 @@ in {
     git
     gnumake
 
-    # Compiler (avoid /bin/cc collisions)
-    gcc-unwrapped
   ];
 
   # Ensure writable config and clear HM symlink remnants during transitions
