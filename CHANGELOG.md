@@ -9,10 +9,11 @@
 
 #### 📅 **Updated: March 24th, 2026**
 
-- Fixed `nixvim` config error 
-  - `lualine` theme set to auto 
-- Fixed evaluation warnings 
-
+- Fixed `nixvim` config error
+  - `lualine` theme set to auto
+- Fixed evaluation warnings
+  - `gtk.gtk4` theme set to `null`
+  - `git.signing.format` set to `null`
 
 #### 📅 **Updated: March 16th, 2026**
 
