@@ -7,6 +7,13 @@
 
 # 🚀 **Current Release - ZaneyOS v2.6.1**
 
+#### 📅 **Updated: March 24th, 2026**
+
+- Fixed `nixvim` config error 
+  - `lualine` theme set to auto 
+- Fixed evaluation warnings 
+
+
 #### 📅 **Updated: March 16th, 2026**
 
 - Fixed issues with `qs-wallpaper,qs-wlogout`

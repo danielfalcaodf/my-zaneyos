@@ -53,7 +53,7 @@
       lualine = {
         enable = true;
         settings = {
-          options = {theme = "catppuccin";};
+          options = {theme = "auto";};
         };
       };
       bufferline.enable = true;
