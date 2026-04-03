@@ -7,6 +7,12 @@
 
 # 🚀 **Current Release - ZaneyOS v2.6.1**
 
+#### 📅 **Updated: April 3rd, 2026**
+
+- Swapped `awww` for `swww`
+  - `swww` is no longer maintained
+  - removed `--format xrgb` flag also no needed
+
 #### 📅 **Updated: March 24th, 2026**
 
 - Fixed `nixvim` config error

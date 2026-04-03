@@ -30,8 +30,8 @@ pkgs.writeShellScriptBin "qs-wallpapers-restore" ''
     hyprlock-update-wallpaper-link >/dev/null 2>&1 || true
   fi
 
-  # Order: recorded backend first, then swww -> hyprpaper -> mpvpaper -> waypaper
-  ORDER_DEFAULT="swww,hyprpaper,mpvpaper,waypaper"
+  # Order: recorded backend first, then awww -> hyprpaper -> mpvpaper -> waypaper
+  ORDER_DEFAULT="awww,hyprpaper,mpvpaper,waypaper"
   ORDER_COMBINED="$BACKEND_J,$ORDER_DEFAULT"
   # De-duplicate while preserving order (awk trick)
   ORDER=$({ echo "$ORDER_COMBINED" | ${pkgs.coreutils}/bin/tr ',' '\n' | ${pkgs.gawk}/bin/awk 'NF{ if (!seen[$0]++) print $0 }' | ${pkgs.coreutils}/bin/tr '\n' ','; echo; } | ${pkgs.coreutils}/bin/tr -s ',' | ${pkgs.gnused}/bin/sed 's/^,\|,$//g')
@@ -50,35 +50,35 @@ pkgs.writeShellScriptBin "qs-wallpapers-restore" ''
     return 1
   }
 
-  start_swww() {
+  start_awww() {
 
-    # Stop conflicting daemons if we intend to use swww
+    # Stop conflicting daemons if we intend to use awww
     ${pkgs.procps}/bin/pkill -x mpvpaper >/dev/null 2>&1 || true
     ${pkgs.procps}/bin/pkill -x hyprpaper >/dev/null 2>&1 || true
 
-    if ! ${pkgs.swww}/bin/swww query >/dev/null 2>&1; then
-      log "Starting swww-daemon"
-      ${pkgs.swww}/bin/swww-daemon >/dev/null 2>&1 & disown || true
+    if ! ${pkgs.awww}/bin/awww query >/dev/null 2>&1; then
+      log "Starting awww-daemon"
+      ${pkgs.awww}/bin/awww-daemon >/dev/null 2>&1 & disown || true
       for i in $(${pkgs.coreutils}/bin/seq 1 50); do
-        if ${pkgs.swww}/bin/swww query >/dev/null 2>&1; then break; fi
+        if ${pkgs.awww}/bin/awww query >/dev/null 2>&1; then break; fi
         ${pkgs.coreutils}/bin/sleep 0.1
       done
     fi
     # Robust resize: use explicit WALLPAPER_RESIZE if provided; otherwise try fill -> fit -> crop
     if [ -n "''${WALLPAPER_RESIZE:-}" ]; then
-      log "swww img --resize ''${WALLPAPER_RESIZE} $PATH_J"
-      ${pkgs.swww}/bin/swww img --resize "''${WALLPAPER_RESIZE}" "$PATH_J"
+      log "awww img --resize ''${WALLPAPER_RESIZE} $PATH_J"
+      ${pkgs.awww}/bin/awww img --resize "''${WALLPAPER_RESIZE}" "$PATH_J"
     else
-      log "Trying swww resize modes: fill -> fit -> crop"
-      ${pkgs.swww}/bin/swww img --resize fill "$PATH_J" || \
-      ${pkgs.swww}/bin/swww img --resize fit  "$PATH_J" || \
-      ${pkgs.swww}/bin/swww img --resize crop "$PATH_J"
+      log "Trying awww resize modes: fill -> fit -> crop"
+      ${pkgs.awww}/bin/awww img --resize fill "$PATH_J" || \
+      ${pkgs.awww}/bin/awww img --resize fit  "$PATH_J" || \
+      ${pkgs.awww}/bin/awww img --resize crop "$PATH_J"
     fi
   }
 
   start_hyprpaper() {
     ${pkgs.procps}/bin/pkill -x mpvpaper >/dev/null 2>&1 || true
-    ${pkgs.procps}/bin/pkill -x swww-daemon >/dev/null 2>&1 || true
+    ${pkgs.procps}/bin/pkill -x awww-daemon >/dev/null 2>&1 || true
     _TMPDIR=$(${pkgs.coreutils}/bin/mktemp -d)
     _CFG="$_TMPDIR/hyprpaper.conf"
     {
@@ -94,7 +94,7 @@ pkgs.writeShellScriptBin "qs-wallpapers-restore" ''
   }
 
   start_mpvpaper() {
-    ${pkgs.procps}/bin/pkill -x swww-daemon >/dev/null 2>&1 || true
+    ${pkgs.procps}/bin/pkill -x awww-daemon >/dev/null 2>&1 || true
     ${pkgs.procps}/bin/pkill -x hyprpaper >/dev/null 2>&1 || true
     local MPV_OPTS="--no-audio --loop-file=inf --image-display-duration=inf --no-osc --no-osd-bar --keep-open=yes --keepaspect=yes --panscan=1.0"
     log "Starting mpvpaper"
@@ -104,7 +104,7 @@ pkgs.writeShellScriptBin "qs-wallpapers-restore" ''
   start_waypaper() {
     if command -v waypaper >/dev/null 2>&1; then
       log "Trying waypaper"
-      waypaper --backend swww --wallpaper "$PATH_J" >/dev/null 2>&1 || return 1
+      waypaper --backend awww --wallpaper "$PATH_J" >/dev/null 2>&1 || return 1
     else
       return 1
     fi
@@ -113,7 +113,7 @@ pkgs.writeShellScriptBin "qs-wallpapers-restore" ''
   IFS=',' read -r -a tools <<<"$ORDER"
   for t in "''${tools[@]}"; do
     case "$t" in
-      swww)       start_swww && exit 0 || log "swww failed; falling back" ;;
+      awww)       start_awww && exit 0 || log "awww failed; falling back" ;;
       hyprpaper)  start_hyprpaper && exit 0 || log "hyprpaper failed; falling back" ;;
       mpvpaper)   start_mpvpaper && exit 0 || log "mpvpaper failed; falling back" ;;
       waypaper)   start_waypaper && exit 0 || log "waypaper failed; falling back" ;;

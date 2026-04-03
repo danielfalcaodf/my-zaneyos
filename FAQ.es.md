@@ -827,7 +827,7 @@ stylixImage = ../../wallpapers/AnimeGirlNightSky.jpg;
 <summary>**  ¿Cómo puedo establecer un temporizador para cambiar el wallpaper automáticamente?  **</summary>
 
 1. Edita el archivo `~/zaneyos/modules/home/hyprland/config.nix` file.
-2. Comenta la línea `sleep 1.5 && swww img ...`
+2. Comenta la línea `sleep 1.5 && awww img ...`
 3. Agrega nueva línea después de eso con `sleep 1 && wallsetter`
 
 ```json
@@ -835,13 +835,13 @@ settings = {
       exec-once = [
         "dbus-update-activation-environment --all --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
-        "killall -q swww;sleep .5 && swww init"
+        "killall -q awww;sleep .5 && awww init"
         "killall -q waybar;sleep .5 && waybar"
         "killall -q swaync;sleep .5 && swaync"
         "nm-applet --indicator"
         "lxqt-policykit-agent"
         "DropTerminal --spawn-only"
-        #"sleep 1.5 && swww img /home/${username}/Pictures/Wallpapers/zaney-wallpaper.jpg"
+        #"sleep 1.5 && awww img /home/${username}/Pictures/Wallpapers/zaney-wallpaper.jpg"
         "sleep 1 && wallsetter"
       ];
 ```

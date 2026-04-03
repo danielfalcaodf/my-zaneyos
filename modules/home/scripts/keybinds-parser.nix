@@ -271,7 +271,7 @@ pkgs.writeShellScriptBin "keybinds-parser" ''
               else if (low ~ /(emacs|code|vscode|nvim|vim)/) category="editor"
               else if (low ~ /(rofi|wofi|dmenu|launcher)/) category="launcher"
               else if (low ~ /(chrome|chromium|firefox|brave|browser)/) category="browser"
-              else if (low ~ /(swww|wallpaper)/) category="wallpaper"
+              else if (low ~ /(awww|wallpaper)/) category="wallpaper"
               else if (low ~ /(playerctl|wpctl|pactl|pamixer|brightnessctl|volume|brightness)/) category="media"
               else category="app"
             } else {

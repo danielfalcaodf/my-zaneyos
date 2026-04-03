@@ -67,8 +67,8 @@ pkgs.writeShellScriptBin "qs-vid-wallpapers-apply" ''
 
   case "$BACKEND" in
     mpvpaper)
-      log "Stopping swww-daemon, hyprpaper, mpvpaper if running"
-      ${pkgs.procps}/bin/pkill -x swww-daemon >/dev/null 2>&1 || true
+      log "Stopping awww-daemon, hyprpaper, mpvpaper if running"
+      ${pkgs.procps}/bin/pkill -x awww-daemon >/dev/null 2>&1 || true
       ${pkgs.procps}/bin/pkill -x hyprpaper >/dev/null 2>&1 || true
       ${pkgs.procps}/bin/pkill -x mpvpaper >/dev/null 2>&1 || true
       log "Sleeping briefly before starting mpvpaper"

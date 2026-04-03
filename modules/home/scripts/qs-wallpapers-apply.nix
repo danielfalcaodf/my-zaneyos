@@ -28,7 +28,7 @@ pkgs.writeShellScriptBin "qs-wallpapers-apply" ''
   # Auto-detect sensible default backend per compositor when not provided via env
   if [ -z "''${BACKEND:-}" ]; then
     if [ "''${XDG_SESSION_DESKTOP:-}" = "Niri" ] || [ "''${XDG_CURRENT_DESKTOP:-}" = "Niri" ] || command -v niri >/dev/null 2>&1; then
-      BACKEND="swww"
+      BACKEND="awww"
     else
       BACKEND="mpvpaper"
     fi
@@ -96,8 +96,8 @@ pkgs.writeShellScriptBin "qs-wallpapers-apply" ''
   case "$BACKEND" in
     mpvpaper)
       # Stop other wallpaper daemons to avoid conflicts
-      log "Stopping swww-daemon, hyprpaper, mpvpaper if running"
-      ${pkgs.procps}/bin/pkill -x swww-daemon >/dev/null 2>&1 || true
+      log "Stopping awww-daemon, hyprpaper, mpvpaper if running"
+      ${pkgs.procps}/bin/pkill -x awww-daemon >/dev/null 2>&1 || true
       ${pkgs.procps}/bin/pkill -x hyprpaper >/dev/null 2>&1 || true
       ${pkgs.procps}/bin/pkill -x mpvpaper >/dev/null 2>&1 || true
       # Give the compositor a moment to release layers
@@ -120,16 +120,16 @@ pkgs.writeShellScriptBin "qs-wallpapers-apply" ''
       exit 0
       ;;
 
-    swww)
+    awww)
       ${pkgs.procps}/bin/pkill -x mpvpaper >/dev/null 2>&1 || true
-      # Start swww-daemon if needed (newer swww has no 'init' subcommand)
-      if ! ${pkgs.swww}/bin/swww query >/dev/null 2>&1; then
-        log "Starting swww-daemon"
-        ${pkgs.swww}/bin/swww-daemon >/dev/null 2>&1 & disown || true
+      # Start awww-daemon if needed (newer awww has no 'init' subcommand)
+      if ! ${pkgs.awww}/bin/awww query >/dev/null 2>&1; then
+        log "Starting awww-daemon"
+        ${pkgs.awww}/bin/awww-daemon >/dev/null 2>&1 & disown || true
         # wait briefly for the daemon to be ready
         for i in $(${pkgs.coreutils}/bin/seq 1 50); do
-          if ${pkgs.swww}/bin/swww query >/dev/null 2>&1; then
-            log "swww-daemon ready"
+          if ${pkgs.awww}/bin/awww query >/dev/null 2>&1; then
+            log "awww-daemon ready"
             break
           fi
           ${pkgs.coreutils}/bin/sleep 0.1
@@ -139,26 +139,26 @@ pkgs.writeShellScriptBin "qs-wallpapers-apply" ''
       ${pkgs.procps}/bin/pkill -x hyprpaper >/dev/null 2>&1 || true
 
       # Robust resize: if WALLPAPER_RESIZE is set, use it; otherwise try fill -> fit -> crop
-      run_swww_img() {
+      run_awww_img() {
         if [ -n "''${WALLPAPER_RESIZE:-}" ]; then
-          log "swww img --resize ''${WALLPAPER_RESIZE} $sel"
-          ${pkgs.swww}/bin/swww img --resize "''${WALLPAPER_RESIZE}" "$sel"
+          log "awww img --resize ''${WALLPAPER_RESIZE} $sel"
+          ${pkgs.awww}/bin/awww img --resize "''${WALLPAPER_RESIZE}" "$sel"
           return $?
         fi
-        log "Trying swww resize modes: fill -> fit -> crop"
-        ${pkgs.swww}/bin/swww img --resize fill "$sel" || \
-        ${pkgs.swww}/bin/swww img --resize fit  "$sel" || \
-        ${pkgs.swww}/bin/swww img --resize crop "$sel"
+        log "Trying awww resize modes: fill -> fit -> crop"
+        ${pkgs.awww}/bin/awww img --resize fill "$sel" || \
+        ${pkgs.awww}/bin/awww img --resize fit  "$sel" || \
+        ${pkgs.awww}/bin/awww img --resize crop "$sel"
       }
 
       # Niri: generic apply has proven to work more reliably than per-output here
-      run_swww_img
+      run_awww_img
       exit $?
       ;;
 
     hyprpaper)
       ${pkgs.procps}/bin/pkill -x mpvpaper >/dev/null 2>&1 || true
-      ${pkgs.procps}/bin/pkill -x swww-daemon >/dev/null 2>&1 || true
+      ${pkgs.procps}/bin/pkill -x awww-daemon >/dev/null 2>&1 || true
       # Generate a minimal hyprpaper config and start it
       _TMPDIR=$(${pkgs.coreutils}/bin/mktemp -d)
       _CFG="$_TMPDIR/hyprpaper.conf"
