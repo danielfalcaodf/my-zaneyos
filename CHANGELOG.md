@@ -5,13 +5,18 @@
 
 ---
 
-# 🚀 **Current Release - ZaneyOS v2.6.1**
+# 🚀 **Current Release - ZaneyOS v2.6.2**
 
 #### 📅 **Updated: April 3rd, 2026**
 
+- Pinned `neovim` to v11.6
+  - `neovim` v12.0 breaks inline image preview in `snacks` plugin
+  - This only effects `bugsvim` neovim config
+  - `nixvim` and `nvf` don't use `snacks` plugin
 - Swapped `awww` for `swww`
   - `swww` is no longer maintained
-  - removed `--format xrgb` flag also no needed
+  - removed `--format xrgb` flag also not needed
+  - Added flake for `awww` was getting error on 25.11 installs of ZOS
 
 #### 📅 **Updated: March 24th, 2026**
 
