@@ -302,8 +302,8 @@
       lazygit
       nil
       hyprls
-      nodePackages.typescript-language-server
-      nodePackages.typescript
+      typescript-language-server
+      typescript
       vscode-langservers-extracted
       pyright
       lua-language-server

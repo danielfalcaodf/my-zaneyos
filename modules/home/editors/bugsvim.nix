@@ -19,12 +19,12 @@ in {
     # Language Servers
     lua-language-server
     pyright
-    nodePackages.typescript-language-server
+    typescript-language-server
     tailwindcss-language-server
     clang-tools
-    nodePackages.bash-language-server
+    bash-language-server
     rust-analyzer
-    nodePackages.vscode-langservers-extracted # html, css, json, eslint
+    vscode-langservers-extracted # html, css, json, eslint
     nil # Nix LSP
     hyprls
     stdenv.cc
@@ -37,7 +37,7 @@ in {
     alejandra
 
     # Linters
-    nodePackages.eslint_d
+    eslint_d
     luajitPackages.luacheck
     cpplint
 
@@ -47,7 +47,6 @@ in {
     tree-sitter
     git
     gnumake
-
   ];
 
   # Ensure writable config and clear HM symlink remnants during transitions
