@@ -109,6 +109,23 @@ has_nvidia=false
 has_intel=false
 has_amd=false
 has_vm=false
+detect_vm() {
+  if command -v systemd-detect-virt &>/dev/null; then
+    if systemd-detect-virt --quiet; then
+      return 0
+    fi
+  fi
+  for f in /sys/class/dmi/id/product_name /sys/class/dmi/id/sys_vendor; do
+    if [ -r "$f" ] && grep -Eqi 'qemu|kvm|vmware|virtualbox|hyper-v|microsoft corporation|xen|parallels' "$f"; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+if detect_vm; then
+  has_vm=true
+fi
 
 if lspci | grep -qi 'vga\|3d\|display'; then
   while read -r line; do
@@ -118,7 +135,7 @@ if lspci | grep -qi 'vga\|3d\|display'; then
       has_amd=true
     elif echo "$line" | grep -qi 'intel'; then
       has_intel=true
-    elif echo "$line" | grep -qi 'virtio\|vmware'; then
+    elif echo "$line" | grep -Eqi 'virtio|vmware|virtualbox|qxl|hyper-v|microsoft corporation|parallels|qemu|bochs|cirrus|svga|virtual'; then
       has_vm=true
     fi
   done < <(lspci | grep -i 'vga\|3d\|display')
