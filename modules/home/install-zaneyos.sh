@@ -129,7 +129,15 @@ fi
 
 if lspci | grep -qi 'vga\|3d\|display'; then
   while read -r line; do
-    if echo "$line" | grep -qi 'nvidia'; then
+    if echo "$line" | grep -Eq '\[10de:'; then
+      has_nvidia=true
+    elif echo "$line" | grep -Eq '\[1002:'; then
+      has_amd=true
+    elif echo "$line" | grep -Eq '\[8086:'; then
+      has_intel=true
+    elif echo "$line" | grep -Eq '\[(1af4|15ad|80ee|1b36|1414|1234|1013):'; then
+      has_vm=true
+    elif echo "$line" | grep -qi 'nvidia'; then
       has_nvidia=true
     elif echo "$line" | grep -qi 'amd\|ati\|advanced micro devices'; then
       has_amd=true
@@ -138,7 +146,7 @@ if lspci | grep -qi 'vga\|3d\|display'; then
     elif echo "$line" | grep -Eqi 'virtio|vmware|virtualbox|qxl|hyper-v|microsoft corporation|parallels|qemu|bochs|cirrus|svga|virtual'; then
       has_vm=true
     fi
-  done < <(lspci | grep -i 'vga\|3d\|display')
+  done < <(lspci -nn | grep -i 'vga\|3d\|display')
 
   if $has_vm; then
     DETECTED_PROFILE="vm"
