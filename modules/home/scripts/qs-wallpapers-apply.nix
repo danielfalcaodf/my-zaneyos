@@ -1,4 +1,6 @@
-{pkgs}:
+{pkgs, inputs}: let
+  awwwPkg = inputs.awww.packages.${pkgs.stdenv.hostPlatform.system}.awww;
+in
 pkgs.writeShellScriptBin "qs-wallpapers-apply" ''
   #!/usr/bin/env bash
   set -euo pipefail
@@ -123,12 +125,12 @@ pkgs.writeShellScriptBin "qs-wallpapers-apply" ''
     awww)
       ${pkgs.procps}/bin/pkill -x mpvpaper >/dev/null 2>&1 || true
       # Start awww-daemon if needed (newer awww has no 'init' subcommand)
-      if ! ${pkgs.awww}/bin/awww query >/dev/null 2>&1; then
+      if ! ${awwwPkg}/bin/awww query >/dev/null 2>&1; then
         log "Starting awww-daemon"
-        ${pkgs.awww}/bin/awww-daemon >/dev/null 2>&1 & disown || true
+        ${awwwPkg}/bin/awww-daemon >/dev/null 2>&1 & disown || true
         # wait briefly for the daemon to be ready
         for i in $(${pkgs.coreutils}/bin/seq 1 50); do
-          if ${pkgs.awww}/bin/awww query >/dev/null 2>&1; then
+          if ${awwwPkg}/bin/awww query >/dev/null 2>&1; then
             log "awww-daemon ready"
             break
           fi
@@ -142,13 +144,13 @@ pkgs.writeShellScriptBin "qs-wallpapers-apply" ''
       run_awww_img() {
         if [ -n "''${WALLPAPER_RESIZE:-}" ]; then
           log "awww img --resize ''${WALLPAPER_RESIZE} $sel"
-          ${pkgs.awww}/bin/awww img --resize "''${WALLPAPER_RESIZE}" "$sel"
+          ${awwwPkg}/bin/awww img --resize "''${WALLPAPER_RESIZE}" "$sel"
           return $?
         fi
         log "Trying awww resize modes: fill -> fit -> crop"
-        ${pkgs.awww}/bin/awww img --resize fill "$sel" || \
-        ${pkgs.awww}/bin/awww img --resize fit  "$sel" || \
-        ${pkgs.awww}/bin/awww img --resize crop "$sel"
+        ${awwwPkg}/bin/awww img --resize fill "$sel" || \
+        ${awwwPkg}/bin/awww img --resize fit  "$sel" || \
+        ${awwwPkg}/bin/awww img --resize crop "$sel"
       }
 
       # Niri: generic apply has proven to work more reliably than per-output here

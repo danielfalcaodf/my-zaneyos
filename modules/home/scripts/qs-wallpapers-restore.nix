@@ -1,4 +1,6 @@
-{pkgs}:
+{pkgs, inputs}: let
+  awwwPkg = inputs.awww.packages.${pkgs.stdenv.hostPlatform.system}.awww;
+in
 pkgs.writeShellScriptBin "qs-wallpapers-restore" ''
   #!/usr/bin/env bash
   set -euo pipefail
@@ -56,23 +58,23 @@ pkgs.writeShellScriptBin "qs-wallpapers-restore" ''
     ${pkgs.procps}/bin/pkill -x mpvpaper >/dev/null 2>&1 || true
     ${pkgs.procps}/bin/pkill -x hyprpaper >/dev/null 2>&1 || true
 
-    if ! ${pkgs.awww}/bin/awww query >/dev/null 2>&1; then
+    if ! ${awwwPkg}/bin/awww query >/dev/null 2>&1; then
       log "Starting awww-daemon"
-      ${pkgs.awww}/bin/awww-daemon >/dev/null 2>&1 & disown || true
+      ${awwwPkg}/bin/awww-daemon >/dev/null 2>&1 & disown || true
       for i in $(${pkgs.coreutils}/bin/seq 1 50); do
-        if ${pkgs.awww}/bin/awww query >/dev/null 2>&1; then break; fi
+        if ${awwwPkg}/bin/awww query >/dev/null 2>&1; then break; fi
         ${pkgs.coreutils}/bin/sleep 0.1
       done
     fi
     # Robust resize: use explicit WALLPAPER_RESIZE if provided; otherwise try fill -> fit -> crop
     if [ -n "''${WALLPAPER_RESIZE:-}" ]; then
       log "awww img --resize ''${WALLPAPER_RESIZE} $PATH_J"
-      ${pkgs.awww}/bin/awww img --resize "''${WALLPAPER_RESIZE}" "$PATH_J"
+      ${awwwPkg}/bin/awww img --resize "''${WALLPAPER_RESIZE}" "$PATH_J"
     else
       log "Trying awww resize modes: fill -> fit -> crop"
-      ${pkgs.awww}/bin/awww img --resize fill "$PATH_J" || \
-      ${pkgs.awww}/bin/awww img --resize fit  "$PATH_J" || \
-      ${pkgs.awww}/bin/awww img --resize crop "$PATH_J"
+      ${awwwPkg}/bin/awww img --resize fill "$PATH_J" || \
+      ${awwwPkg}/bin/awww img --resize fit  "$PATH_J" || \
+      ${awwwPkg}/bin/awww img --resize crop "$PATH_J"
     fi
   }
 

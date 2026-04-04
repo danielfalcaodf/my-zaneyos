@@ -1,4 +1,6 @@
-{pkgs, ...}:
+{pkgs, inputs, ...}: let
+  awwwPkg = inputs.awww.packages.${pkgs.stdenv.hostPlatform.system}.awww;
+in
 pkgs.writeShellScriptBin "wallsetter" ''
 
   TIMEOUT=720
@@ -17,7 +19,7 @@ pkgs.writeShellScriptBin "wallsetter" ''
 
   	PREVIOUS=$WALLPAPER
 
-  	${pkgs.awww}/bin/awww img "$WALLPAPER" --transition-type random --transition-step 1 --transition-fps 60
+ 	${awwwPkg}/bin/awww img "$WALLPAPER" --transition-type random --transition-step 1 --transition-fps 60
   	sleep $TIMEOUT
   done
 ''
