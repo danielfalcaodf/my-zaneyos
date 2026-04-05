@@ -213,6 +213,7 @@ cd "$REPO_DIR" || exit 1
 print_header "Configuring Host and Profile"
 mkdir -p hosts/"$hostName"
 cp hosts/default/*.nix hosts/"$hostName"
+git add "hosts/$hostName"
 
 installusername=$(echo $USER)
 git config --global user.name "$installusername"
@@ -274,6 +275,50 @@ get_device_for_mount() {
 
 boot_device=$(get_device_for_mount "/boot")
 boot2_device=$(get_device_for_mount "/boot2")
+if $mirror_boot; then
+  python3 - <<PY
+from pathlib import Path
+import re
+
+hw_path = Path("./hosts/$hostName/hardware.nix")
+text = hw_path.read_text()
+
+def patch_block(block: str) -> str:
+    if "nofail" in block:
+        return block
+    def repl(m):
+        inner = m.group(1).strip()
+        if inner:
+            inner = inner + " "
+        return f'options = [ {inner}"nofail" "x-systemd.device-timeout=10s" ];'
+    return re.sub(r'options\\s*=\\s*\\[(.*?)\\];', repl, block, flags=re.S)
+
+text = re.sub(r'fileSystems\\."\\/boot2"\\s*=\\s*\\{.*?\\n\\s*\\};', lambda m: patch_block(m.group(0)), text, flags=re.S)
+hw_path.write_text(text)
+PY
+fi
+if [ -f "./hosts/$hostName/hardware.nix" ]; then
+  python3 - <<PY
+from pathlib import Path
+import re
+
+hw_path = Path("./hosts/$hostName/hardware.nix")
+text = hw_path.read_text()
+
+def patch_block(block: str) -> str:
+    if "nofail" in block:
+        return block
+    def repl(m):
+        inner = m.group(1).strip()
+        if inner:
+            inner = inner + " "
+        return f'options = [ {inner}"nofail" "x-systemd.device-timeout=10s" "_netdev" ];'
+    return re.sub(r'options\\s*=\\s*\\[(.*?)\\];', repl, block, flags=re.S)
+
+text = re.sub(r'fileSystems\\."\\/mnt\\/nas"\\s*=\\s*\\{.*?\\n\\s*\\};', lambda m: patch_block(m.group(0)), text, flags=re.S)
+hw_path.write_text(text)
+PY
+fi
 
 if $mirror_boot || $grub_in_current; then
   vars_file="./hosts/$hostName/variables.nix"
