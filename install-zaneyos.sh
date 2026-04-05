@@ -242,7 +242,7 @@ if [ -d "$HOME/zaneyos" ]; then
 fi
 
 print_header "Cloning ZaneyOS Repository"
-git clone https://gitlab.com/zaney/zaneyos.git -b zos-next --depth=1 ~/zaneyos
+git clone https://gitlab.com/zaney/zaneyos.git -b zos-next-grub --depth=1 ~/zaneyos
 cd ~/zaneyos || exit 1
 
 print_header "Git Configuration"
@@ -391,15 +391,15 @@ awk -v h="$hostName" '
     in_hosts=0
   }
   { print }
-' ./flake.nix > ./flake.nix.tmp && mv ./flake.nix.tmp ./flake.nix
+' ./flake.nix >./flake.nix.tmp && mv ./flake.nix.tmp ./flake.nix
 
 # (quiet) flake updated
 
 # Update timezone in system.nix (robust quoting via Python helper)
 cp ./modules/core/system.nix ./modules/core/system.nix.bak
 python3 ./scripts/update_timezone.py ./modules/core/system.nix "$timezone" || {
-  print_error "Failed to update time.timeZone in modules/core/system.nix";
-  exit 1;
+  print_error "Failed to update time.timeZone in modules/core/system.nix"
+  exit 1
 }
 rm ./modules/core/system.nix.bak
 
@@ -407,9 +407,9 @@ rm ./modules/core/system.nix.bak
 cp ./hosts/$hostName/variables.nix ./hosts/$hostName/variables.nix.bak
 python3 ./scripts/update_vars.py "./hosts/$hostName/variables.nix" \
   "$gitUsername" "$gitEmail" "$hostName" "$profile" "$keyboardLayout" "$keyboardVariant" "$consoleKeyMap" || {
-  print_error "Failed to update hosts/$hostName/variables.nix";
-  echo "Check the file exists and the script at ./scripts/update_vars.py is present.";
-  exit 1;
+  print_error "Failed to update hosts/$hostName/variables.nix"
+  echo "Check the file exists and the script at ./scripts/update_vars.py is present."
+  exit 1
 }
 rm ./hosts/$hostName/variables.nix.bak
 
