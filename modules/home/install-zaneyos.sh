@@ -277,44 +277,50 @@ boot2_device=$(get_device_for_mount "/boot2")
 
 if $mirror_boot || $grub_in_current; then
   vars_file="./hosts/$hostName/variables.nix"
-  sed -i '/^[[:space:]]*bootLoader[[:space:]]*=/d' "$vars_file"
-  sed -i '/^[[:space:]]*grubMirroredBoots[[:space:]]*=/,/^[[:space:]]*];/d' "$vars_file"
+  python3 - <<PY
+from pathlib import Path
+import re
+
+vars_path = Path("$vars_file")
+text = vars_path.read_text()
+
+text = re.sub(r"^\\s*bootLoader\\s*=.*\\n", "", text, flags=re.M)
+text = re.sub(r"^\\s*grubMirroredBoots\\s*=\\s*\\[[\\s\\S]*?^\\s*];\\n", "", text, flags=re.M)
+
+boot = ${boot_device@Q}
+boot2 = ${boot2_device@Q}
+
+insert_lines = [
+    '    bootLoader = "grub";',
+]
+if $mirror_boot and boot and boot2:
+    insert_lines += [
+        '    grubMirroredBoots = [',
+        f'      {{ path = "/boot"; devices = [ "{boot}" ]; }}',
+        f'      {{ path = "/boot2"; devices = [ "{boot2}" ]; }}',
+        '    ];',
+    ]
+elif boot:
+    insert_lines += [
+        '    grubMirroredBoots = [',
+        f'      {{ path = "/boot"; devices = [ "{boot}" ]; }}',
+        '    ];',
+    ]
+
+insert = "\\n".join(insert_lines) + "\\n"
+text, n = re.subn(r"(^\\s*zaneyos\\s*=\\s*\\{\\n)", r"\\1" + insert, text, count=1, flags=re.M)
+if n == 0:
+    raise SystemExit("Could not find zaneyos block to insert bootloader settings")
+
+vars_path.write_text(text)
+PY
 
   if $mirror_boot && [ -n "$boot_device" ] && [ -n "$boot2_device" ]; then
-    awk -v boot_device="$boot_device" -v boot2_device="$boot2_device" '
-      /^[[:space:]]*zaneyos[[:space:]]*=[[:space:]]*{/ && !done {
-        print;
-        print "    bootLoader = \"grub\";";
-        print "    grubMirroredBoots = [";
-        print "      { path = \"/boot\"; devices = [ \"" boot_device "\" ]; }";
-        print "      { path = \"/boot2\"; devices = [ \"" boot2_device "\" ]; }";
-        print "    ];";
-        done=1;
-        next
-      }
-      {print}
-    ' "$vars_file" > "$vars_file.tmp" && mv "$vars_file.tmp" "$vars_file"
     echo -e "${GREEN}Detected mirrored /boot and /boot2; configuring GRUB with mirroredBoots.${NC}"
+  elif $mirror_boot; then
+    echo -e "${RED}Detected /boot2 but could not resolve devices; enabling GRUB without mirroredBoots.${NC}"
   else
-    awk -v boot_device="$boot_device" '
-      /^[[:space:]]*zaneyos[[:space:]]*=[[:space:]]*{/ && !done {
-        print;
-        print "    bootLoader = \"grub\";";
-        if (boot_device != "") {
-          print "    grubMirroredBoots = [";
-          print "      { path = \"/boot\"; devices = [ \"" boot_device "\" ]; }";
-          print "    ];";
-        }
-        done=1;
-        next
-      }
-      {print}
-    ' "$vars_file" > "$vars_file.tmp" && mv "$vars_file.tmp" "$vars_file"
-    if $mirror_boot; then
-      echo -e "${RED}Detected /boot2 but could not resolve devices; enabling GRUB without mirroredBoots.${NC}"
-    else
-      echo -e "${GREEN}Detected GRUB-based system; configuring GRUB.${NC}"
-    fi
+    echo -e "${GREEN}Detected GRUB-based system; configuring GRUB.${NC}"
   fi
 else
   echo -e "${GREEN}No mirrored /boot2 and no GRUB detected; leaving bootloader defaults.${NC}"
@@ -331,7 +337,7 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 1
 fi
 
-sudo nixos-rebuild boot --flake ~/zaneyos/#${profile}
+sudo nixos-rebuild boot --flake ~/zaneyos/#${hostName}
 
 # Check the exit status of the last command (nixos-rebuild)
 if [ $? -eq 0 ]; then
