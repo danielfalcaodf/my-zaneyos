@@ -7,6 +7,13 @@
 
 # 🚀 **Current Release - ZaneyOS v2.6.2**
 
+#### 📅 **Updated: April 5th, 2026**
+
+- Added support for grub
+  - Supports single drive w/grub
+  - Supports BTRFS mirrored boot drives
+    - Currenly only supporting ddubs `nix-iso` BTRFS mirror cfg
+
 #### 📅 **Updated: April 3rd, 2026**
 
 - Pinned `neovim` to v11.6

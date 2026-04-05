@@ -244,6 +244,82 @@ sed -i "/^[[:space:]]*username[[:space:]]*=[[:space:]]*\"/ s/\"[^\"]*\"/\"$insta
 print_header "Generating Hardware Configuration -- Ignore ERROR: cannot access /bin"
 sudo nixos-generate-config --show-hardware-config > ./hosts/$hostName/hardware.nix
 
+print_header "Bootloader Configuration"
+mirror_boot=false
+if grep -q '"/boot2"' "./hosts/$hostName/hardware.nix"; then
+  mirror_boot=true
+elif [ -f /etc/nixos/hardware-configuration.nix ] && grep -q '"/boot2"' /etc/nixos/hardware-configuration.nix; then
+  mirror_boot=true
+fi
+
+grub_in_current=false
+if [ -f /etc/nixos/configuration.nix ] && grep -q 'boot\.loader\.grub\.enable[[:space:]]*=[[:space:]]*true' /etc/nixos/configuration.nix; then
+  grub_in_current=true
+fi
+
+get_device_for_mount() {
+  local mountpoint="$1"
+  local device=""
+  if [ -f "./hosts/$hostName/hardware.nix" ]; then
+    device=$(sed -n "/fileSystems\\.\"${mountpoint//\//\\/}\"/,/};/p" "./hosts/$hostName/hardware.nix" | sed -n 's/.*device = "\(.*\)".*/\1/p' | head -n 1)
+  fi
+  if [ -z "$device" ] && [ -f /etc/nixos/hardware-configuration.nix ]; then
+    device=$(sed -n "/fileSystems\\.\"${mountpoint//\//\\/}\"/,/};/p" /etc/nixos/hardware-configuration.nix | sed -n 's/.*device = "\(.*\)".*/\1/p' | head -n 1)
+  fi
+  if [ -z "$device" ] && command -v findmnt >/dev/null 2>&1; then
+    device=$(findmnt -no SOURCE "$mountpoint" 2>/dev/null | head -n 1)
+  fi
+  echo "$device"
+}
+
+boot_device=$(get_device_for_mount "/boot")
+boot2_device=$(get_device_for_mount "/boot2")
+
+if $mirror_boot || $grub_in_current; then
+  vars_file="./hosts/$hostName/variables.nix"
+  sed -i '/^[[:space:]]*bootLoader[[:space:]]*=/d' "$vars_file"
+  sed -i '/^[[:space:]]*grubMirroredBoots[[:space:]]*=/,/^[[:space:]]*];/d' "$vars_file"
+
+  if $mirror_boot && [ -n "$boot_device" ] && [ -n "$boot2_device" ]; then
+    awk -v boot_device="$boot_device" -v boot2_device="$boot2_device" '
+      /^[[:space:]]*zaneyos[[:space:]]*=[[:space:]]*{/ && !done {
+        print;
+        print "    bootLoader = \"grub\";";
+        print "    grubMirroredBoots = [";
+        print "      { path = \"/boot\"; devices = [ \"" boot_device "\" ]; }";
+        print "      { path = \"/boot2\"; devices = [ \"" boot2_device "\" ]; }";
+        print "    ];";
+        done=1;
+        next
+      }
+      {print}
+    ' "$vars_file" > "$vars_file.tmp" && mv "$vars_file.tmp" "$vars_file"
+    echo -e "${GREEN}Detected mirrored /boot and /boot2; configuring GRUB with mirroredBoots.${NC}"
+  else
+    awk -v boot_device="$boot_device" '
+      /^[[:space:]]*zaneyos[[:space:]]*=[[:space:]]*{/ && !done {
+        print;
+        print "    bootLoader = \"grub\";";
+        if (boot_device != "") {
+          print "    grubMirroredBoots = [";
+          print "      { path = \"/boot\"; devices = [ \"" boot_device "\" ]; }";
+          print "    ];";
+        }
+        done=1;
+        next
+      }
+      {print}
+    ' "$vars_file" > "$vars_file.tmp" && mv "$vars_file.tmp" "$vars_file"
+    if $mirror_boot; then
+      echo -e "${RED}Detected /boot2 but could not resolve devices; enabling GRUB without mirroredBoots.${NC}"
+    else
+      echo -e "${GREEN}Detected GRUB-based system; configuring GRUB.${NC}"
+    fi
+  fi
+else
+  echo -e "${GREEN}No mirrored /boot2 and no GRUB detected; leaving bootloader defaults.${NC}"
+fi
+
 print_header "Setting Nix Configuration"
 NIX_CONFIG="experimental-features = nix-command flakes"
 

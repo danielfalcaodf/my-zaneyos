@@ -167,6 +167,30 @@ with lib; {
       description = "Console key map.";
     };
 
+    # Bootloader selection
+    bootLoader = mkOption {
+      type = types.enum ["systemd-boot" "grub"];
+      default = "systemd-boot";
+      description = "Bootloader to use (systemd-boot or GRUB).";
+    };
+
+    grubMirroredBoots = mkOption {
+      type = types.listOf (types.submodule {
+        options = {
+          path = mkOption {
+            type = types.str;
+            description = "Mount path for the EFI system partition.";
+          };
+          devices = mkOption {
+            type = types.listOf types.str;
+            description = "Devices to install GRUB to for this EFI mount.";
+          };
+        };
+      });
+      default = [];
+      description = "GRUB mirroredBoots entries for multi-ESP setups.";
+    };
+
     # For hybrid support (Intel/NVIDIA Prime or AMD/NVIDIA)
     intelID = mkOption {
       type = types.str;

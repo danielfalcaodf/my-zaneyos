@@ -82,6 +82,13 @@ _: {
     keyboardVariant = "";
     consoleKeyMap = "us";
 
+    # Bootloader selection
+    # bootLoader = "systemd-boot"; # or "grub"
+    # grubMirroredBoots = [
+    #   { path = "/boot"; devices = [ "/dev/disk/by-uuid/XXXX" ]; }
+    #   { path = "/boot2"; devices = [ "/dev/disk/by-uuid/YYYY" ]; }
+    # ];
+
     # Themes, waybar and animation.
     # Set Stylix Image
     # This will set your color palette

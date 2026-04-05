@@ -4,6 +4,7 @@
   ...
 }: let
   inherit (pkgs.stdenv.hostPlatform) isx86_64 isAarch64;
+  cfg = config.zaneyos;
 in {
   boot = {
     kernelPackages =
@@ -16,14 +17,19 @@ in {
     kernel.sysctl = {"vm.max_map_count" = 2147483642;};
 
     loader = {
-      grub.enable = false;
-      systemd-boot.enable = isx86_64;
+      grub = {
+        enable = cfg.bootLoader == "grub";
+        device = "nodev";
+        efiSupport = true;
+        mirroredBoots = cfg.grubMirroredBoots;
+      };
+      systemd-boot.enable = isx86_64 && cfg.bootLoader == "systemd-boot";
       efi.canTouchEfiVariables = true;
 
       # this is the bootloader used for raspberry pi 4.
       # we will presumably need more fine-grained configuration for what
       # bootloader to use.
-      generic-extlinux-compatible.enable = isAarch64;
+      generic-extlinux-compatible.enable = isAarch64 && cfg.bootLoader != "grub";
     };
 
     # Appimage Support
