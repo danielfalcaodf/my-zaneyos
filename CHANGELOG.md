@@ -5,7 +5,17 @@
 
 ---
 
-# 🚀 **Current Release - ZaneyOS v2.6.2**
+# 🚀 **Current Release - ZaneyOS v3.0**
+
+#### 📅 **Updated: April 7rd, 2026**
+
+- Improved GPU detection on install and `zcli`
+- Added `hyprshutdown`
+  - Not yet wired in
+- Changed `zos-next` version to 3.0
+- Added cheatsheet for `bugsvim`
+- Added `awww` to flake input
+  - Had issues installing from nixpkgs on older NixOS versions
 
 #### 📅 **Updated: April 3rd, 2026**
 
