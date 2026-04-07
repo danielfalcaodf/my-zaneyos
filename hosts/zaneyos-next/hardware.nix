@@ -35,6 +35,13 @@
 
   swapDevices = [];
 
+  zramSwap = {
+    enable = true;
+    algorithm = "zstd";
+    memoryPercent = 50;
+    priority = 100;
+  };
+
   security.sudo.wheelNeedsPassword = false;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
