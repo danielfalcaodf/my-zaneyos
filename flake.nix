@@ -76,6 +76,7 @@
       };
 
     hosts = [
+      "zos-nix-mirror"
       "zaneyos-next"
       "default"
       "zaneyos-24-vm"

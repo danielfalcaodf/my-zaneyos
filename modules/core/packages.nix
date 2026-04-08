@@ -51,6 +51,7 @@ in {
       alejandra # nix formatter
       amfora # Fancy Terminal Browser For Gemini Protocol
       appimage-run # Needed For AppImage Support
+      atop # monitor tool
       brave # Brave Browser
       brightnessctl # For Screen Brightness Control
       caligula # TUI for writing ISOs to flash

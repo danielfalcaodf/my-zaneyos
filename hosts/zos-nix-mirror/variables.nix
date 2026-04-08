@@ -10,8 +10,8 @@ _: {
   # and can be removed to use the project defaults.
   zaneyos = {
     # Git Configuration
-    gitUsername = "Tyler Kelley";
-    gitEmail = "tylerzanekelley@gmail.com";
+    gitUsername = "Don Williams";
+    gitEmail = "don.e.williams@gmail.com";
 
     # does not have to be the same as the directory name, but
     # would be common
@@ -33,7 +33,7 @@ _: {
     vscodeEnable = true;
     antigravityEnable = true; # Google port of vscodium
     # Note: This is evil-helix with VIM keybindings by default
-    helixEnable = false;
+    helixEnable = true;
     #To install: Enable here, zcli rebuild, then run zcli doom install
     doomEmacsEnable = true;
     # Neovim config: "nixvim" | "nvf" | "bugsvim"
@@ -51,7 +51,7 @@ _: {
     # This does NOT install your browser
     # You need to install it by adding it to the `packages.nix`
     # or as a flatpak
-    browser = "brave";
+    browser = "google-chrome-stable";
 
     # Default applications for this host (written to ~/.config/mimeapps.list)
     # Uncomment and adjust to set per-host defaults.
@@ -135,12 +135,12 @@ _: {
     # Set Animation style
     # Available options are:
     #animChoice = ../../modules/home/hyprland/animations-def.nix;
-    animChoice = ../../modules/home/hyprland/animations-end4.nix;
+    #animChoice = ../../modules/home/hyprland/animations-end4.nix;
     #animChoice = ../../modules/home/hyprland/animations-end4-slide.nix;
     #animChoice = ../../modules/home/hyprland/animations-end-slide.nix;
     #animChoice = ../../modules/home/hyprland/animations-dynamic.nix;
     #animChoice = ../../modules/home/hyprland/animations-moving.nix;
-    #animChoice = ../../modules/home/hyprland/animations-hyde-optimized.nix;
+    animChoice = ../../modules/home/hyprland/animations-hyde-optimized.nix;
     #animChoice = ../../modules/home/hyprland/animations-mahaveer-me-1.nix;
     #animChoice = ../../modules/home/hyprland/animations-mahaveer-me-2.nix;
     #animChoice = ../../modules/home/hyprland/animations-ml4w-classic.nix;
