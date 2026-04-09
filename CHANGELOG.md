@@ -9,7 +9,7 @@
 
 #### 📅 **Updated: April 7rd, 2026**
 
-- Improved GPU detection on install and `zcli`
+- Improved GPU detection in `install-zaneyos.sh` and `zcli`
 - Added `hyprshutdown`
   - Not yet wired in
 - Changed `zos-next` version to 3.0
