@@ -227,30 +227,38 @@ in
       fi
 
       if ${pkgs.pciutils}/bin/lspci &> /dev/null; then # Check if lspci is available
-        if ${pkgs.pciutils}/bin/lspci | ${pkgs.gnugrep}/bin/grep -qi 'vga\|3d\|display'; then
+        if ${pkgs.pciutils}/bin/lspci -nn | ${pkgs.gnugrep}/bin/grep -qi 'vga\|3d\|display'; then
           while read -r line; do
-            if echo "$line" | ${pkgs.gnugrep}/bin/grep -qi 'nvidia'; then
+            if echo "$line" | ${pkgs.gnugrep}/bin/grep -Eq '\[10de:'; then
+              has_nvidia=true
+            elif echo "$line" | ${pkgs.gnugrep}/bin/grep -Eq '\[1002:'; then
+              has_amd=true
+            elif echo "$line" | ${pkgs.gnugrep}/bin/grep -Eq '\[8086:'; then
+              has_intel=true
+            elif echo "$line" | ${pkgs.gnugrep}/bin/grep -Eq '\[(1af4|15ad|80ee|1b36|1414|1234|1013):'; then
+              has_vm=true
+            elif echo "$line" | ${pkgs.gnugrep}/bin/grep -qi 'nvidia'; then
               has_nvidia=true
             elif echo "$line" | ${pkgs.gnugrep}/bin/grep -qi 'amd\|ati\|advanced micro devices'; then
               has_amd=true
             elif echo "$line" | ${pkgs.gnugrep}/bin/grep -qi 'intel'; then
               has_intel=true
-            elif echo "$line" | ${pkgs.gnugrep}/bin/grep -qi 'virtio\|vmware\|qxl\|qemu\|virtualbox\|bochs\|hyper-v\|microsoft'; then
+            elif echo "$line" | ${pkgs.gnugrep}/bin/grep -qi 'virtio\|vmware\|virtualbox\|qxl\|hyper-v\|microsoft corporation\|parallels\|qemu\|bochs\|cirrus\|svga\|virtual'; then
               has_vm=true
             fi
-          done < <(${pkgs.pciutils}/bin/lspci | ${pkgs.gnugrep}/bin/grep -i 'vga\|3d\|display')
+          done < <(${pkgs.pciutils}/bin/lspci -nn | ${pkgs.gnugrep}/bin/grep -i 'vga\|3d\|display')
 
-          if "$has_vm"; then
+          if $has_vm; then
             detected_profile="vm"
-          elif "$has_nvidia" && "$has_intel"; then
+          elif $has_nvidia && $has_intel; then
             detected_profile="nvidia-laptop"
-          elif "$has_nvidia" && "$has_amd"; then
+          elif $has_nvidia && $has_amd; then
             detected_profile="amd-hybrid"
-          elif "$has_nvidia"; then
+          elif $has_nvidia; then
             detected_profile="nvidia"
-          elif "$has_amd"; then
+          elif $has_amd; then
             detected_profile="amd"
-          elif "$has_intel"; then
+          elif $has_intel; then
             detected_profile="intel"
           fi
         fi
