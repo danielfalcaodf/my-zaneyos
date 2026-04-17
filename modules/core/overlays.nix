@@ -5,6 +5,15 @@
 
     # Pin Neovim to 0.11.6 (zos-next)
     (_final: prev: let
+      tree-sitter-0_25_9 = prev.tree-sitter.overrideAttrs (_old: {
+        version = "0.25.9";
+        src = prev.fetchFromGitHub {
+          owner = "tree-sitter";
+          repo = "tree-sitter";
+          rev = "v0.25.9";
+          hash = "sha256-i7sptOJuLPSl0v8qYF54zfvVKOUtekcFedqapxehzWI=";
+        };
+      });
       neovim-unwrapped-0_11_6 = prev.neovim-unwrapped.overrideAttrs (_old: {
         version = "0.11.6";
         src = prev.fetchFromGitHub {
@@ -15,6 +24,7 @@
         };
       });
     in {
+      tree-sitter = tree-sitter-0_25_9;
       neovim-unwrapped = neovim-unwrapped-0_11_6;
       neovim = prev.neovim.override {neovim-unwrapped = neovim-unwrapped-0_11_6;};
     })
