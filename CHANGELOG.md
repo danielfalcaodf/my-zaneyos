@@ -13,16 +13,11 @@
 - Added `hyprshutdown`
   - Not yet wired in
 - Changed `zos-next` version to 3.0
-- Added cheatsheet for `bugsvim`
 - Added `awww` to flake input
   - Had issues installing from nixpkgs on older NixOS versions
 
 #### 📅 **Updated: April 3rd, 2026**
 
-- Pinned `neovim` to v11.6
-  - `neovim` v12.0 breaks inline image preview in `snacks` plugin
-  - This only effects `bugsvim` neovim config
-  - `nixvim` and `nvf` don't use `snacks` plugin
 - Swapped `awww` for `swww`
   - `swww` is no longer maintained
   - removed `--format xrgb` flag also not needed

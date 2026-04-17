@@ -31,7 +31,7 @@ _: {
     helixEnable = true;
     #To install rebuild, then run zcli doom install
     doomEmacsEnable = false;
-    # Neovim config: "nixvim" | "nvf" | "bugsvim"
+    # Neovim config: "nixvim" | "nvf"
     neovimConfig = "nixvim";
 
     # Hyprland Settings

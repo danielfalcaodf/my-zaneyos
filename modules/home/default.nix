@@ -61,8 +61,6 @@ in {
     ++ (
       if neovimConfig == "nixvim"
       then [./editors/nixvim.nix]
-      else if neovimConfig == "bugsvim"
-      then [./editors/bugsvim.nix]
       else [./editors/nvf.nix]
     );
 }
