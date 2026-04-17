@@ -85,9 +85,9 @@ with lib; {
       description = "Enable Doom Emacs.";
     };
     neovimConfig = mkOption {
-      type = types.enum ["nixvim" "nvf" "bugsvim"];
+      type = types.enum ["nixvim" "nvf"];
       default = "nixvim";
-      description = "Select Neovim configuration (nixvim, nvf, or bugsvim).";
+      description = "Select Neovim configuration (nixvim or nvf).";
     };
     obsStudioEnable = mkOption {
       type = types.bool;
