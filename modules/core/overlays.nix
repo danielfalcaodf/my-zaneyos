@@ -13,6 +13,7 @@
           rev = "v0.25.9";
           hash = "sha256-i7sptOJuLPSl0v8qYF54zfvVKOUtekcFedqapxehzWI=";
         };
+        cargoHash = "";
       });
       neovim-unwrapped-0_11_6 = prev.neovim-unwrapped.overrideAttrs (_old: {
         version = "0.11.6";
