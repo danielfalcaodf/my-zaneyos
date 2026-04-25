@@ -9,8 +9,8 @@ in {
   boot = {
     kernelPackages =
       if isx86_64
-      then pkgs.linuxPackages_zen
-      else pkgs.linuxPackages;
+      then pkgs.linuxPackages_latest
+      else pkgs.linuxPackages_zen;
 
     kernelModules = ["v4l2loopback"];
     extraModulePackages = [config.boot.kernelPackages.v4l2loopback];

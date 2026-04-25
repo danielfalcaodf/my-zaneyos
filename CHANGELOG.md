@@ -7,6 +7,13 @@
 
 # 🚀 **Current Release - ZaneyOS v2.6.2**
 
+#### 📅 **Updated: April 25th, 2026**
+
+- Moved to latest kernel vs. zen kernel
+  - Kernel 7.0.x is better than 6.19.zen
+- Disabled `vfr` in hyprland config
+  - It's not supported post hyprland v0.54.3
+
 #### 📅 **Updated: April 5th, 2026**
 
 - Added support for grub
