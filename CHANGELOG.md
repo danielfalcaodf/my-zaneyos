@@ -13,6 +13,10 @@
   - Kernel v7.0.x is a better kernel than 6.19.zen
 - Disabled `vfr` in Hyprland config
   - Not supported post Hyprland v0.54.3
+- `nixvim.nix` disabled `noice`
+  - Caused `press any key` popup after nevoim update
+- Created wrtitable directory for neovim project.nvim
+  - A format update failed to update history
 
 #### 📅 **Updated: April 7rd, 2026**
 

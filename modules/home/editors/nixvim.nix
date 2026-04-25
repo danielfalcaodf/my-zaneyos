@@ -78,7 +78,7 @@
 
       # Notifications and UI polish
       notify.enable = true;
-      noice.enable = true;
+      noice.enable = false;
 
       # Startup dashboard
       alpha = {
