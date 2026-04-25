@@ -7,6 +7,13 @@
 
 # 🚀 **Current Release - ZaneyOS v3.0**
 
+#### 📅 **Updated: April 25th, 2026**
+
+- Moved from `zen` to `latest` kernel
+  - Kernel v7.0.x is a better kernel than 6.19.zen
+- Disabled `vfr` in Hyprland config
+  - Not supported post Hyprland v0.54.3
+
 #### 📅 **Updated: April 7rd, 2026**
 
 - Improved GPU detection in `install-zaneyos.sh` and `zcli`
