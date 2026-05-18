@@ -7,7 +7,20 @@
 
 # 🚀 **Current Release - ZaneyOS v3.0**
 
-#### 📅 **Updated: April 25th, 2026**
+#### 📅 **Updated: May 2026**
+
+- Removed `psuedotile` from `dwingle` layout no longer supported
+- Set hyprland `configType` to `hyprlang` for now.
+  - Will set to `lua` once conversion is done
+- Added `cpu-frew` code but left disabled
+  - This helps on 12-14th gen intels to quiet the loud fans spinup/spindown
+  - Other benefits as well, mostly for laptop users
+- Allowed `openssl-v1.1.1w` until `discord` and `direnv` get updated
+- Removed `vfr` from Hyprland config. - Not supported with 55.x
+- Removed `bugsvim` config its not compat with `nvim 12.x` and `treesitter v26.x`
+-
+
+#### 📅 **Updated: April 2026**
 
 - Moved from `zen` to `latest` kernel
   - Kernel v7.0.x is a better kernel than 6.19.zen
@@ -17,25 +30,16 @@
   - Caused `press any key` popup after nevoim update
 - Created wrtitable directory for neovim project.nvim
   - A format update failed to update history
-
-#### 📅 **Updated: April 7rd, 2026**
-
 - Improved GPU detection in `install-zaneyos.sh` and `zcli`
 - Added `hyprshutdown`
   - Not yet wired in
 - Changed `zos-next` version to 3.0
 - Added `awww` to flake input
   - Had issues installing from nixpkgs on older NixOS versions
-
-#### 📅 **Updated: April 3rd, 2026**
-
 - Swapped `awww` for `swww`
   - `swww` is no longer maintained
   - removed `--format xrgb` flag also not needed
   - Added flake for `awww` was getting error on 25.11 installs of ZOS
-
-#### 📅 **Updated: March 24th, 2026**
-
 - Fixed `nixvim` config error
   - `lualine` theme set to auto
 - Fixed evaluation warnings

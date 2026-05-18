@@ -67,6 +67,7 @@ in {
     ".config/face.jpg".source = ./face.jpg;
   };
   wayland.windowManager.hyprland = {
+    configType = "hyprlang";
     enable = true;
     package = pkgs.hyprland;
     systemd = {
@@ -138,7 +139,6 @@ in {
       };
 
       dwindle = {
-        pseudotile = false;
         preserve_split = true;
         smart_resizing = true;
         use_active_for_splits = true;
