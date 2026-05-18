@@ -41,7 +41,7 @@ in {
   };
 
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.permittedInsecurePackages = [ "openssl-1.1.1w" ];
+  nixpkgs.config.permittedInsecurePackages = ["openssl-1.1.1w"];
 
   environment.systemPackages = with pkgs;
     [
@@ -55,13 +55,13 @@ in {
       atop # monitor tool
       brave # Brave Browser
       brightnessctl # For Screen Brightness Control
-      caligula # TUI for writing ISOs to flash
+      #caligula # TUI for writing ISOs to flash
       cliphist # Clipboard manager using rofi menu
       cmatrix # Matrix Movie Effect In Terminal
-      cowsay # Great Fun Terminal Program
-      discord # Stable client
-      discord-canary # beta  client
-      docker-compose # Allows Controlling Docker From A Single File
+      #cowsay # Great Fun Terminal Program
+      #discord # Stable client
+      #discord-canary # beta  client
+      #docker-compose # Allows Controlling Docker From A Single File
       duf # Utility For Viewing Disk Usage In Terminal
       dysk # Disk space util nice formattting
       eza # Beautiful ls Replacement
@@ -74,6 +74,7 @@ in {
       tuigreet # The Login Manager (Sometimes Referred To As Display Manager)
       htop # Simple Terminal Based System Monitor
       eog # For Image Viewing
+      fd # Better than find util used by emacs also
       inxi # CLI System Information Tool
       killall # For Killing All Instances Of Programs
       libnotify # For Notifications
@@ -92,11 +93,11 @@ in {
       pandoc # format MD to HTML for cheatsheet parser
       pavucontrol # For Editing Audio Levels & Devices
       pciutils # Collection Of Tools For Inspecting PCI Devices
-      picard # For Changing Music Metadata & Getting Cover Art
+      #picard # For Changing Music Metadata & Getting Cover Art
       pkg-config # Wrapper Script For Allowing Packages To Get Info On Others
       playerctl # Allows Changing Media Volume Through Scripts
       python3 # needeed for boot mirror install
-      rhythmbox # audio player
+      #rhythmbox # audio player
       ripgrep # Improved Grep
       socat # Needed For Screenshots
       unrar # Tool For Handling .rar Files
@@ -105,7 +106,7 @@ in {
       upower # noctalia shell battery
       uwsm # Universal Wayland Session Manager (optional must be enabled)
       v4l-utils # Used For Things Like OBS Virtual Camera
-      warp-terminal # Terminal with AI support build in
+      #warp-terminal # Terminal with AI support build in
       waypaper # Change wallpaper
       wget # Tool For Fetching Files With Links
       ytmdl # Tool For Downloading Audio From YouTube

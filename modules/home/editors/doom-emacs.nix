@@ -7,11 +7,15 @@
 lib.mkIf zaneyos.doomEmacsEnable {
   home.packages = with pkgs; [
     emacs-pgtk
+    emacsPackages.npm
     git
     lazygit
     ripgrep
     libtool
     cmake
+    gnumake
+    gcc
+    fd
     pkg-config
     # Spell checking
     hunspell
