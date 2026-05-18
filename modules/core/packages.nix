@@ -39,7 +39,7 @@ in {
   };
 
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.permittedInsecurePackages = [ "openssl-1.1.1w" ];
+  nixpkgs.config.permittedInsecurePackages = ["openssl-1.1.1w"];
 
   environment.systemPackages = with pkgs;
     [
@@ -61,9 +61,11 @@ in {
       eza # Beautiful ls Replacement
       ffmpeg # Terminal Video / Audio Editing
       file-roller # Archive Manager
+      fd # find util needed for emacs but good util regardless vs. find
       gearlever # Manage / run Appimages
       icu # dep for gearlever
       gimp # Great Photo Editor
+      gnumake # Needed for emacs
       gpu-screen-recorder # needed for nnoctalia-shell
       power-profiles-daemon # needed for noctalia-shell power cycle
       mesa-demos # needed for inxi diag util
@@ -93,6 +95,7 @@ in {
       playerctl # Allows Changing Media Volume Through Scripts
       rhythmbox # audio player
       ripgrep # Improved Grep
+      sqlite # needed for emaacs
       socat # Needed For Screenshots
       unrar # Tool For Handling .rar Files
       unzip # Tool For Handling .zip Files

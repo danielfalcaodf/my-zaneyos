@@ -1,11 +1,15 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
     emacs-pgtk
+    emacsPackages.npm
     git
     lazygit
     ripgrep
     libtool
     cmake
+    gcc
+    gnumake
+    sqlite
     pkg-config
     # Spell checking
     hunspell
