@@ -69,6 +69,7 @@ in {
   };
   wayland.windowManager.hyprland = {
     enable = true;
+    configType = "hyprlang";
     package = pkgs.hyprland;
     systemd = {
       enable = true;
@@ -148,7 +149,6 @@ in {
       };
 
       dwindle = {
-        pseudotile = false;
         preserve_split = true;
         smart_resizing = true;
         use_active_for_splits = true;
