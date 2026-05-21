@@ -8,6 +8,16 @@
   virtualisation = {
     docker = {
       enable = lib.mkDefault true;
+      # Log rotation: prevents /var/lib/docker/containers/*/*-json.log filling disk
+      daemon.settings = {
+        log-driver = "json-file";
+        log-opts = {
+          max-size = "10m";
+          max-file = "3";
+        };
+        # Disable userland proxy: better performance, less attack surface
+        userland-proxy = false;
+      };
     };
 
     podman.enable = false;

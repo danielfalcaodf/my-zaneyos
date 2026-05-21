@@ -1,5 +1,11 @@
 # Basic edition — light desktop: VS Code, Docker, Portainer, Caddy, essential dev tools.
 {pkgs, ...}: {
+  imports = [
+    # Caddy local reverse proxy (portainer.localhost, db.localhost, etc.)
+    ../core/caddy.nix
+    # DNS: resolve *.localhost via NetworkManager dnsmasq
+    ../core/dns.nix
+  ];
   environment.systemPackages = with pkgs; [
     # Dev essentials
     git
