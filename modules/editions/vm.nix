@@ -1,6 +1,10 @@
 # VM edition — minimal, lightweight, no heavy services.
 # Plymouth is already disabled in boot.nix when edition == "vm".
-{pkgs, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   environment.systemPackages = with pkgs; [
     # Minimal dev tools only
     git
@@ -12,7 +16,8 @@
     jq
   ];
 
-  # Docker optional in VM (disabled by default for minimal footprint)
-  virtualisation.docker.enable = false;
-  virtualisation.libvirtd.enable = false;
+  # Docker and libvirtd disabled in VM for minimal footprint.
+  # lib.mkForce overrides the lib.mkDefault true in virtualisation.nix.
+  virtualisation.docker.enable = lib.mkForce false;
+  virtualisation.libvirtd.enable = lib.mkForce false;
 }

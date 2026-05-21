@@ -77,6 +77,16 @@ in {
             tamasfe.even-better-toml
             zainchen.json
             shd101wyy.markdown-preview-enhanced
+            # Dev essentials
+            ms-python.python
+            ms-python.vscode-pylance
+            ms-azuretools.vscode-docker
+            dbaeumer.vscode-eslint
+            esbenp.prettier-vscode
+            redhat.vscode-yaml
+            eamodio.gitlens
+            mkhl.direnv
+            editorconfig.editorconfig
           ])
           ++ hyprlangExts
           ++ hyprlsExts
@@ -85,6 +95,10 @@ in {
         userSettings = lib.mkForce {
           "workbench.colorTheme" = "Nero Hyprland";
           "workbench.iconTheme" = "catppuccin-mocha";
+          "editor.formatOnSave" = true;
+          "editor.defaultFormatter" = "esbenp.prettier-vscode";
+          "[nix]" = {"editor.defaultFormatter" = "kamadorueda.alejandra";};
+          "[python]" = {"editor.defaultFormatter" = "ms-python.python";};
         };
       };
     };

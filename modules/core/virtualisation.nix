@@ -1,14 +1,19 @@
-{pkgs, ...}: {
-  # Only enable either docker or podman -- Not both
+{
+  pkgs,
+  lib,
+  ...
+}: {
+  # Only enable either docker or podman -- Not both.
+  # lib.mkDefault allows edition modules (e.g. vm.nix) to override with false.
   virtualisation = {
     docker = {
-      enable = true;
+      enable = lib.mkDefault true;
     };
 
     podman.enable = false;
 
     libvirtd = {
-      enable = true;
+      enable = lib.mkDefault true;
     };
 
     virtualbox.host = {
