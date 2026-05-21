@@ -2,9 +2,14 @@
 
 <div align="center">
 
-## ZaneyOS 🟰 Best ❄️ NixOS Configs
+## ZaneyOS — Personal Fork / Adaptação Pessoal ❄️
 
-\*\* Updated: January 16th, 2026
+> **Fork/adaptação pessoal** do [ZaneyOS](https://gitlab.com/zaney/zaneyos), criado originalmente por **Tyler Kelley (Zaney)**.
+> Este fork preserva integralmente a interface gráfica do ZaneyOS original e adiciona uma camada de
+> **edições** (full / medium / basic / vm), ferramentas de desenvolvimento, homelab e stacks Docker.
+> Todo crédito pela estética, identidade visual e estrutura base pertence ao projeto original.
+
+\*\* Base: ZaneyOS | Fork atualizado: 2026
 
 ZaneyOS is a simple way of reproducing my configuration on any NixOS system.
 This includes the wallpaper, scripts, applications, config files, and more.

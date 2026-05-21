@@ -3,6 +3,17 @@
   gitUsername = "Don Williams";
   gitEmail = "don.e.williams@gmail.com";
 
+  # ============================================================
+  # Edition — controls which feature layer is activated
+  # Options: "full" | "medium" | "basic" | "vm"
+  # The install script will update this automatically.
+  # ============================================================
+  edition = "basic";
+
+  # System locale and timezone (moved from modules/core/system.nix)
+  timeZone = "America/New_York";
+  locale = "en_US.UTF-8";
+
   # Set Displau Manager
   # `tui` for Text login
   # `sddm` for graphical GUI (default)

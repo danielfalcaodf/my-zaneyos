@@ -5,6 +5,13 @@
 }: let
   # Import the host-specific variables.nix
   vars = import ../../hosts/${host}/variables.nix;
+  edition = vars.edition or "basic";
+  # Select the system-level edition module
+  editionModule =
+    if edition == "full" then ../../modules/editions/full.nix
+    else if edition == "medium" then ../../modules/editions/medium.nix
+    else if edition == "vm" then ../../modules/editions/vm.nix
+    else ../../modules/editions/basic.nix; # default: basic
 in {
   imports = [
     ./boot.nix
@@ -35,5 +42,7 @@ in {
     ./xserver.nix
     ./cachix.nix
     inputs.stylix.nixosModules.stylix
+    # Edition feature layer (non-visual, additive)
+    editionModule
   ];
 }

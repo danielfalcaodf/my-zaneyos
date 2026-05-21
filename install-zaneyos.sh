@@ -35,11 +35,12 @@ print_summary() {
   echo -e "${CYAN}╠═══════════════════════════════════════════════════════════════════════╣${NC}"
   echo -e "${CYAN}║  🖥️  Hostname:        ${BLUE}${1}${NC}"
   echo -e "${CYAN}║  🎮 GPU Profile:      ${BLUE}${2}${NC}"
-  echo -e "${CYAN}║  👤 System Username:  ${BLUE}${3}${NC}"
-  echo -e "${CYAN}║  🌐 Timezone:         ${BLUE}${4}${NC}"
-  echo -e "${CYAN}║  ⌨️  Keyboard Layout:  ${BLUE}${5}${NC}"
-  echo -e "${CYAN}║  ⌨️  Keyboard Variant: ${BLUE}${6:-none}${NC}"
-  echo -e "${CYAN}║  🖥️  Console Keymap:   ${BLUE}${7:-$5}${NC}"
+  echo -e "${CYAN}║  📦 Edition:          ${BLUE}${3}${NC}"
+  echo -e "${CYAN}║  👤 System Username:  ${BLUE}${4}${NC}"
+  echo -e "${CYAN}║  🌐 Timezone:         ${BLUE}${5}${NC}"
+  echo -e "${CYAN}║  ⌨️  Keyboard Layout:  ${BLUE}${6}${NC}"
+  echo -e "${CYAN}║  ⌨️  Keyboard Variant: ${BLUE}${7:-none}${NC}"
+  echo -e "${CYAN}║  🖥️  Console Keymap:   ${BLUE}${8:-$6}${NC}"
   echo -e "${CYAN}╚═══════════════════════════════════════════════════════════════════════╝${NC}"
 }
 
@@ -51,9 +52,11 @@ print_error() {
 # Function to print a success banner
 print_success_banner() {
   echo -e "${GREEN}╔═══════════════════════════════════════════════════════════════════════╗${NC}"
-  echo -e "${GREEN}║                 ZaneyOS Installation Successful!                      ║${NC}"
+  echo -e "${GREEN}║            ZaneyOS Custom — Installation Successful! 🎉               ║${NC}"
   echo -e "${GREEN}║                                                                       ║${NC}"
   echo -e "${GREEN}║   Please reboot your system for changes to take full effect.          ║${NC}"
+  echo -e "${GREEN}║                                                                       ║${NC}"
+  echo -e "${GREEN}║   After reboot, run: zcli diag    to verify your setup               ║${NC}"
   echo -e "${GREEN}║                                                                       ║${NC}"
   echo -e "${GREEN}╚═══════════════════════════════════════════════════════════════════════╝${NC}"
 }
@@ -61,7 +64,7 @@ print_success_banner() {
 # Function to print a failure banner
 print_failure_banner() {
   echo -e "${RED}╔═══════════════════════════════════════════════════════════════════════╗${NC}"
-  echo -e "${RED}║                 ZaneyOS Installation Failed!                          ║${NC}"
+  echo -e "${RED}║               ZaneyOS Custom — Installation Failed!                   ║${NC}"
   echo -e "${RED}║                                                                       ║${NC}"
   echo -e "${RED}║   Please review the log file for details:                             ║${NC}"
   echo -e "${RED}║   ${LOG_FILE}                                                        ║${NC}"
@@ -261,8 +264,8 @@ else
   echo -e "${GREEN}I hope you find your time here enjoyable!${NC}"
 fi
 
-print_header "Cloning ZaneyOS Repository"
-git clone https://gitlab.com/zaney/zaneyos.git -b main --depth=1 ~/zaneyos
+print_header "Cloning Repository"
+git clone https://github.com/danielfalcaodf/my-zaneyos.git -b main --depth=1 ~/zaneyos
 cd ~/zaneyos || exit 1
 
 print_header "Git Configuration"
@@ -287,6 +290,7 @@ echo -e "${GREEN}✓ Git email: $gitEmail${NC}"
 
 print_header "Timezone Configuration"
 echo "🌎 Common timezones:"
+echo "  • Brazil: America/Sao_Paulo, America/Fortaleza, America/Manaus"
 echo "  • US: America/New_York, America/Chicago, America/Denver, America/Los_Angeles"
 echo "  • Europe: Europe/London, Europe/Berlin, Europe/Paris, Europe/Rome"
 echo "  • Asia: Asia/Tokyo, Asia/Shanghai, Asia/Seoul, Asia/Kolkata"
@@ -297,6 +301,30 @@ if [ -z "$timezone" ]; then
   timezone="America/New_York"
 fi
 echo -e "${GREEN}✓ Timezone set to: $timezone${NC}"
+
+print_header "Edition Selection"
+echo "📦 Choose your system edition:"
+echo "  • full   — Complete workstation: dev tools, homelab, Docker stacks, LLM, cloud/k8s"
+echo "  • medium — Dev workstation: dev tools, homelab, Docker, cloud tools (no LLM/Android)"
+echo "  • basic  — Light desktop: VS Code, Docker, Portainer, Caddy, essential dev tools"
+echo "  • vm     — Minimal for VMs: lightweight, no heavy services, no Plymouth"
+echo ""
+echo "  Storage requirements:"
+echo "    vm: min 40GB  | basic: min 80GB  | medium: min 150GB  | full: min 250GB"
+echo ""
+read -rp "Enter your edition [ basic ]: " edition
+if [ -z "$edition" ]; then
+  edition="basic"
+fi
+# Validate edition
+case "$edition" in
+full | medium | basic | vm) ;;
+*)
+  echo -e "${YELLOW}⚠️  Unknown edition '$edition'. Defaulting to 'basic'.${NC}"
+  edition="basic"
+  ;;
+esac
+echo -e "${GREEN}✓ Edition set to: $edition${NC}"
 
 print_header "Keyboard Layout Configuration"
 echo "🌍 Common keyboard layouts:"
@@ -377,7 +405,7 @@ cp hosts/default/*.nix hosts/"$hostName"
 
 # Show a nice summary and ask for confirmation before making changes
 echo ""
-print_summary "$hostName" "$profile" "$installusername" "$timezone" "$keyboardLayout" "$keyboardVariant" "$consoleKeyMap"
+print_summary "$hostName" "$profile" "$edition" "$installusername" "$timezone" "$keyboardLayout" "$keyboardVariant" "$consoleKeyMap"
 echo ""
 echo -e "${YELLOW}Please review the configuration above.${NC}"
 read -p "$(echo -e "${YELLOW}Continue with installation? (Y/N): ${NC}")" -n 1 -r
@@ -394,11 +422,9 @@ echo -e "${BLUE}Updating configuration files...${NC}"
 echo -e "  ${CYAN}installusername:${NC} $installusername"
 echo -e "  ${CYAN}hostName:${NC} $hostName"
 echo -e "  ${CYAN}profile:${NC} $profile"
+echo -e "  ${CYAN}edition:${NC} $edition"
 echo -e "  ${CYAN}timezone:${NC} $timezone"
 echo -e "  ${CYAN}keyboardLayout:${NC} $keyboardLayout"
-echo "  installusername: $installusername"
-echo "  hostName: $hostName"
-echo "  profile: $profile"
 
 # Update flake.nix (simple pattern replacements that work)
 # Create backup first, before any changes
@@ -414,23 +440,23 @@ grep -E "(host|profile|username) =" ./flake.nix.bak
 cp ./flake.nix.bak ./flake.nix
 rm ./flake.nix.bak
 
-# Update timezone in system.nix
-cp ./modules/core/system.nix ./modules/core/system.nix.bak
-awk -v newtz="$timezone" '/^  time\.timeZone = / { sub(/"[^"]*"/, "\"" newtz "\""); } { print }' ./modules/core/system.nix.bak >./modules/core/system.nix
-rm ./modules/core/system.nix.bak
-
 # Update variables in host file (do all keys in one pass to avoid quoting issues)
+# Now also patches: edition, timeZone (timezone moved from system.nix to variables.nix)
 cp ./hosts/$hostName/variables.nix ./hosts/$hostName/variables.nix.bak
 awk -v v_user="$gitUsername" \
   -v v_email="$gitEmail" \
   -v v_kb="$keyboardLayout" \
   -v v_kv="$keyboardVariant" \
-  -v v_ckm="$consoleKeyMap" '
+  -v v_ckm="$consoleKeyMap" \
+  -v v_edition="$edition" \
+  -v v_tz="$timezone" '
   /^  gitUsername = /     { sub(/"[^"]*"/, "\"" v_user "\"") }
   /^  gitEmail = /        { sub(/"[^"]*"/, "\"" v_email "\"") }
   /^  keyboardLayout = /  { sub(/"[^"]*"/, "\"" v_kb "\"") }
   /^  keyboardVariant = / { sub(/"[^"]*"/, "\"" v_kv "\"") }
   /^  consoleKeyMap = /   { sub(/"[^"]*"/, "\"" v_ckm "\"") }
+  /^  edition = /         { sub(/"[^"]*"/, "\"" v_edition "\"") }
+  /^  timeZone = /        { sub(/"[^"]*"/, "\"" v_tz "\"") }
   { print }
 ' ./hosts/$hostName/variables.nix.bak >./hosts/$hostName/variables.nix
 rm ./hosts/$hostName/variables.nix.bak
@@ -446,6 +472,9 @@ git config --global --unset-all user.email
 
 print_header "Generating Hardware Configuration -- Ignore ERROR: cannot access /bin"
 sudo nixos-generate-config --show-hardware-config >./hosts/$hostName/hardware.nix
+echo -e "${YELLOW}⚠️  hosts/$hostName/hardware.nix was generated for this machine.${NC}"
+echo -e "${YELLOW}   This file contains hardware-specific UUIDs and should NOT be committed to git.${NC}"
+echo -e "${YELLOW}   It is already listed in .gitignore.${NC}"
 
 print_header "Setting Nix Configuration"
 NIX_CONFIG="experimental-features = nix-command flakes"
