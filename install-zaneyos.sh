@@ -326,6 +326,30 @@ full | medium | basic | vm) ;;
 esac
 echo -e "${GREEN}✓ Edition set to: $edition${NC}"
 
+# Warn when the user picks 'vm' edition on a machine already detected as a VM.
+# 'vm' GPU profile (no GPU drivers) ≠ 'vm' edition (minimal software).
+# A homelab server running inside a VM should use basic/medium/full edition.
+if [ "$edition" = "vm" ] && [ "$profile" = "vm" ]; then
+  echo ""
+  echo -e "${YELLOW}╔═══════════════════════════════════════════════════════════════════════╗${NC}"
+  echo -e "${YELLOW}║  ⚠️  ATENÇÃO: GPU profile 'vm' ≠ Edition 'vm'                         ║${NC}"
+  echo -e "${YELLOW}║                                                                       ║${NC}"
+  echo -e "${YELLOW}║  O GPU profile 'vm' foi detectado automaticamente (sem drivers GPU).  ║${NC}"
+  echo -e "${YELLOW}║  A edition 'vm' é MINIMALISTA: sem VS Code, sem Docker, sem Node.     ║${NC}"
+  echo -e "${YELLOW}║                                                                       ║${NC}"
+  echo -e "${YELLOW}║  Para um servidor homelab rodando como VM, use: basic, medium ou full ║${NC}"
+  echo -e "${YELLOW}╚═══════════════════════════════════════════════════════════════════════╝${NC}"
+  echo ""
+  read -rp "Manter edição 'vm' (minimal)? Ou digite outra [ basic ]: " edition_override
+  if [ -n "$edition_override" ] && [ "$edition_override" != "vm" ]; then
+    case "$edition_override" in
+    full | medium | basic) edition="$edition_override" ;;
+    *) edition="basic" ;;
+    esac
+    echo -e "${GREEN}✓ Edition alterada para: $edition${NC}"
+  fi
+fi
+
 print_header "Keyboard Layout Configuration"
 echo "🌍 Common keyboard layouts:"
 echo "  • us (US English) - default"
@@ -461,7 +485,28 @@ awk -v v_user="$gitUsername" \
 ' ./hosts/$hostName/variables.nix.bak >./hosts/$hostName/variables.nix
 rm ./hosts/$hostName/variables.nix.bak
 
+# Apply edition-specific feature flags to variables.nix
+# Each edition enables the tools it promises to install.
+VARS_FILE="./hosts/$hostName/variables.nix"
+set_bool() {
+  # set_bool <key> <true|false>
+  sed -i "s|^  ${1} = .*;|  ${1} = ${2};|" "$VARS_FILE"
+}
+
+case "$edition" in
+  basic | medium | full)
+    set_bool "vscodeEnable"   "true"
+    set_bool "thunarEnable"   "true"
+    ;;
+  vm)
+    # vm edition keeps defaults (minimal — no heavy GUI tools)
+    set_bool "vscodeEnable"   "false"
+    set_bool "thunarEnable"   "false"
+    ;;
+esac
+
 echo "Configuration files updated successfully!"
+
 
 print_header "Git Configuration"
 git config --global user.name "$gitUsername"

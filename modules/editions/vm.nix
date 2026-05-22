@@ -6,7 +6,7 @@
   ...
 }: {
   environment.systemPackages = with pkgs; [
-    # Minimal dev tools only
+    # Core dev tools — available even on minimal VMs
     git
     curl
     wget
@@ -14,6 +14,12 @@
     ripgrep
     fd
     jq
+    # Node ecosystem (documented as available in all editions)
+    nodejs_22
+    nodePackages.pnpm
+    # Linting / formatting
+    biome
+    nil # Nix LSP
   ];
 
   # Docker and libvirtd disabled in VM for minimal footprint.
