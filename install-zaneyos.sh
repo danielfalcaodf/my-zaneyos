@@ -265,7 +265,7 @@ else
 fi
 
 print_header "Cloning Repository"
-git clone https://github.com/danielfalcaodf/my-zaneyos.git -b main --depth=1 ~/zaneyos
+git clone https://github.com/danielfalcaodf/my-zaneyos.git -b feat/devdaniel-homelab-editions --depth=1 ~/zaneyos
 cd ~/zaneyos || exit 1
 
 print_header "Git Configuration"
