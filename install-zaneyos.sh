@@ -533,10 +533,82 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
   exit 1
 fi
 
-sudo nixos-rebuild boot --flake ~/zaneyos/#${profile}
+sudo nixos-rebuild switch --flake ~/zaneyos/#${profile}
+BUILD_STATUS=$?
 
-# Check the exit status of the last command (nixos-rebuild)
-if [ $? -eq 0 ]; then
+# ---------------------------------------------------------------------------
+# Docker stack deployment — runs only when build succeeded and edition
+# requires Docker (basic / medium / full). vm edition skips all stacks.
+# ---------------------------------------------------------------------------
+deploy_stack() {
+  local stack_path="$1"
+  local name="$2"
+  if [ ! -d "$stack_path" ]; then
+    echo -e "  ${YELLOW}⚠️  $name: diretório não encontrado ($stack_path), pulando.${NC}"
+    return
+  fi
+  # Bootstrap .env from .env.example when no .env exists yet
+  if [ -f "$stack_path/.env.example" ] && [ ! -f "$stack_path/.env" ]; then
+    cp "$stack_path/.env.example" "$stack_path/.env"
+    echo -e "  ${CYAN}ℹ  $name: .env criado a partir de .env.example — revise as senhas antes do uso em produção.${NC}"
+  fi
+  echo -e "  ${CYAN}→ Iniciando $name...${NC}"
+  if (cd "$stack_path" && docker compose up -d 2>&1); then
+    echo -e "  ${GREEN}✓ $name rodando${NC}"
+  else
+    echo -e "  ${YELLOW}⚠️  $name falhou. Inicie manualmente: cd $stack_path && docker compose up -d${NC}"
+  fi
+}
+
+if [ $BUILD_STATUS -eq 0 ]; then
+  STACKS_DIR="$HOME/zaneyos/docker/stacks"
+
+  case "$edition" in
+    vm)
+      echo -e "${YELLOW}Edição VM: Docker stacks ignorados (modo minimal).${NC}"
+      ;;
+
+    basic)
+      print_header "Deploying Docker Stacks — Basic Edition"
+      deploy_stack "$STACKS_DIR/homelab/portainer" "Portainer"
+      deploy_stack "$STACKS_DIR/homelab/caddy"     "Caddy"
+      deploy_stack "$STACKS_DIR/homelab/homepage"  "Homepage"
+      ;;
+
+    medium)
+      print_header "Deploying Docker Stacks — Medium Edition"
+      deploy_stack "$STACKS_DIR/homelab/portainer"     "Portainer"
+      deploy_stack "$STACKS_DIR/homelab/caddy"         "Caddy"
+      deploy_stack "$STACKS_DIR/homelab/homepage"      "Homepage"
+      deploy_stack "$STACKS_DIR/databases/postgres"    "PostgreSQL"
+      deploy_stack "$STACKS_DIR/databases/redis"       "Redis"
+      deploy_stack "$STACKS_DIR/monitoring/prometheus" "Prometheus"
+      deploy_stack "$STACKS_DIR/monitoring/grafana"    "Grafana"
+      deploy_stack "$STACKS_DIR/monitoring/loki"       "Loki"
+      deploy_stack "$STACKS_DIR/automation/n8n"        "n8n"
+      deploy_stack "$STACKS_DIR/automation/mailpit"    "Mailpit"
+      ;;
+
+    full)
+      print_header "Deploying Docker Stacks — Full Edition"
+      deploy_stack "$STACKS_DIR/homelab/portainer"     "Portainer"
+      deploy_stack "$STACKS_DIR/homelab/caddy"         "Caddy"
+      deploy_stack "$STACKS_DIR/homelab/homepage"      "Homepage"
+      deploy_stack "$STACKS_DIR/databases/postgres"    "PostgreSQL"
+      deploy_stack "$STACKS_DIR/databases/mysql"       "MySQL"
+      deploy_stack "$STACKS_DIR/databases/redis"       "Redis"
+      deploy_stack "$STACKS_DIR/databases/cloudbeaver" "CloudBeaver"
+      deploy_stack "$STACKS_DIR/databases/adminer"     "Adminer"
+      deploy_stack "$STACKS_DIR/monitoring/prometheus" "Prometheus"
+      deploy_stack "$STACKS_DIR/monitoring/grafana"    "Grafana"
+      deploy_stack "$STACKS_DIR/monitoring/loki"       "Loki"
+      deploy_stack "$STACKS_DIR/automation/n8n"        "n8n"
+      deploy_stack "$STACKS_DIR/automation/mailpit"    "Mailpit"
+      deploy_stack "$STACKS_DIR/storage/minio"         "MinIO"
+      deploy_stack "$STACKS_DIR/llm/open-webui"        "Open WebUI (LLM)"
+      ;;
+  esac
+
   print_success_banner
 else
   print_failure_banner
