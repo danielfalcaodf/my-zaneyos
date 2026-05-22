@@ -4,7 +4,7 @@
 
 ## STATUS — Progresso por Fase
 
-> Última atualização: 2026-05-21 (rev2) | Branch: `feat/devdaniel-homelab-editions`
+> Última atualização: 2026-05-22 | Branch: `feat/devdaniel-homelab-editions`
 
 ### ✅ Phase 0 — Foundation (COMPLETA)
 
@@ -86,13 +86,15 @@
 
 ---
 
-### ❌ Phase 5 — Documentação (NÃO INICIADA)
+### ✅ Phase 5 — Documentação (COMPLETA)
 
-- [ ] `docs/editions.md` — guia de edições
-- [ ] `docs/homelab.md` — guia de homelab/Docker stacks
-- [ ] `docs/dev-tools.md` — guia de ferramentas dev
-- [ ] `docs/docker-stacks.md` — referência rápida de stacks
-- [ ] `README.md` — seções de edições matrix, requisitos de storage, instruções de instalação atualizadas
+- [x] `docs/editions.md` — guia de edições com matriz completa de recursos
+- [x] `docs/homelab.md` — guia de homelab (Caddy, DNS, Portainer, Homepage, segurança)
+- [x] `docs/dev-tools.md` — guia NVM/SDKMAN/mise com coexistência e fish shell
+- [x] `docs/docker-stacks.md` — referência completa com portas, URLs e instruções
+- [x] `docs/installation.md` — guia de instalação completo (automatizado + manual + pós-install)
+- [x] `README.md` — Fork docs links, seção Editions com matriz, requisitos de storage, Installation atualizado
+- [x] `docker/stacks/README.md` — portas corrigidas (Grafana 3000, Loki 3100, Adminer 8082), homepage adicionada
 
 ---
 
@@ -109,7 +111,7 @@
 - [x] VS Code disponível via `vscodeEnable = true`
 - [x] NVM/SDKMAN: inicializados no fish shell sem conflito com mise (env vars + mise activate fish)
 - [x] Edição VM: Plymouth desabilitado, sem serviços pesados
-- [ ] Edição Full: Ollama opcional (comentado, não baixa modelos por padrão)
+- [x] Edição Full: Ollama opcional (comentado em `full.nix`, não baixa modelos por padrão)
 
 ---
 

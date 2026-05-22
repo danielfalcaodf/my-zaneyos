@@ -1,0 +1,132 @@
+# Guia de Edições — ZaneyOS Custom Fork
+
+As edições definem quais ferramentas, serviços e stacks são instalados no sistema.
+A edição é configurada em `hosts/<hostname>/variables.nix` via `edition = "..."`.
+
+---
+
+## Edições disponíveis
+
+| Edição | Caso de uso |
+|---|---|
+| `vm` | Máquinas virtuais, ambientes de teste leves |
+| `basic` | Desktop de desenvolvimento com homelab básico |
+| `medium` | Workstation completa: cloud, databases, monitoring |
+| `full` | Estação máxima: LLM, Android SDK, todas as ferramentas |
+
+Cada edição é **aditiva**: `full` inclui tudo do `medium`, que inclui tudo do `basic`.
+
+---
+
+## Matriz de recursos por edição
+
+| Recurso | VM | Basic | Medium | Full |
+|---|:---:|:---:|:---:|:---:|
+| **Desktop & UI** | | | | |
+| Desktop Hyprland/ZaneyOS | ✅ | ✅ | ✅ | ✅ |
+| Stylix / Waybar / Noctalia | ✅ | ✅ | ✅ | ✅ |
+| VS Code (`vscodeEnable`) | ✅ | ✅ | ✅ | ✅ |
+| Plymouth boot | ❌ | ✅ | ✅ | ✅ |
+| **Homelab** | | | | |
+| Docker | opt | ✅ | ✅ | ✅ |
+| Caddy (reverse proxy local) | ❌ | ✅ | ✅ | ✅ |
+| DNS local (`*.localhost`) | ❌ | ✅ | ✅ | ✅ |
+| **Dev — Node / Python** | | | | |
+| Node.js 22 + pnpm | ✅ | ✅ | ✅ | ✅ |
+| Python 3 + uv + ruff | ✅ | ✅ | ✅ | ✅ |
+| NVM (wrapper shell) | ✅ | ✅ | ✅ | ✅ |
+| mise (versão global) | ✅ | ✅ | ✅ | ✅ |
+| **Dev — JVM** | | | | |
+| JDK 21 + Maven + Gradle | ❌ | ❌ | ✅ | ✅ |
+| SDKMAN (wrapper shell) | ❌ | ❌ | ✅ | ✅ |
+| **Dev — Ferramentas** | | | | |
+| git + lazygit + gh + delta | ✅ | ✅ | ✅ | ✅ |
+| just + direnv | ✅ | ✅ | ✅ | ✅ |
+| zellij | ❌ | ❌ | ✅ | ✅ |
+| pre-commit + lefthook + gitleaks | ❌ | ❌ | ✅ | ✅ |
+| **LSPs (editores)** | | | | |
+| nil (Nix LSP) | ✅ | ✅ | ✅ | ✅ |
+| typescript-language-server | ✅ | ✅ | ✅ | ✅ |
+| bash-language-server | ✅ | ✅ | ✅ | ✅ |
+| yaml-language-server | ✅ | ✅ | ✅ | ✅ |
+| python-lsp-server | ✅ | ✅ | ✅ | ✅ |
+| biome | ✅ | ✅ | ✅ | ✅ |
+| **Bancos de dados (clientes)** | | | | |
+| PostgreSQL client | ❌ | ✅ | ✅ | ✅ |
+| MySQL client | ❌ | ❌ | ✅ | ✅ |
+| Redis client | ❌ | ❌ | ✅ | ✅ |
+| DBeaver | ❌ | ❌ | ✅ | ✅ |
+| pspg (pager SQL) | ❌ | ❌ | ✅ | ✅ |
+| **Cloud / DevOps** | | | | |
+| AWS CLI v2 | ❌ | ❌ | ✅ | ✅ |
+| Google Cloud SDK | ❌ | ❌ | ✅ | ✅ |
+| Terraform + Terragrunt | ❌ | ❌ | ✅ | ✅ |
+| kubectl + k9s + helm | ❌ | ❌ | ✅ | ✅ |
+| kubectx + stern + kustomize | ❌ | ❌ | ✅ | ✅ |
+| k3d | ❌ | ❌ | ❌ | ✅ |
+| Firebase Tools | ❌ | ❌ | ❌ | ✅ |
+| **LLM / IA** | | | | |
+| aichat | ❌ | ❌ | ❌ | ✅ |
+| Ollama (serviço NixOS) | ❌ | ❌ | ❌ | opt |
+| Open WebUI (Docker stack) | ❌ | ❌ | ❌ | opt |
+| **Virtualização** | | | | |
+| distrobox | ❌ | ❌ | ❌ | ✅ |
+| QEMU / libvirtd | ❌ | ❌ | ❌ | opt |
+| **SSH** | | | | |
+| SSH key-only | ✅ | ✅ | ✅ | ✅ |
+
+Legenda: ✅ incluído | ❌ não incluído | opt = opcional via toggle em `variables.nix`
+
+---
+
+## Configurar a edição
+
+Em `hosts/<hostname>/variables.nix`:
+
+```nix
+{
+  edition = "medium";  # "vm" | "basic" | "medium" | "full"
+}
+```
+
+Após alterar, reconstruir o sistema:
+
+```bash
+zcli rebuild
+```
+
+---
+
+## Módulos NixOS por edição
+
+| Arquivo | Papel |
+|---|---|
+| `modules/editions/vm.nix` | Plymouth desabilitado, Docker desabilitado por padrão |
+| `modules/editions/basic.nix` | Base dev + Caddy + DNS local + Docker |
+| `modules/editions/medium.nix` | Importa basic + JVM + cloud + kubernetes |
+| `modules/editions/full.nix` | Importa medium + k3d + Firebase + aichat + distrobox |
+
+O módulo de edição é carregado automaticamente em `modules/core/default.nix`
+com base no valor de `vars.edition`.
+
+---
+
+## Ativar Ollama (edição Full)
+
+O serviço Ollama está comentado por padrão para não ocupar espaço com modelos.
+Para ativar, edite `modules/editions/full.nix`:
+
+```nix
+# Descomente a linha abaixo:
+services.ollama.enable = true;
+```
+
+Em seguida, baixe modelos manualmente:
+
+```bash
+ollama pull llama3
+ollama pull codellama
+```
+
+> Os modelos ficam em `~/.ollama/models` e podem ocupar vários GB.
+> Certifique-se de ter armazenamento suficiente (edição Full recomenda 500 GB+).
