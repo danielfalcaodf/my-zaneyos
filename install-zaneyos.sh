@@ -472,6 +472,7 @@ git config --global --unset-all user.email
 
 print_header "Generating Hardware Configuration -- Ignore ERROR: cannot access /bin"
 sudo nixos-generate-config --show-hardware-config >./hosts/$hostName/hardware.nix
+git add -f ./hosts/$hostName/hardware.nix
 echo -e "${YELLOW}⚠️  hosts/$hostName/hardware.nix was generated for this machine.${NC}"
 echo -e "${YELLOW}   This file contains hardware-specific UUIDs and should NOT be committed to git.${NC}"
 echo -e "${YELLOW}   It is already listed in .gitignore.${NC}"
