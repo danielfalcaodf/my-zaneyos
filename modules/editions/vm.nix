@@ -16,7 +16,7 @@
     jq
     # Node ecosystem (documented as available in all editions)
     nodejs_22
-    nodePackages.pnpm
+    pnpm
     # Linting / formatting
     biome
     nil # Nix LSP

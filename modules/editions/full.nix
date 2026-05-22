@@ -7,7 +7,7 @@
     # Kubernetes extras
     k3d
     # Cloud extras
-    nodePackages.firebase-tools
+    firebase-tools
     # LLM / AI
     aichat
     # Utilities

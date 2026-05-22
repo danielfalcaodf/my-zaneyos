@@ -17,7 +17,7 @@
     mise
     # Node ecosystem
     nodejs_22
-    nodePackages.pnpm
+    pnpm
     # Python
     python3
     uv
@@ -26,8 +26,8 @@
     postgresql_client
     # LSPs
     nil
-    nodePackages.typescript-language-server
-    nodePackages.bash-language-server
+    typescript-language-server
+    bash-language-server
     yaml-language-server
     python3Packages.python-lsp-server
     biome
