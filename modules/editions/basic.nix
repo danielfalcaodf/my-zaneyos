@@ -23,7 +23,7 @@
     uv
     ruff
     # Database clients
-    postgresql_client
+    postgresql
     # LSPs
     nil
     typescript-language-server
