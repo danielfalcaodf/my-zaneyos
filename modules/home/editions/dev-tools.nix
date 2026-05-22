@@ -33,6 +33,23 @@
     eval "$(mise activate zsh)"
   '';
 
+  # Fish shell: NVM and SDKMAN don't natively support fish.
+  # Set env vars so project tooling can locate them; use mise for runtime management.
+  # To use NVM in fish, install the fish-nvm wrapper manually:
+  #   fisher install jorgebucaran/nvm.fish
+  programs.fish.interactiveShellInit = ''
+    # NVM — set dir so nvm.fish plugin can find it if installed
+    set -x NVM_DIR "$HOME/.nvm"
+
+    # SDKMAN — set dir; use `sdk` commands via `bass` if installed
+    set -x SDKMAN_DIR "$HOME/.sdkman"
+
+    # mise (native fish support — manages global tool versions)
+    if command -q mise
+      mise activate fish | source
+    end
+  '';
+
   home.sessionVariables = {
     # mise configuration
     MISE_GLOBAL_TOOL_VERSIONS_FILE = "$HOME/.config/mise/config.toml";

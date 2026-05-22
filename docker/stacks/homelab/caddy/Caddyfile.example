@@ -1,0 +1,40 @@
+{
+	# Disable automatic HTTPS — using .localhost domains on loopback only
+	auto_https off
+}
+
+portainer.localhost {
+	reverse_proxy 127.0.0.1:9000
+}
+
+db.localhost {
+	reverse_proxy 127.0.0.1:8082
+}
+
+cloudbeaver.localhost {
+	reverse_proxy 127.0.0.1:8978
+}
+
+n8n.localhost {
+	reverse_proxy 127.0.0.1:5678
+}
+
+uptime.localhost {
+	reverse_proxy 127.0.0.1:3001
+}
+
+mail.localhost {
+	reverse_proxy 127.0.0.1:8025
+}
+
+minio.localhost {
+	reverse_proxy 127.0.0.1:9001
+}
+
+grafana.localhost {
+	reverse_proxy 127.0.0.1:3000
+}
+
+home.localhost {
+	reverse_proxy 127.0.0.1:3003
+}

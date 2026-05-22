@@ -4,7 +4,7 @@
 
 ## STATUS — Progresso por Fase
 
-> Última atualização: 2026-05-21 | Branch: `feat/devdaniel-homelab-editions`
+> Última atualização: 2026-05-21 (rev2) | Branch: `feat/devdaniel-homelab-editions`
 
 ### ✅ Phase 0 — Foundation (COMPLETA)
 
@@ -31,12 +31,12 @@
 - [x] `modules/home/editions/default.nix` — importa `dev-tools.nix` (exceto vm)
 - [x] `modules/home/editions/dev-tools.nix` — init de NVM/SDKMAN/mise no shell (ZSH)
 - [x] `modules/home/editors/vscode.nix` — extensões LSP/dev adicionadas
-- [ ] `dev-tools.nix` para fish shell — NVM/SDKMAN ainda não inicializado no fish
+- [x] `dev-tools.nix` para fish shell — `programs.fish.interactiveShellInit` adicionado (NVM env vars + mise activate fish)
 - [ ] `nix flake check` — nomes de pacotes a confirmar (`mysql80`, `postgresql_client`, `dbeaver-bin`, `biome`, etc.)
 
 ---
 
-### 🔶 Phase 2 — Docker Stacks (PARCIAL)
+### ✅ Phase 2 — Docker Stacks (COMPLETA)
 
 #### Databases
 - [x] `docker/stacks/databases/postgres/` — `.env.example` + `compose.yml`
@@ -48,41 +48,41 @@
 
 #### Homelab
 - [x] `docker/stacks/homelab/portainer/` — `.env.example` + `compose.yml`
-- [ ] `docker/stacks/homelab/caddy/` — apenas Caddy via módulo NixOS; stack Docker standalone faltando
-- [ ] `docker/stacks/homelab/homepage/` — compose faltando
+- [x] `docker/stacks/homelab/caddy/` — compose.yml + Caddyfile.example + .env.example criados
+- [x] `docker/stacks/homelab/homepage/` — compose.yml + config/settings.yaml.example criados
 
 #### Monitoring
-- [ ] `docker/stacks/monitoring/grafana/` — compose faltando
-- [ ] `docker/stacks/monitoring/prometheus/` — compose faltando
-- [ ] `docker/stacks/monitoring/loki/` — compose faltando
+- [x] `docker/stacks/monitoring/grafana/` — compose.yml + .env.example criados
+- [x] `docker/stacks/monitoring/prometheus/` — compose.yml + prometheus.yml.example criados
+- [x] `docker/stacks/monitoring/loki/` — compose.yml criado
 
 #### Automation
 - [x] `docker/stacks/automation/n8n/` — `.env.example` criado
-- [ ] `docker/stacks/automation/n8n/compose.yml` — faltando
-- [ ] `docker/stacks/automation/uptime-kuma/` — faltando
-- [ ] `docker/stacks/automation/mailpit/` — faltando
+- [x] `docker/stacks/automation/n8n/compose.yml` — criado (com postgres integrado)
+- [x] `docker/stacks/automation/uptime-kuma/` — compose.yml criado
+- [x] `docker/stacks/automation/mailpit/` — compose.yml criado
 
 #### Storage
 - [x] `docker/stacks/storage/minio/` — `.env.example` criado
-- [ ] `docker/stacks/storage/minio/compose.yml` — faltando
+- [x] `docker/stacks/storage/minio/compose.yml` — criado
 
 #### LLM
 - [x] `docker/stacks/llm/open-webui/` — `.env.example` criado
-- [ ] `docker/stacks/llm/open-webui/compose.yml` — faltando
+- [x] `docker/stacks/llm/open-webui/compose.yml` — criado
 
 ---
 
 ### ✅ Phase 3 — Caddy Reverse Proxy (COMPLETA via NixOS)
 
 - [x] `modules/core/caddy.nix` — serviço Caddy criado como módulo NixOS
-- [ ] Integração com `modules/core/default.nix` — verificar se importado
+- [x] Integração via `modules/editions/basic.nix` — importado corretamente (design por edição, não direto no core)
 
 ---
 
 ### ✅ Phase 4 — DNS Local (COMPLETA via NixOS)
 
 - [x] `modules/core/dns.nix` — dnsmasq configurado como módulo NixOS
-- [ ] Integração com `modules/core/default.nix` — verificar se importado
+- [x] Integração via `modules/editions/basic.nix` — importado corretamente (vm edition não recebe DNS local)
 
 ---
 
@@ -107,7 +107,7 @@
 - [x] `.env` não versionado, apenas `.env.example`
 - [x] `hardware.nix` real não versionado (apenas template)
 - [x] VS Code disponível via `vscodeEnable = true`
-- [ ] NVM/SDKMAN: inicializados no fish shell sem conflito com mise
+- [x] NVM/SDKMAN: inicializados no fish shell sem conflito com mise (env vars + mise activate fish)
 - [x] Edição VM: Plymouth desabilitado, sem serviços pesados
 - [ ] Edição Full: Ollama opcional (comentado, não baixa modelos por padrão)
 
