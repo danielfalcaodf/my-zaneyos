@@ -1,0 +1,110 @@
+# Pipeline de exemplo para my-zaneyos — Woodpecker CI
+#
+# ATENÇÃO: Este é um arquivo de EXEMPLO, não ativado por padrão.
+# Para ativar, copie para .woodpecker.yml na raiz do repositório:
+#   cp .woodpecker/example.yml .woodpecker.yml
+#
+# Pré-requisitos:
+# - Woodpecker CI configurado (docker/stacks/automation/woodpecker)
+# - Repositório ativado no Woodpecker: http://woodpecker.homelab.lan
+# - Segredos configurados no Woodpecker (se necessário)
+#
+# Referências:
+# - https://woodpecker-ci.org/docs/usage/workflow-syntax
+# - docs/woodpecker-ci.md
+
+---
+# Executar apenas em push para branches de feature ou main
+when:
+  event: [push, pull_request]
+  branch:
+    - main
+    - "feat/*"
+    - "fix/*"
+
+steps:
+  # ─── Validação do flake Nix ───────────────────────────────────────────────
+  - name: nix-flake-check
+    image: nixos/nix:latest
+    # TODO: ativar quando o runner tiver Nix disponível
+    # O runner padrão Docker pode não ter Nix — considere imagem nixos/nix
+    commands:
+      - nix --extra-experimental-features "nix-command flakes" flake check --no-build 2>&1 || echo "⚠️ nix flake check falhou — verifique o flake"
+    when:
+      status: [success]
+    # Descomente para ativar:
+    # failure_allowed: true
+
+  # ─── ShellCheck nos scripts ───────────────────────────────────────────────
+  - name: shellcheck
+    image: koalaman/shellcheck-alpine:stable
+    commands:
+      - echo "Verificando scripts com shellcheck..."
+      - |
+        find scripts/ -type f -name "*.sh" -exec shellcheck {} \; 2>/dev/null || true
+      - |
+        shellcheck scripts/ai/claude-discord-session 2>/dev/null || echo "⚠️ shellcheck: scripts/ai/claude-discord-session"
+      - |
+        shellcheck scripts/ai/claude-project-session 2>/dev/null || echo "⚠️ shellcheck: scripts/ai/claude-project-session"
+      - |
+        shellcheck scripts/ai/agent-commit 2>/dev/null || echo "⚠️ shellcheck: scripts/ai/agent-commit"
+      - |
+        shellcheck scripts/ai/agent-status 2>/dev/null || echo "⚠️ shellcheck: scripts/ai/agent-status"
+      - echo "✅ ShellCheck concluído"
+
+  # ─── Validar Docker Compose das stacks principais ────────────────────────
+  - name: compose-validate-woodpecker
+    image: docker:27-cli
+    commands:
+      - echo "Validando compose.yml do Woodpecker CI..."
+      - docker compose -f docker/stacks/automation/woodpecker/compose.yml config --quiet
+      - echo "✅ Woodpecker compose válido"
+    environment:
+      # Valores fictícios para validação da sintaxe (sem secrets reais)
+      WOODPECKER_HOST: "http://woodpecker.homelab.lan"
+      WOODPECKER_GITHUB_CLIENT: "dummy"
+      WOODPECKER_GITHUB_SECRET: "dummy"
+      WOODPECKER_AGENT_SECRET: "dummy-secret-for-validation-only"
+
+  - name: compose-validate-homepage
+    image: docker:27-cli
+    commands:
+      - echo "Validando compose.yml do Homepage..."
+      - docker compose -f docker/stacks/homelab/homepage/compose.yml config --quiet
+      - echo "✅ Homepage compose válido"
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: "localhost:3003"
+      HOMEPAGE_HOST_PORT: "3003"
+
+  # ─── Verificar .env não commitados ────────────────────────────────────────
+  - name: check-no-env-committed
+    image: alpine:latest
+    commands:
+      - echo "Verificando se há .env commitados por engano..."
+      - |
+        if find . -name ".env" -not -path "./.git/*" -not -name ".env.example" 2>/dev/null | grep -q "."; then
+          echo "❌ ERRO: Arquivos .env encontrados no repositório!"
+          find . -name ".env" -not -path "./.git/*" -not -name ".env.example"
+          exit 1
+        fi
+      - echo "✅ Nenhum .env comprometido"
+
+  # ─── Lint de Markdown (opcional) ─────────────────────────────────────────
+  # TODO: ativar quando markdownlint estiver disponível
+  # - name: markdown-lint
+  #   image: davidanson/markdownlint-cli2
+  #   commands:
+  #     - markdownlint-cli2 "docs/**/*.md" "*.md"
+
+  # ─── Notificação final (futuro) ───────────────────────────────────────────
+  # TODO: configurar webhook Discord para notificações de CI
+  # - name: discord-notify
+  #   image: appleboy/drone-discord
+  #   settings:
+  #     webhook_id:
+  #       from_secret: DISCORD_WEBHOOK_ID
+  #     webhook_token:
+  #       from_secret: DISCORD_WEBHOOK_TOKEN
+  #     message: "CI {{ .Status }} — {{ .Repo.FullName }}@{{ .Commit.Branch }}"
+  #   when:
+  #     status: [failure, success]
