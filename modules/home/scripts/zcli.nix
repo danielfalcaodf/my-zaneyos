@@ -421,6 +421,9 @@ in
         echo "Starting NixOS rebuild for host: $(${pkgs.nettools}/bin/hostname)"
         if eval "${pkgs.nh}/bin/nh os switch --diff always --hostname '$PROFILE' $extra_args"; then
           echo "Rebuild finished successfully"
+          echo ""
+          echo "Running post-rebuild validation..."
+          zaneyos-check || true
         else
           echo "Rebuild Failed" >&2
           exit 1
@@ -465,6 +468,9 @@ in
         echo "Updating flake and rebuilding system for host: $(${pkgs.nettools}/bin/hostname)"
         if eval "${pkgs.nh}/bin/nh os switch --diff always --hostname '$PROFILE' --update $extra_args"; then
           echo "Update and rebuild finished successfully"
+          echo ""
+          echo "Running post-rebuild validation..."
+          zaneyos-check || true
         else
           echo "Update and rebuild Failed" >&2
           exit 1
