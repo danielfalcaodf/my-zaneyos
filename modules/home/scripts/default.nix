@@ -50,7 +50,7 @@
         ".config/mimeapps.list.backup"
       ];
     })
-    (import ./zaneyos-check.nix {inherit pkgs host;})
+    (import ./zaneyos-check.nix {inherit pkgs;})
   ];
 
   xdg.desktopEntries.dropterminal = {

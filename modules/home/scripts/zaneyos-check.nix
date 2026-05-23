@@ -1,21 +1,24 @@
 # zaneyos-check — post-install validation script.
 # Verifies packages, system services and Docker stacks are correctly
 # installed for the active edition. Prints fix commands for anything missing.
-{
-  pkgs,
-  host,
-  ...
-}: let
-  vars = import ../../../hosts/${host}/variables.nix;
-  edition = vars.edition or "basic";
-  stacks = "$HOME/zaneyos/docker/stacks";
-in
+# Edition is detected at runtime from ~/zaneyos/hosts/*/variables.nix
+{pkgs, ...}:
   pkgs.writeShellScriptBin "zaneyos-check" ''
     #!/usr/bin/env bash
     set -euo pipefail
 
-    EDITION="${edition}"
-    STACKS_DIR="${stacks}"
+    STACKS_DIR="$HOME/zaneyos/docker/stacks"
+
+    # ── detect edition at runtime ─────────────────────────────────────────────
+    EDITION="basic"
+    VARS_FILE=""
+    for f in "$HOME/zaneyos/hosts/"*/variables.nix; do
+      [ -f "$f" ] && VARS_FILE="$f" && break
+    done
+    if [ -n "$VARS_FILE" ]; then
+      _ed=$(grep -oP '(?<=edition\s=\s")[^"]+' "$VARS_FILE" 2>/dev/null || true)
+      [ -n "$_ed" ] && EDITION="$_ed"
+    fi
 
     # ── colours ──────────────────────────────────────────────────────────────
     RED='\033[0;31m'
