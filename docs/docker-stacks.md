@@ -54,14 +54,47 @@ docker compose up -d
 ---
 
 ### Homepage
-**Diretório:** `homelab/homepage/` | **Porta:** `3003` | **URL:** http://home.localhost
+**Diretório:** `homelab/homepage/` | **Porta:** `3003` | **URL:** http://home.homelab.lan
 
 ```bash
-cp config/settings.yaml.example config/settings.yaml
-docker compose up -d
+zstack init homelab/homepage
+# Edite o .env com seus hosts permitidos:
+nano docker/stacks/homelab/homepage/.env
+zstack up homelab/homepage
 ```
 
 Dashboard configurável para homelab. Adicione serviços em `config/services.yaml`.
+
+> **Erro "Host validation failed"?** Veja a seção de troubleshooting abaixo.
+
+#### HOMEPAGE_ALLOWED_HOSTS
+
+O Homepage exige que os hosts usados para acessá-lo estejam na lista `HOMEPAGE_ALLOWED_HOSTS`.
+
+Configure no `.env`:
+```bash
+# Via hostname local (Caddy + DNS):
+HOMEPAGE_ALLOWED_HOSTS=homepage.homelab.lan,home.homelab.lan,localhost:3003,127.0.0.1:3003
+
+# Via IP da LAN:
+HOMEPAGE_ALLOWED_HOSTS=192.168.0.10:3003,localhost:3003
+```
+
+**Troubleshooting — Host validation failed:**
+```bash
+# 1. Ver o host exato no log:
+zstack logs homelab/homepage
+
+# 2. Copie o host que aparece no erro (ex: "192.168.0.10:3003")
+# 3. Adicione ao .env e recriar o container (restart simples não aplica envs):
+zstack restart homelab/homepage
+# ou:
+cd docker/stacks/homelab/homepage
+docker compose up -d --force-recreate
+```
+
+> ⚠️ `HOMEPAGE_ALLOWED_HOSTS=*` desabilita a validação e **não é recomendado**.
+> Use apenas para debug temporário.
 
 ---
 
