@@ -51,6 +51,7 @@
       ];
     })
     (import ./zaneyos-check.nix {inherit pkgs;})
+    (import ./zstack.nix {inherit pkgs;})
   ];
 
   xdg.desktopEntries.dropterminal = {
