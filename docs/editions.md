@@ -66,9 +66,24 @@ Cada edição é **aditiva**: `full` inclui tudo do `medium`, que inclui tudo do
 | k3d | ❌ | ❌ | ❌ | ✅ |
 | Firebase Tools | ❌ | ❌ | ❌ | ✅ |
 | **LLM / IA** | | | | |
+| OpenRouter env support | ✅ | ✅ | ✅ | ✅ |
+| ai-env-check / ai-tools-list | ✅ | ✅ | ✅ | ✅ |
+| Claude Code | ✅ | ✅ | ✅ | ✅ |
+| Codex CLI | ✅ | ✅ | ✅ | ✅ |
+| GitHub Copilot CLI (`copilot`) | ✅ | ✅ | ✅ | ✅ |
+| Qwen Code | ❌ | ✅ | ✅ | ✅ |
+| mods (charm, pipe AI) | ❌ | ✅ | ✅ | ✅ |
+| Hermes Agent | ❌ | TODO¹ | TODO¹ | TODO¹ |
+| OpenCode | ❌ | ❌ | ✅ | ✅ |
+| Aider | ❌ | ❌ | ✅ | ✅ |
+| Goose CLI | ❌ | ❌ | ✅ | ✅ |
+| Gemini CLI | ❌ | ❌ | ✅ | ✅ |
+| shell-gpt | ❌ | ❌ | ✅ | ✅ |
 | aichat | ❌ | ❌ | ❌ | ✅ |
+| llama.cpp | ❌ | ❌ | ❌ | ✅ |
 | Ollama (serviço NixOS) | ❌ | ❌ | ❌ | opt |
 | Open WebUI (Docker stack) | ❌ | ❌ | ❌ | opt |
+| Tabby (self-hosted completion) | ❌ | ❌ | ❌ | opt |
 | **Virtualização** | | | | |
 | distrobox | ❌ | ❌ | ❌ | ✅ |
 | QEMU / libvirtd | ❌ | ❌ | ❌ | opt |
@@ -76,6 +91,25 @@ Cada edição é **aditiva**: `full` inclui tudo do `medium`, que inclui tudo do
 | SSH key-only | ✅ | ✅ | ✅ | ✅ |
 
 Legenda: ✅ incluído | ❌ não incluído | opt = opcional via toggle em `variables.nix`
+
+¹ **Hermes Agent**: não disponível no nixpkgs. Consulte: https://github.com/NousResearch/hermes-agent
+
+---
+
+## Ferramentas de IA e OpenRouter
+
+Consulte os guias detalhados:
+
+- [`docs/ai-tools.md`](ai-tools.md) — ferramentas por edição, comandos e exemplos
+- [`docs/ai-tools-openrouter.md`](ai-tools-openrouter.md) — configuração segura do OpenRouter
+
+**Configuração rápida:**
+```bash
+mkdir -p ~/.config/ai-tools
+cp ~/zaneyos/docs/examples/openrouter.env.example ~/.config/ai-tools/openrouter.env
+# edite o arquivo e defina OPENROUTER_API_KEY
+ai-env-check
+```
 
 ---
 

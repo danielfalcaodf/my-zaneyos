@@ -1,7 +1,11 @@
 # Medium edition — dev workstation: dev tools, homelab, cloud (no LLM/Android).
 # Extends basic with more databases, cloud tools and kubernetes CLI.
 {pkgs, ...}: {
-  imports = [./basic.nix];
+  imports = [
+    ./basic.nix
+    # AI Tools tier 2: opencode, aider, goose-cli, gemini-cli, shell-gpt
+    ../ai-tools/tier2.nix
+  ];
 
   environment.systemPackages = with pkgs; [
     # Additional dev tools

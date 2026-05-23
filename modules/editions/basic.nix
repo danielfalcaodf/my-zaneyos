@@ -5,6 +5,8 @@
     ../core/caddy.nix
     # DNS: resolve *.localhost via NetworkManager dnsmasq
     ../core/dns.nix
+    # AI Tools tier 1: claude-code, codex, qwen-code, mods
+    ../ai-tools/tier1.nix
   ];
   environment.systemPackages = with pkgs; [
     # Dev essentials

@@ -1,7 +1,11 @@
 # Full edition — complete workstation: all dev tools, homelab, cloud, LLM, mobile.
 # Extends medium with Ollama, k3d, Android SDK and extra cloud tools.
 {pkgs, ...}: {
-  imports = [./medium.nix];
+  imports = [
+    ./medium.nix
+    # AI Tools tier 3: llama-cpp (Ollama via services.ollama, Open WebUI via Docker)
+    ../ai-tools/tier3.nix
+  ];
 
   environment.systemPackages = with pkgs; [
     # Kubernetes extras
