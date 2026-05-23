@@ -26,13 +26,14 @@ in
     NC='\033[0m'
 
     PASS=0; WARN=0; FAIL=0
+    # note: use PASS=$((PASS+1)) — ((PASS++)) exits with set -e when value was 0
 
     # ── helpers ───────────────────────────────────────────────────────────────
     section() { echo -e "\n''${CYAN}''${BOLD}━━━ $1 ━━━''${NC}"; }
 
-    ok()   { echo -e "  ''${GREEN}✓''${NC} $1"; ((PASS++)); }
-    warn() { echo -e "  ''${YELLOW}⚠''${NC}  $1"; ((WARN++)); }
-    fail() { echo -e "  ''${RED}✗''${NC} $1"; ((FAIL++)); }
+    ok()   { echo -e "  ''${GREEN}✓''${NC} $1"; PASS=$((PASS+1)); }
+    warn() { echo -e "  ''${YELLOW}⚠''${NC}  $1"; WARN=$((WARN+1)); }
+    fail() { echo -e "  ''${RED}✗''${NC} $1"; FAIL=$((FAIL+1)); }
     hint() { echo -e "       ''${YELLOW}→ $1''${NC}"; }
     info() { echo -e "  ''${CYAN}ℹ''${NC}  $1"; }
 
