@@ -7,7 +7,44 @@ Todos os stacks ficam em `docker/stacks/`. Cada um segue as mesmas convenções:
 
 ---
 
-## Como usar qualquer stack
+## Usando o script `zstack` (recomendado)
+
+O `zstack` é o gerenciador de stacks integrado ao ZaneyOS (disponível após `zcli rebuild`):
+
+```bash
+# Listar todas as stacks e status de .env
+zstack list
+
+# Listar apenas uma categoria
+zstack list --category automation
+
+# Inicializar .env a partir de .env.example (sem sobrescrever existentes)
+zstack init
+zstack init automation/woodpecker
+zstack init homelab/homepage
+
+# Gerenciar stacks
+zstack up homelab/homepage
+zstack down homelab/homepage
+zstack restart automation/woodpecker
+zstack logs homelab/homepage
+
+# Ver status de todos os containers
+zstack ps
+
+# Diagnosticar problemas
+zstack doctor
+
+# Atualizar imagens e recriar
+zstack update llm/open-webui
+
+# Ver volumes que precisam backup
+zstack backup-info
+```
+
+---
+
+## Como usar manualmente (alternativa)
 
 ```bash
 cd ~/zaneyos/docker/stacks/<categoria>/<stack>
@@ -235,6 +272,22 @@ Servidor SMTP local para desenvolvimento. Configure suas aplicações para usar:
 - Host: `127.0.0.1`
 - Porta SMTP: `1025`
 - Sem autenticação (ou qualquer usuário/senha)
+
+---
+
+### Woodpecker CI
+**Diretório:** `automation/woodpecker/` | **Porta:** `8000` | **Edição:** opt (qualquer)
+
+Plataforma de CI/CD open source. Integra-se com GitHub e Gitea.
+
+```bash
+zstack init automation/woodpecker
+# Edite o .env: WOODPECKER_HOST, GITHUB OAuth, AGENT_SECRET
+nano docker/stacks/automation/woodpecker/.env
+zstack up automation/woodpecker
+```
+
+Veja o guia completo em: [`docs/woodpecker-ci.md`](woodpecker-ci.md)
 
 ---
 

@@ -120,15 +120,35 @@ Na primeira inicialização o Portainer pedirá para criar um usuário admin.
 Stack: `docker/stacks/homelab/homepage/`
 
 ```bash
-cd ~/zaneyos/docker/stacks/homelab/homepage
-cp config/settings.yaml.example config/settings.yaml
-docker compose up -d
+zstack init homelab/homepage
+# Edite o .env com os hosts permitidos
+nano docker/stacks/homelab/homepage/.env
+zstack up homelab/homepage
 ```
 
 Acesse em: https://home.homelab.lan
 
 Personalize adicionando serviços em `config/services.yaml` e `config/bookmarks.yaml`.
 Veja a documentação completa em: https://gethomepage.dev
+
+> **Erro "Host validation failed"?** Configure `HOMEPAGE_ALLOWED_HOSTS` no `.env`.
+> Veja: [`docs/docker-stacks.md`](docker-stacks.md) — seção Homepage.
+
+---
+
+## Woodpecker CI
+
+Stack: `docker/stacks/automation/woodpecker/`
+
+Plataforma de CI/CD open source para automatizar pipelines de build e teste.
+
+```bash
+zstack init automation/woodpecker
+nano docker/stacks/automation/woodpecker/.env
+zstack up automation/woodpecker
+```
+
+Veja o guia completo em: [`docs/woodpecker-ci.md`](woodpecker-ci.md)
 
 ---
 
@@ -156,6 +176,7 @@ Veja a documentação completa em: https://gethomepage.dev
 | MinIO Console | https://minio.homelab.lan |
 | Grafana | https://grafana.homelab.lan |
 | Homepage | https://home.homelab.lan |
+| Woodpecker CI | http://woodpecker.homelab.lan |
 
 > O domínio `homelab.lan` pode ser trocado em `hosts/<hostname>/variables.nix` (`localDomain`).
 > Veja [docs/network.md](network.md) para o guia completo de rede, TLS e VPN.

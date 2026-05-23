@@ -56,9 +56,13 @@ This includes the wallpaper, scripts, applications, config files, and more.
 
 - [Installation Guide](docs/installation.md) — automated + manual install, post-install steps
 - [Editions Guide](docs/editions.md) — vm / basic / medium / full feature matrix
-- [Homelab Guide](docs/homelab.md) — Caddy, DNS local, Portainer, Homepage
+- [Homelab Guide](docs/homelab.md) — Caddy, DNS local, Portainer, Homepage, Woodpecker CI
 - [Dev Tools Guide](docs/dev-tools.md) — NVM / SDKMAN / mise coexistence
-- [Docker Stacks Reference](docs/docker-stacks.md) — all available stacks with ports
+- [Docker Stacks Reference](docs/docker-stacks.md) — all available stacks + `zstack` manager
+- [AI Tools Guide](docs/ai-tools.md) — AI coding tools by edition
+- [Woodpecker CI Guide](docs/woodpecker-ci.md) — self-hosted CI/CD with Docker
+- [Discord + Claude Workflow](docs/automation/discord-claude-workflow.md) — Claude Code Channels via Discord
+- [Akita-style AI Workflow](docs/automation/akita-style-ai-workflow.md) — safe pair programming with AI
 
 ### Cheatsheets and Guides
 
