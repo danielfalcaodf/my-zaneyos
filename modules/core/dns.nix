@@ -11,9 +11,11 @@
 {...}: {
   # Disable systemd-resolved's stub listener so dnsmasq can bind to port 53.
   # DNS forwarding by resolved is still active; only the local stub is disabled.
-  services.resolved.extraConfig = ''
-    DNSStubListener=no
-  '';
+  services.resolved.settings = {
+    Resolve = {
+      DNSStubListener = "no";
+    };
+  };
 
   services.dnsmasq = {
     enable = true;
