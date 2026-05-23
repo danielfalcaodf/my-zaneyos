@@ -18,7 +18,7 @@
     maven
     gradle
     # Database clients
-    mysql80  # mysql client
+    mysql84  # mysql client
     pspg
     dbeaver-bin
     # Cloud / DevOps
