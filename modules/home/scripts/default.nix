@@ -2,6 +2,7 @@
   config,
   pkgs,
   inputs,
+  host,
   username,
   profile,
   ...
@@ -49,6 +50,7 @@
         ".config/mimeapps.list.backup"
       ];
     })
+    (import ./zaneyos-check.nix {inherit pkgs host;})
   ];
 
   xdg.desktopEntries.dropterminal = {
