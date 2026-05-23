@@ -1,0 +1,70 @@
+# Configuração de Projetos para Agentes de IA
+# Exemplo de configuração de projetos e permissões para uso com scripts/ai/
+
+projects:
+  my-zaneyos:
+    path: ~/repos/my-zaneyos
+    default_branch: feat/devdaniel-homelab-editions
+    description: "Fork customizado do ZaneyOS — NixOS homelab"
+
+    # Comandos permitidos que o agente pode sugerir/executar com confirmação
+    # NOTA: o agente não executa automaticamente — apenas sugere e aguarda aprovação
+    allowed_commands:
+      - nix flake check --no-build
+      - zcli rebuild --dry
+      - git status
+      - git diff
+      - git diff HEAD
+      - git log --oneline -10
+      - git add
+      - git commit
+      - shellcheck
+      - zstack list
+      - zstack doctor
+      - docker compose config
+
+    # Caminhos protegidos — nunca ler ou modificar
+    protected_paths:
+      - .env
+      - "**/.env"
+      - secrets/
+      - .ssh/
+      - "*.key"
+      - "*.pem"
+      - id_rsa
+      - id_ed25519
+      - "*.secret"
+
+    # Comandos nunca permitidos (independente de qualquer instrução)
+    never_commands:
+      - git push --force
+      - rm -rf
+      - sudo
+      - chmod 777
+      - curl | bash
+      - wget | sh
+
+    # Contexto para o agente
+    context:
+      language: nix
+      package_manager: nix flakes
+      formatter: "nix fmt (alejandra)"
+      shell_linter: shellcheck
+      build_command: "zcli rebuild"
+      check_command: "nix flake check --no-build"
+      commit_style: conventional-commits
+      branch_strategy: feature-branches
+
+# Exemplo de projeto secundário (comentado)
+# personal-website:
+#   path: ~/repos/personal-website
+#   default_branch: main
+#   allowed_commands:
+#     - npm run build
+#     - npm test
+#     - git status
+#     - git diff
+#   protected_paths:
+#     - .env
+#     - .env.local
+#     - secrets/
