@@ -29,6 +29,7 @@ print_header() {
 }
 
 # Function to print a configuration summary
+# Args: hostname profile edition username timezone kbLayout kbVariant consoleKeyMap localDomain lanIP tailscale
 print_summary() {
   echo -e "${CYAN}╔═══════════════════════════════════════════════════════════════════════╗${NC}"
   echo -e "${CYAN}║                 📋 Installation Configuration Summary                 ║${NC}"
@@ -41,6 +42,10 @@ print_summary() {
   echo -e "${CYAN}║  ⌨️  Keyboard Layout:  ${BLUE}${6}${NC}"
   echo -e "${CYAN}║  ⌨️  Keyboard Variant: ${BLUE}${7:-none}${NC}"
   echo -e "${CYAN}║  🖥️  Console Keymap:   ${BLUE}${8:-$6}${NC}"
+  echo -e "${CYAN}╠═══════════════════════════════════════════════════════════════════════╣${NC}"
+  echo -e "${CYAN}║  🌍 Homelab Domain:   ${BLUE}${9:-homelab.lan}${NC}"
+  echo -e "${CYAN}║  📡 LAN IP:           ${BLUE}${10:-127.0.0.1}${NC}"
+  echo -e "${CYAN}║  🔒 Tailscale VPN:    ${BLUE}${11:-false}${NC}"
   echo -e "${CYAN}╚═══════════════════════════════════════════════════════════════════════╝${NC}"
 }
 
@@ -423,13 +428,65 @@ if [ -z "$consoleKeyMap" ]; then
 fi
 echo -e "${GREEN}✓ Console keymap set to: $consoleKeyMap${NC}"
 
+# ---------------------------------------------------------------------------
+# Network & Homelab Configuration
+# ---------------------------------------------------------------------------
+print_header "Network & Homelab Configuration"
+echo "🌐 Configure DNS and network settings for LAN-wide homelab access."
+echo "   Services will be reachable as https://<service>.<domain> from any"
+echo "   device on your network (after pointing the device's DNS to this PC)."
+echo ""
+
+# Auto-detect LAN IP
+detected_lan_ip=$(ip route get 1.1.1.1 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}' | head -1)
+if [ -z "$detected_lan_ip" ]; then
+  detected_lan_ip="192.168.1.100"
+fi
+
+# Auto-detect primary interface
+detected_iface=$(ip route get 1.1.1.1 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i=="dev") print $(i+1)}' | head -1)
+if [ -z "$detected_iface" ]; then
+  detected_iface="eth0"
+fi
+
+read -rp "Local homelab domain [ homelab.lan ]: " localDomain
+if [ -z "$localDomain" ]; then
+  localDomain="homelab.lan"
+fi
+echo -e "${GREEN}✓ Domain: $localDomain${NC}"
+
+read -rp "LAN IP of this machine [ $detected_lan_ip ]: " lanIP
+if [ -z "$lanIP" ]; then
+  lanIP="$detected_lan_ip"
+fi
+echo -e "${GREEN}✓ LAN IP: $lanIP${NC}"
+
+read -rp "Network interface [ $detected_iface ]: " networkInterface
+if [ -z "$networkInterface" ]; then
+  networkInterface="$detected_iface"
+fi
+echo -e "${GREEN}✓ Interface: $networkInterface${NC}"
+
+tailscaleEnable="false"
+echo ""
+read -p "Enable Tailscale VPN for remote access? (y/N): " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+  tailscaleEnable="true"
+  echo -e "${GREEN}✓ Tailscale: enabled${NC}"
+  echo -e "${CYAN}  After reboot, run: sudo tailscale up${NC}"
+  echo -e "${CYAN}  Or with auth key: sudo tailscale up --authkey=<key>${NC}"
+else
+  echo -e "${GREEN}✓ Tailscale: disabled (can be enabled later in variables.nix)${NC}"
+fi
+
 print_header "Configuring Host and Profile"
 mkdir -p hosts/"$hostName"
 cp hosts/default/*.nix hosts/"$hostName"
 
 # Show a nice summary and ask for confirmation before making changes
 echo ""
-print_summary "$hostName" "$profile" "$edition" "$installusername" "$timezone" "$keyboardLayout" "$keyboardVariant" "$consoleKeyMap"
+print_summary "$hostName" "$profile" "$edition" "$installusername" "$timezone" "$keyboardLayout" "$keyboardVariant" "$consoleKeyMap" "$localDomain" "$lanIP" "$tailscaleEnable"
 echo ""
 echo -e "${YELLOW}Please review the configuration above.${NC}"
 read -p "$(echo -e "${YELLOW}Continue with installation? (Y/N): ${NC}")" -n 1 -r
@@ -473,14 +530,22 @@ awk -v v_user="$gitUsername" \
   -v v_kv="$keyboardVariant" \
   -v v_ckm="$consoleKeyMap" \
   -v v_edition="$edition" \
-  -v v_tz="$timezone" '
-  /^  gitUsername = /     { sub(/"[^"]*"/, "\"" v_user "\"") }
-  /^  gitEmail = /        { sub(/"[^"]*"/, "\"" v_email "\"") }
-  /^  keyboardLayout = /  { sub(/"[^"]*"/, "\"" v_kb "\"") }
-  /^  keyboardVariant = / { sub(/"[^"]*"/, "\"" v_kv "\"") }
-  /^  consoleKeyMap = /   { sub(/"[^"]*"/, "\"" v_ckm "\"") }
-  /^  edition = /         { sub(/"[^"]*"/, "\"" v_edition "\"") }
-  /^  timeZone = /        { sub(/"[^"]*"/, "\"" v_tz "\"") }
+  -v v_tz="$timezone" \
+  -v v_domain="$localDomain" \
+  -v v_lanip="$lanIP" \
+  -v v_iface="$networkInterface" \
+  -v v_tailscale="$tailscaleEnable" '
+  /^  gitUsername = /       { sub(/"[^"]*"/, "\"" v_user "\"") }
+  /^  gitEmail = /          { sub(/"[^"]*"/, "\"" v_email "\"") }
+  /^  keyboardLayout = /    { sub(/"[^"]*"/, "\"" v_kb "\"") }
+  /^  keyboardVariant = /   { sub(/"[^"]*"/, "\"" v_kv "\"") }
+  /^  consoleKeyMap = /     { sub(/"[^"]*"/, "\"" v_ckm "\"") }
+  /^  edition = /           { sub(/"[^"]*"/, "\"" v_edition "\"") }
+  /^  timeZone = /          { sub(/"[^"]*"/, "\"" v_tz "\"") }
+  /^  localDomain = /       { sub(/"[^"]*"/, "\"" v_domain "\"") }
+  /^  lanIP = /             { sub(/"[^"]*"/, "\"" v_lanip "\"") }
+  /^  networkInterface = /  { sub(/"[^"]*"/, "\"" v_iface "\"") }
+  /^  tailscaleEnable = /   { sub(/= (false|true);/, "= " v_tailscale ";") }
   { print }
 ' ./hosts/$hostName/variables.nix.bak >./hosts/$hostName/variables.nix
 rm ./hosts/$hostName/variables.nix.bak
@@ -563,6 +628,65 @@ deploy_stack() {
 if [ $BUILD_STATUS -eq 0 ]; then
   STACKS_DIR="$HOME/zaneyos/docker/stacks"
 
+  # ---------------------------------------------------------------------------
+  # check_network_status — verify DNS, Caddy, and Blocky after build
+  # ---------------------------------------------------------------------------
+  check_network_status() {
+    echo ""
+    print_header "Network Status Check"
+
+    echo -e "${CYAN}▶ Blocky DNS service:${NC}"
+    if systemctl is-active --quiet blocky 2>/dev/null; then
+      echo -e "  ${GREEN}✓ blocky.service is running${NC}"
+    else
+      echo -e "  ${YELLOW}⚠  blocky.service is not running (may need reboot)${NC}"
+    fi
+
+    echo -e "${CYAN}▶ Caddy HTTPS proxy:${NC}"
+    if systemctl is-active --quiet caddy 2>/dev/null; then
+      echo -e "  ${GREEN}✓ caddy.service is running${NC}"
+    else
+      echo -e "  ${YELLOW}⚠  caddy.service is not running (may need reboot)${NC}"
+    fi
+
+    echo -e "${CYAN}▶ DNS resolution test (portainer.$localDomain → $lanIP):${NC}"
+    if command -v dig &>/dev/null; then
+      resolved=$(dig +short "portainer.$localDomain" @127.0.0.1 2>/dev/null | head -1)
+      if [ "$resolved" = "$lanIP" ]; then
+        echo -e "  ${GREEN}✓ DNS resolves correctly ($resolved)${NC}"
+      elif [ -n "$resolved" ]; then
+        echo -e "  ${YELLOW}⚠  DNS resolved to $resolved (expected $lanIP)${NC}"
+      else
+        echo -e "  ${YELLOW}⚠  DNS did not resolve (Blocky may need a moment to start)${NC}"
+      fi
+    else
+      echo -e "  ${YELLOW}⚠  dig not available — install bind (zcli rebuild after reboot)${NC}"
+    fi
+
+    echo ""
+    echo -e "${CYAN}📜 Root CA certificate (install once on each device):${NC}"
+    echo -e "  ${BLUE}/var/lib/caddy/.local/share/caddy/pki/authorities/local/root.crt${NC}"
+    echo -e "  See ${BLUE}docs/network.md${NC} for per-platform installation instructions."
+
+    if [ "$tailscaleEnable" = "true" ]; then
+      echo ""
+      echo -e "${CYAN}🔒 Tailscale VPN:${NC}"
+      if systemctl is-active --quiet tailscaled 2>/dev/null; then
+        echo -e "  ${GREEN}✓ tailscaled is running${NC}"
+        echo -e "  ${CYAN}  Run: sudo tailscale up    to authenticate${NC}"
+      else
+        echo -e "  ${YELLOW}⚠  tailscaled not running (reboot required)${NC}"
+      fi
+    fi
+
+    echo ""
+    echo -e "${CYAN}💡 Next steps:${NC}"
+    echo -e "  1. Reboot: ${BLUE}reboot${NC}"
+    echo -e "  2. Set your router's primary DNS to: ${BLUE}$lanIP${NC}"
+    echo -e "  3. Install the root CA cert on each device (see docs/network.md)"
+    echo -e "  4. Check status: ${BLUE}zcli net-status${NC}"
+  }
+
   case "$edition" in
     vm)
       echo -e "${YELLOW}Edição VM: Docker stacks ignorados (modo minimal).${NC}"
@@ -571,14 +695,12 @@ if [ $BUILD_STATUS -eq 0 ]; then
     basic)
       print_header "Deploying Docker Stacks — Basic Edition"
       deploy_stack "$STACKS_DIR/homelab/portainer" "Portainer"
-      deploy_stack "$STACKS_DIR/homelab/caddy"     "Caddy"
       deploy_stack "$STACKS_DIR/homelab/homepage"  "Homepage"
       ;;
 
     medium)
       print_header "Deploying Docker Stacks — Medium Edition"
       deploy_stack "$STACKS_DIR/homelab/portainer"     "Portainer"
-      deploy_stack "$STACKS_DIR/homelab/caddy"         "Caddy"
       deploy_stack "$STACKS_DIR/homelab/homepage"      "Homepage"
       deploy_stack "$STACKS_DIR/databases/postgres"    "PostgreSQL"
       deploy_stack "$STACKS_DIR/databases/redis"       "Redis"
@@ -592,7 +714,6 @@ if [ $BUILD_STATUS -eq 0 ]; then
     full)
       print_header "Deploying Docker Stacks — Full Edition"
       deploy_stack "$STACKS_DIR/homelab/portainer"     "Portainer"
-      deploy_stack "$STACKS_DIR/homelab/caddy"         "Caddy"
       deploy_stack "$STACKS_DIR/homelab/homepage"      "Homepage"
       deploy_stack "$STACKS_DIR/databases/postgres"    "PostgreSQL"
       deploy_stack "$STACKS_DIR/databases/mysql"       "MySQL"
@@ -609,6 +730,7 @@ if [ $BUILD_STATUS -eq 0 ]; then
       ;;
   esac
 
+  check_network_status
   print_success_banner
 else
   print_failure_banner

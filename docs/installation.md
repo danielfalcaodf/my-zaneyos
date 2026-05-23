@@ -155,19 +155,66 @@ Após o reboot, execute o diagnóstico:
 zcli diag
 ```
 
+Verifique o status de rede (DNS, Caddy e Blocky):
+
+```bash
+zcli net-status
+```
+
 Verifique se o Caddy está rodando (edições basic/medium/full):
 
 ```bash
 systemctl status caddy
-curl -I http://portainer.localhost
+# Após instalar o root CA certificate no dispositivo:
+curl -I https://portainer.homelab.lan
 ```
 
-Verifique o DNS local:
+Verifique o DNS local via Blocky:
 
 ```bash
-nslookup portainer.localhost
-# Deve resolver para 127.0.0.1
+dig portainer.homelab.lan @127.0.0.1
+# Deve retornar o LAN IP do servidor (ex: 192.168.1.100)
 ```
+
+---
+
+## Configuração de rede pós-instalação
+
+Para acessar os serviços de outros dispositivos da rede (celular, outro PC):
+
+### 1. Configure o DNS do roteador
+
+No painel do roteador, defina o **DNS primário** como o LAN IP do PC NixOS.
+Exemplo: se o PC está em `192.168.1.100`, coloque `192.168.1.100` como DNS primário.
+
+Todos os dispositivos conectados ao roteador passarão a usar o Blocky
+e resolverão `*.homelab.lan` automaticamente.
+
+### 2. Instale o root CA certificate
+
+O Caddy usa sua própria CA interna. Cada dispositivo precisa confiar no root CA
+**uma única vez** para que HTTPS funcione sem aviso.
+
+O cert está em:
+```
+/var/lib/caddy/.local/share/caddy/pki/authorities/local/root.crt
+```
+
+Veja [docs/network.md](network.md) para instruções por plataforma
+(Windows, macOS, iOS, Android, Linux, Chrome, Firefox).
+
+### 3. Acesse os serviços
+
+Após configurar DNS e instalar o cert:
+
+| Serviço | URL |
+|---|---|
+| Portainer | https://portainer.homelab.lan |
+| Grafana | https://grafana.homelab.lan |
+| Homepage | https://home.homelab.lan |
+| ... | ... |
+
+> Veja a lista completa em [docs/homelab.md](homelab.md).
 
 ---
 

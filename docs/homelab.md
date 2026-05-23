@@ -1,43 +1,60 @@
 # Guia de Homelab — ZaneyOS Custom Fork
 
-Este guia explica a arquitetura do homelab local: Caddy como reverse proxy,
-DNS local para `.localhost`, e como usar os Docker stacks.
+Este guia explica a arquitetura do homelab local: Blocky como DNS proxy,
+Caddy como reverse proxy HTTPS, e como usar os Docker stacks.
 
 ---
 
 ## Arquitetura
 
 ```
-Navegador
-   │
-   ▼  http://portainer.localhost
-[Caddy :80]  ◄── NixOS module (caddy.nix)
-   │
-   ├── portainer.localhost  →  127.0.0.1:9000  (Portainer)
-   ├── db.localhost         →  127.0.0.1:8082  (Adminer)
-   ├── cloudbeaver.localhost→  127.0.0.1:8978  (CloudBeaver)
-   ├── n8n.localhost        →  127.0.0.1:5678  (n8n)
-   ├── uptime.localhost     →  127.0.0.1:3001  (Uptime Kuma)
-   ├── mail.localhost       →  127.0.0.1:8025  (Mailpit)
-   ├── minio.localhost      →  127.0.0.1:9001  (MinIO)
-   ├── grafana.localhost    →  127.0.0.1:3000  (Grafana)
-   └── home.localhost       →  127.0.0.1:3003  (Homepage)
+Celular / outro PC na rede local
+    │
+    │  DNS query: portainer.homelab.lan ?
+    ▼
+[Blocky :53  — 0.0.0.0]         ← módulo NixOS (blocky.nix)
+    │  *.homelab.lan → LAN IP do servidor
+    │  outras queries → Quad9 DoH (https://dns.quad9.net)
+    │  blocklists de ads (StevenBlack)
+    ▼
+[Caddy :443/:80  — 0.0.0.0]     ← módulo NixOS (caddy.nix)
+    │  TLS: CA local (Caddy internal CA — local_certs)
+    │  HTTP :80 → redireciona para HTTPS :443
+    │
+    ├── portainer.homelab.lan  →  127.0.0.1:9000  (Portainer)
+    ├── db.homelab.lan         →  127.0.0.1:8082  (Adminer)
+    ├── cloudbeaver.homelab.lan→  127.0.0.1:8978  (CloudBeaver)
+    ├── n8n.homelab.lan        →  127.0.0.1:5678  (n8n)
+    ├── uptime.homelab.lan     →  127.0.0.1:3001  (Uptime Kuma)
+    ├── mail.homelab.lan       →  127.0.0.1:8025  (Mailpit)
+    ├── minio.homelab.lan      →  127.0.0.1:9001  (MinIO)
+    ├── grafana.homelab.lan    →  127.0.0.1:3000  (Grafana)
+    └── home.homelab.lan       →  127.0.0.1:3003  (Homepage)
 
-[NetworkManager + dnsmasq]  ◄── NixOS module (dns.nix)
-   └── *.localhost  →  127.0.0.1
+Acesso remoto (Tailscale VPN — opcional):
+    Dispositivo remoto
+        │ WireGuard mesh (Tailscale)
+        ▼
+    PC NixOS → mesmo Blocky + Caddy
 ```
 
-> Todos os serviços ficam **somente em loopback** (`127.0.0.1`).
-> Nenhum banco ou serviço é exposto na rede local.
+**Configurar no roteador (único passo manual):**
+Defina o DNS primário do roteador como o IP LAN do PC NixOS (ex: `192.168.1.100`).
+Isso faz todos os dispositivos da rede usarem o Blocky automaticamente.
+
+**Por dispositivo (uma única vez):**
+Instale o root CA certificate do Caddy em cada dispositivo — veja [docs/network.md](network.md).
+
+> O domínio `homelab.lan` é configurável em `variables.nix` (`localDomain`).
+> O `.lan` evita conflitos com mDNS/Bonjour (`.local` é reservado).
 
 ---
 
-## Caddy (reverse proxy)
+## Caddy (reverse proxy HTTPS)
 
-### Via NixOS (recomendado — edições basic/medium/full)
-
-O módulo `modules/core/caddy.nix` configura o Caddy como serviço NixOS.
-Ele é ativado automaticamente nas edições `basic`, `medium` e `full`.
+O módulo `modules/core/caddy.nix` configura o Caddy como serviço NixOS com
+HTTPS automático via CA interna (`local_certs`). Ativado nas edições `basic`,
+`medium` e `full`.
 
 ```bash
 # Verificar status
@@ -46,49 +63,39 @@ systemctl status caddy
 # Ver logs
 journalctl -u caddy -f
 
-# Testar acesso
-curl -I http://portainer.localhost
+# Testar acesso (após instalar o root CA no dispositivo)
+curl -I https://portainer.homelab.lan
+
+# Caminho do root CA certificate
+ls /var/lib/caddy/.local/share/caddy/pki/authorities/local/root.crt
 ```
-
-### Via Docker (opcional — quando não usar o módulo NixOS)
-
-Use o stack em `docker/stacks/homelab/caddy/`:
-
-```bash
-cd ~/zaneyos/docker/stacks/homelab/caddy
-cp Caddyfile.example Caddyfile
-docker compose up -d
-```
-
-> O `Caddyfile` já está no `.gitignore`. Personalize sem medo de versionamento acidental.
 
 ---
 
-## DNS Local (`.localhost`)
+## Blocky (DNS proxy LAN)
 
-### Via NixOS (recomendado — edições basic/medium/full)
-
-O módulo `modules/core/dns.nix` configura o dnsmasq integrado ao NetworkManager.
-Todos os domínios `*.localhost` resolvem para `127.0.0.1` automaticamente.
+O módulo `modules/core/blocky.nix` substitui o dnsmasq anterior.
+Escuta em `0.0.0.0:53` — qualquer dispositivo na rede pode usá-lo.
 
 ```bash
-# Verificar que o dnsmasq está ativo
-resolvectl status | grep -A3 "DNS Servers"
+# Verificar status
+systemctl status blocky
 
-# Testar resolução
-nslookup portainer.localhost
-# Resposta esperada: 127.0.0.1
+# Testar resolução DNS (do próprio host)
+dig portainer.homelab.lan @127.0.0.1
+
+# Testar de outro dispositivo (substitua pelo IP LAN do servidor)
+dig portainer.homelab.lan @192.168.1.100
+
+# Métricas (Prometheus) — porta 4000
+curl http://localhost:4000/metrics
 ```
 
-### Adicionar domínios customizados
+### Configurar DNS no roteador
 
-Para resolver domínios além de `*.localhost`, crie um arquivo em:
-`/etc/NetworkManager/dnsmasq.d/custom.conf`
-
-```
-# Exemplo: resolver minhaapp.local para um servidor na rede
-address=/minhaapp.local/192.168.1.10
-```
+Acesse o painel do roteador e defina:
+- **DNS primário:** `<LAN IP do PC NixOS>` (ex: `192.168.1.100`)
+- **DNS secundário:** `9.9.9.9` (fallback)
 
 ---
 
@@ -102,7 +109,7 @@ cp .env.example .env
 docker compose up -d
 ```
 
-Acesse em: http://portainer.localhost (via Caddy) ou http://localhost:9000
+Acesse em: https://portainer.homelab.lan
 
 Na primeira inicialização o Portainer pedirá para criar um usuário admin.
 
@@ -118,7 +125,7 @@ cp config/settings.yaml.example config/settings.yaml
 docker compose up -d
 ```
 
-Acesse em: http://home.localhost
+Acesse em: https://home.homelab.lan
 
 Personalize adicionando serviços em `config/services.yaml` e `config/bookmarks.yaml`.
 Veja a documentação completa em: https://gethomepage.dev
@@ -130,8 +137,9 @@ Veja a documentação completa em: https://gethomepage.dev
 1. **Nunca exponha bancos na rede** — use apenas `127.0.0.1:PORT:PORT`
 2. **Nunca commite `.env`** — apenas `.env.example` fica no repositório
 3. **Use senhas fortes** — substitua todos os `changeme` no `.env` antes de usar
-4. **Firewall** — portas 22, 80, 443 abertas; bancos NÃO abertos no firewall
+4. **Firewall** — portas 22, 53, 80, 443 abertas; bancos NÃO abertos no firewall
 5. **SSH key-only** — configurado em `modules/core/services.nix`
+6. **Root CA** — não distribua a chave privada (`root.key`); apenas o cert público (`root.crt`)
 
 ---
 
@@ -139,12 +147,15 @@ Veja a documentação completa em: https://gethomepage.dev
 
 | Serviço | URL local |
 |---|---|
-| Portainer | http://portainer.localhost |
-| Adminer | http://db.localhost |
-| CloudBeaver | http://cloudbeaver.localhost |
-| n8n | http://n8n.localhost |
-| Uptime Kuma | http://uptime.localhost |
-| Mailpit | http://mail.localhost |
-| MinIO Console | http://minio.localhost |
-| Grafana | http://grafana.localhost |
-| Homepage | http://home.localhost |
+| Portainer | https://portainer.homelab.lan |
+| Adminer | https://db.homelab.lan |
+| CloudBeaver | https://cloudbeaver.homelab.lan |
+| n8n | https://n8n.homelab.lan |
+| Uptime Kuma | https://uptime.homelab.lan |
+| Mailpit | https://mail.homelab.lan |
+| MinIO Console | https://minio.homelab.lan |
+| Grafana | https://grafana.homelab.lan |
+| Homepage | https://home.homelab.lan |
+
+> O domínio `homelab.lan` pode ser trocado em `hosts/<hostname>/variables.nix` (`localDomain`).
+> Veja [docs/network.md](network.md) para o guia completo de rede, TLS e VPN.
