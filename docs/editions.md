@@ -81,7 +81,7 @@ Cada edição é **aditiva**: `full` inclui tudo do `medium`, que inclui tudo do
 | shell-gpt | ❌ | ❌ | ✅ | ✅ |
 | aichat | ❌ | ❌ | ❌ | ✅ |
 | llama.cpp | ❌ | ❌ | ❌ | ✅ |
-| opencode-desktop | ❌ | ❌ | ❌ | TODO² |
+| opencode-desktop | ❌ | ❌ | ❌ | ✅ |
 | Ollama (serviço NixOS) | ❌ | ❌ | ❌ | opt |
 | Open WebUI (Docker stack) | ❌ | ❌ | ❌ | opt |
 | Tabby (self-hosted completion) | ❌ | ❌ | ❌ | opt |
@@ -97,8 +97,8 @@ Legenda: ✅ incluído | ❌ não incluído | opt = opcional via toggle em `vari
 
 ¹ **Hermes Agent**: não disponível no nixpkgs. Consulte: https://github.com/NousResearch/hermes-agent
 
-² **opencode-desktop**: GUI Desktop do OpenCode. Pacote ainda não disponível no nixpkgs unstable (verificado em 2026-05).
-Acompanhe em: https://search.nixos.org/packages?query=opencode-desktop
+² **opencode-desktop**: GUI Desktop do OpenCode. Disponível no nixpkgs unstable (v1.15.7+).
+Instalado na edição **full** via `modules/ai-tools/tier3.nix`.
 O CLI `opencode` já está disponível na edição **medium** (tier2).
 
 ---

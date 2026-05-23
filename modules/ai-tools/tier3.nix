@@ -10,14 +10,10 @@
     # Usage: llama-cli -m model.gguf -p "prompt"
     llama-cpp
 
-    # TODO: opencode-desktop — Desktop GUI for OpenCode AI coding assistant
-    # Package not yet available in nixpkgs unstable (checked 2026-05).
-    # Track availability at: https://search.nixos.org/packages?query=opencode-desktop
-    # When available, uncomment the line below:
-    # opencode-desktop
-    #
-    # Referência: https://opencode.ai / https://github.com/anomalyco/opencode
-    # Edição: full (opencode CLI já está em tier2/medium)
+    # opencode-desktop — Desktop GUI for OpenCode AI coding assistant
+    # https://opencode.ai / https://search.nixos.org/packages?query=opencode-desktop
+    # opencode CLI já está em tier2/medium; aqui entra a UI desktop (full only)
+    opencode-desktop
   ];
 
   # Tabby: self-hosted AI code completion server

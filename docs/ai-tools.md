@@ -38,7 +38,7 @@ Após o rebuild, os seguintes scripts estão disponíveis no PATH:
 | **shell-gpt** | ❌ | ❌ | ✅ | ✅ |
 | **aichat** | ❌ | ❌ | ❌ | ✅ |
 | **llama.cpp** | ❌ | ❌ | ❌ | ✅ |
-| opencode-desktop (GUI) | ❌ | ❌ | ❌ | TODO² |
+| opencode-desktop (GUI) | ❌ | ❌ | ❌ | ✅ |
 | Ollama (serviço NixOS) | ❌ | ❌ | ❌ | opt |
 | Open WebUI (Docker stack) | ❌ | ❌ | ❌ | opt |
 | Tabby (self-hosted completion) | ❌ | ❌ | ❌ | opt |
@@ -47,9 +47,8 @@ Após o rebuild, os seguintes scripts estão disponíveis no PATH:
 - https://github.com/NousResearch/hermes-agent
 - Após instalar: `hermes model` → selecione OpenRouter
 
-² **opencode-desktop** não está no nixpkgs unstable (verificado em 2026-05).
-Acompanhe em: https://search.nixos.org/packages?query=opencode-desktop
-Quando disponível, será ativado em `modules/ai-tools/tier3.nix`.
+² **opencode-desktop** disponível no nixpkgs unstable desde 2026-05 (v1.15.7+).
+Instalado na edição **full** via `modules/ai-tools/tier3.nix`.
 O CLI `opencode` já está na edição **medium** (tier2).
 
 ---
