@@ -11,8 +11,8 @@
   edition = "basic";
 
   # System locale and timezone (moved from modules/core/system.nix)
-  timeZone = "America/New_York";
-  locale = "en_US.UTF-8";
+  timeZone = "America/Sao_Paulo";
+  locale = "pt_BR.UTF-8";
 
   # Set Displau Manager
   # `tui` for Text login
@@ -79,9 +79,9 @@
   # Setting it here does not enable it. Kitty is installed by default
   terminal = "kitty"; # Set Default System Terminal
 
-  keyboardLayout = "us";
+  keyboardLayout = "br";
   keyboardVariant = "";
-  consoleKeyMap = "us";
+  consoleKeyMap = "br-abnt2";
 
   # For hybrid support (Intel/NVIDIA Prime or AMD/NVIDIA)
   intelID = "PCI:1:0:0";

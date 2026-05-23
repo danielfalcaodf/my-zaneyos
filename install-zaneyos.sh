@@ -294,18 +294,18 @@ echo -e "${GREEN}✓ Git name: $gitUsername${NC}"
 echo -e "${GREEN}✓ Git email: $gitEmail${NC}"
 
 print_header "Timezone Configuration"
-echo "🌎 Common timezones:"
-echo "  • Brazil: America/Sao_Paulo, America/Fortaleza, America/Manaus"
+echo "🌎 Fusos horários comuns:"
+echo "  • Brasil: America/Sao_Paulo, America/Fortaleza, America/Manaus, America/Belem"
 echo "  • US: America/New_York, America/Chicago, America/Denver, America/Los_Angeles"
 echo "  • Europe: Europe/London, Europe/Berlin, Europe/Paris, Europe/Rome"
 echo "  • Asia: Asia/Tokyo, Asia/Shanghai, Asia/Seoul, Asia/Kolkata"
 echo "  • Australia: Australia/Sydney, Australia/Melbourne"
 echo "  • UTC (Universal): UTC"
-read -rp "Enter your timezone [ America/New_York ]: " timezone
+read -rp "Entre com o fuso horário [ America/Sao_Paulo ]: " timezone
 if [ -z "$timezone" ]; then
-  timezone="America/New_York"
+  timezone="America/Sao_Paulo"
 fi
-echo -e "${GREEN}✓ Timezone set to: $timezone${NC}"
+echo -e "${GREEN}✓ Timezone definido: $timezone${NC}"
 
 print_header "Edition Selection"
 echo "📦 Choose your system edition:"
@@ -356,8 +356,9 @@ if [ "$edition" = "vm" ] && [ "$profile" = "vm" ]; then
 fi
 
 print_header "Keyboard Layout Configuration"
-echo "🌍 Common keyboard layouts:"
-echo "  • us (US English) - default"
+echo "🌍 Layouts de teclado comuns:"
+echo "  • br (Português Brasil - ABNT2) - padrão"
+echo "  • us (US English)"
 echo "  • us-intl (US International)"
 echo "  • uk (UK English)"
 echo "  • de (German)"
@@ -366,11 +367,11 @@ echo "  • es (Spanish)"
 echo "  • it (Italian)"
 echo "  • ru (Russian)"
 echo "  • dvorak (Dvorak)"
-read -rp "Enter your keyboard layout: [ us ] " keyboardLayout
+read -rp "Entre com o layout do teclado: [ br ] " keyboardLayout
 if [ -z "$keyboardLayout" ]; then
-  keyboardLayout="us"
+  keyboardLayout="br"
 fi
-echo -e "${GREEN}✓ Keyboard layout set to: $keyboardLayout${NC}"
+echo -e "${GREEN}✓ Layout do teclado definido: $keyboardLayout${NC}"
 
 print_header "Keyboard Variant Configuration"
 # Suggest a variant when user typed a variant-like layout
@@ -415,18 +416,24 @@ else
 fi
 
 print_header "Console Keymap Configuration"
-echo "⌨️  Console keymap (usually matches your keyboard layout):"
-echo "  Most common: us, uk, de, fr, es, it, ru"
-# Smart default: use keyboard layout as console keymap default if it's a common one
+echo "⌨️  Keymap do console (normalmente igual ao layout do teclado):"
+echo "  Mais comuns: br-abnt2, us, uk, de, fr, es, it, ru"
+# Smart default: br → br-abnt2, outros layouts comuns ficam iguais
 defaultConsoleKeyMap="$keyboardLayout"
-if [[ ! "$keyboardLayout" =~ ^(us|uk|de|fr|es|it|ru|us-intl|dvorak)$ ]]; then
-  defaultConsoleKeyMap="us"
-fi
-read -rp "Enter your console keymap: [ $defaultConsoleKeyMap ] " consoleKeyMap
+case "$keyboardLayout" in
+  br) defaultConsoleKeyMap="br-abnt2" ;;
+  us-intl | intl) defaultConsoleKeyMap="us" ;;
+  *)
+    if [[ ! "$keyboardLayout" =~ ^(us|uk|de|fr|es|it|ru|dvorak|br-abnt2)$ ]]; then
+      defaultConsoleKeyMap="us"
+    fi
+    ;;
+esac
+read -rp "Entre com o keymap do console: [ $defaultConsoleKeyMap ] " consoleKeyMap
 if [ -z "$consoleKeyMap" ]; then
   consoleKeyMap="$defaultConsoleKeyMap"
 fi
-echo -e "${GREEN}✓ Console keymap set to: $consoleKeyMap${NC}"
+echo -e "${GREEN}✓ Console keymap definido: $consoleKeyMap${NC}"
 
 # ---------------------------------------------------------------------------
 # Network & Homelab Configuration
