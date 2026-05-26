@@ -52,6 +52,7 @@ in {
       appimage-run # Needed For AppImage Support
       brave # Brave Browser
       brightnessctl # For Screen Brightness Control
+      cliamp # terminal music player
       cliphist # Clipboard manager using rofi menu
       cmatrix # Matrix Movie Effect In Terminal
       cowsay # Great Fun Terminal Program
