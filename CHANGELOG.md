@@ -7,6 +7,8 @@
 
 # 🚀 **Current Release - ZaneyOS v2.6.1**
 
+- Chg: `awww` from flake input to `pkgs.awww`
+  - This resolves build errors
 - Add: `synfetch`
 - Removed `discord` and `discord-canary`
   - They use an outdated `electron`
