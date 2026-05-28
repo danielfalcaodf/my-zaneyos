@@ -7,6 +7,7 @@
 
 # 🚀 **Current Release - ZaneyOS v2.6.1**
 
+- Add: `synfetch`
 - Removed `discord` and `discord-canary`
   - They use an outdated `electron`
     - That build uses and `openssl v1.1.1w`

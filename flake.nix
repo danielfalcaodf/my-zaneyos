@@ -32,6 +32,10 @@
       url = "github:0xc000022070/zen-browser-flake/beta";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    synfetch = {
+      url = "github:SXSLVT/synfetch";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     alejandra = {
       url = "github:kamadorueda/alejandra";
       inputs.nixpkgs.follows = "nixpkgs";
