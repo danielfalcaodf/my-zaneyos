@@ -36,20 +36,10 @@ in {
   # this machine uses Blocky (and therefore resolves *.homelab.lan correctly).
   networking.nameservers = ["127.0.0.1"];
 
-  # Disable systemd-resolved stub listener so Blocky can bind port 53.
-  # systemd-resolved continues to manage the system resolver but forwards
-  # all queries to Blocky at 127.0.0.1 instead of its internal stub.
-  services.resolved = {
-    enable = true;
-    settings = {
-      Resolve = {
-        DNSStubListener = "no";
-        DNS = "127.0.0.1";
-        FallbackDNS = "9.9.9.9 1.1.1.1";
-        DNSSEC = "false";
-      };
-    };
-  };
+  # Avoid systemd-resolved entirely here. With DHCP-provided per-link domains,
+  # resolved routes homelab.lan queries to the uplink DNS (for example 8.8.8.8)
+  # instead of Blocky, which breaks *.homelab.lan on the local machine itself.
+  services.resolved.enable = lib.mkForce false;
 
   services.blocky = {
     enable = true;
@@ -78,7 +68,7 @@ in {
 
       # Ad/tracker blocking using StevenBlack hosts file.
       blocking = {
-        blackLists.ads = [
+        denylists.ads = [
           "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"
         ];
         clientGroupsBlock.default = ["ads"];
