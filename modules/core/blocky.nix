@@ -20,6 +20,16 @@
   localDomain = vars.localDomain or "homelab.lan";
   lanIP = vars.lanIP or "127.0.0.1";
 in {
+  # Prevent NetworkManager from overwriting /etc/resolv.conf with DHCP-provided
+  # DNS servers — without this, NM ignores Blocky and the server itself falls
+  # back to 9.9.9.9 (which can't resolve *.homelab.lan).
+  networking.networkmanager.dns = "none";
+
+  # Point the system resolver at Blocky on localhost.
+  # nameservers writes 127.0.0.1 into /etc/resolv.conf so every process on
+  # this machine uses Blocky (and therefore resolves *.homelab.lan correctly).
+  networking.nameservers = ["127.0.0.1"];
+
   # Disable systemd-resolved stub listener so Blocky can bind port 53.
   # systemd-resolved continues to manage the system resolver but forwards
   # all queries to Blocky at 127.0.0.1 instead of its internal stub.
