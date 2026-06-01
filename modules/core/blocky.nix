@@ -15,7 +15,11 @@
 #   dig portainer.homelab.lan @127.0.0.1
 #   # From another device on the LAN:
 #   dig portainer.homelab.lan @192.168.1.100
-{host, ...}: let
+{
+  host,
+  lib,
+  ...
+}: let
   vars = import ../../hosts/${host}/variables.nix;
   localDomain = vars.localDomain or "homelab.lan";
   lanIP = vars.lanIP or "127.0.0.1";
@@ -23,7 +27,9 @@ in {
   # Prevent NetworkManager from overwriting /etc/resolv.conf with DHCP-provided
   # DNS servers — without this, NM ignores Blocky and the server itself falls
   # back to 9.9.9.9 (which can't resolve *.homelab.lan).
-  networking.networkmanager.dns = "none";
+  # lib.mkForce is needed because services.resolved.enable automatically sets
+  # networkmanager.dns = "systemd-resolved", which conflicts with our setting.
+  networking.networkmanager.dns = lib.mkForce "none";
 
   # Point the system resolver at Blocky on localhost.
   # nameservers writes 127.0.0.1 into /etc/resolv.conf so every process on
