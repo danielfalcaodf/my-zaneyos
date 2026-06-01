@@ -106,4 +106,13 @@ in {
     allowedTCPPorts = [53];
     allowedUDPPorts = [53];
   };
+
+  # Wait for NetworkManager to bring the network fully online before Blocky
+  # starts. Without this, Blocky tries to download the StevenBlack blocklist
+  # before the interface is up, gets "network is unreachable", and fails.
+  systemd.services.NetworkManager-wait-online.enable = true;
+  systemd.services.blocky = {
+    after = ["NetworkManager-wait-online.service"];
+    wants = ["NetworkManager-wait-online.service"];
+  };
 }
