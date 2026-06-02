@@ -15,6 +15,9 @@
     curl
     unzip
     zip
+    # Cloud CLIs
+    awscli2
+    google-cloud-sdk
   ];
 
   # NVM: source NVM if installed (installer puts it at ~/.nvm)
