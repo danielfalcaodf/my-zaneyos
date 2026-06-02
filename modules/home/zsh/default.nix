@@ -27,20 +27,18 @@
 
     oh-my-zsh = {
       enable = true;
+      theme = "spaceship";
+      # spaceship-prompt installs theme at share/zsh/themes/spaceship.zsh-theme
+      custom = "${pkgs.spaceship-prompt}/share/zsh";
+      plugins = [
+        "git"
+        "jsontools"
+        "web-search"
+        "command-not-found"
+      ];
     };
 
-    plugins = [
-      {
-        name = "powerlevel10k";
-        src = pkgs.zsh-powerlevel10k;
-        file = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
-      }
-      {
-        name = "powerlevel10k-config";
-        src = lib.cleanSource ./p10k-config;
-        file = "p10k.zsh";
-      }
-    ];
+    plugins = [];
 
     initContent = ''
       bindkey "\eh" backward-word
@@ -50,6 +48,29 @@
       if [ -f $HOME/.zshrc-personal ]; then
         source $HOME/.zshrc-personal
       fi
+
+      SPACESHIP_PROMPT_ORDER=(
+        time
+        user
+        dir
+        git
+        node
+        java
+        docker
+        docker_compose
+        azure
+        venv
+        dotnet
+        aws
+        gcloud
+        exec_time
+        line_sep
+        jobs
+        exit_code
+        char
+        sudo
+        battery
+      )
     '';
 
     shellAliases = {

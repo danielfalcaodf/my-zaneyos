@@ -1,0 +1,10 @@
+# Homepage settings — copy to settings.yaml and adjust
+# See: https://gethomepage.dev/latest/configs/settings/
+
+title: My Homelab
+background: https://images.unsplash.com/photo-1502790671504-542ad42d5189
+cardBlur: md
+theme: dark
+color: slate
+headerStyle: clean
+language: en

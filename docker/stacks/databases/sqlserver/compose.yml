@@ -1,0 +1,25 @@
+# SQL Server 2022 — bind 127.0.0.1 only. Requires at least 2 GB RAM.
+# NOT recommended for VM/Basic editions due to memory requirements.
+# Copy .env.example to .env and set MSSQL_SA_PASSWORD before starting.
+# Password must meet SQL Server complexity: 8+ chars, upper, lower, digit, symbol.
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?MSSQL_SA_PASSWORD is required}
+      MSSQL_PID: ${MSSQL_PID:-Developer}
+    ports:
+      - "127.0.0.1:1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -Q 'SELECT 1' -C || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  sqlserver_data:

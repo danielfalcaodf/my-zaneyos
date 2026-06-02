@@ -16,5 +16,10 @@
       #eval "$(zoxide init bash)"
       #eval "$(oh-my-posh init bash --config $HOME/.config/powerlevel10k_rainbow.omp.json)"
 
+      # ── AI Tools — OpenRouter (bash) ──────────────────────────────────────
+      # Uncomment to load OpenRouter env vars in bash sessions.
+      # The primary shell (zsh) loads this automatically.
+      # [ -f "$HOME/.config/ai-tools/bash-env.sh" ] && source "$HOME/.config/ai-tools/bash-env.sh"
+
   '';
 }

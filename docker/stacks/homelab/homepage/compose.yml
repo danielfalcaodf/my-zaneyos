@@ -1,0 +1,24 @@
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${HOMEPAGE_HOST_PORT:-3003}:3000"
+    volumes:
+      - ./config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      # HOMEPAGE_ALLOWED_HOSTS: lista de hosts/IPs permitidos para acessar o Homepage.
+      # Separe por vírgula, sem espaços. Inclua todos os hosts/IPs usados para acesso.
+      # Exemplos:
+      #   homepage.homelab.lan,home.homelab.lan,localhost:3003,127.0.0.1:3003
+      #   192.168.0.10:3003
+      # NUNCA use apenas "*" em produção — só para debug temporário.
+      - HOMEPAGE_ALLOWED_HOSTS=${HOMEPAGE_ALLOWED_HOSTS}
+    networks:
+      - homepage
+
+networks:
+  homepage:
+    driver: bridge

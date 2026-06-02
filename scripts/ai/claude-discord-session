@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+# claude-discord-session — Inicia sessão Claude Code com plugin Discord
+# Uso: claude-discord-session [--project <nome>]
+#
+# Pré-requisitos:
+#   - claude instalado (edição basic+)
+#   - Plugin Discord instalado: /plugin install discord@claude-plugins-official
+#   - Token configurado: /discord:configure <token>
+set -euo pipefail
+
+# ─── Cores ────────────────────────────────────────────────────────────────────
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+info()  { echo -e "''${CYAN}ℹ''${NC}  $*"; }
+ok()    { echo -e "''${GREEN}✔''${NC}  $*"; }
+warn()  { echo -e "''${YELLOW}⚠''${NC}  $*"; }
+die()   { echo -e "''${RED}✘''${NC}  $*" >&2; exit 1; }
+
+PROJECT=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --project|-p) shift; PROJECT="$1"; shift ;;
+    --help|-h)
+      echo "Uso: claude-discord-session [--project <nome>]"
+      echo ""
+      echo "Inicia sessão Claude Code com plugin Discord ativo."
+      echo "Usa zellij (se disponível) para sessão persistente."
+      echo ""
+      echo "Exemplos:"
+      echo "  claude-discord-session"
+      echo "  claude-discord-session --project my-zaneyos"
+      exit 0
+      ;;
+    *) die "Argumento desconhecido: $1" ;;
+  esac
+done
+
+# ─── Validações ───────────────────────────────────────────────────────────────
+command -v claude &>/dev/null || die "claude não encontrado. Instale via: zcli rebuild (edição basic+)"
+command -v git &>/dev/null    || die "git não encontrado"
+
+# ─── Determinar diretório do projeto ──────────────────────────────────────────
+if [[ -n "$PROJECT" ]]; then
+  # Procura em locais comuns
+  for search_dir in "$HOME/repos/$PROJECT" "$HOME/$PROJECT" "$(pwd)"; do
+    if [[ -d "$search_dir/.git" ]]; then
+      PROJECT_DIR="$search_dir"
+      break
+    fi
+  done
+  [[ -n "${PROJECT_DIR:-}" ]] || die "Projeto '$PROJECT' não encontrado em ~/repos/ ou ~/"
+else
+  # Usa diretório atual se for um repo git
+  if git -C "$(pwd)" rev-parse --git-dir &>/dev/null; then
+    PROJECT_DIR="$(pwd)"
+  else
+    die "Não está em um repositório git. Use --project <nome> ou cd para o projeto."
+  fi
+fi
+
+# ─── Status antes de iniciar ──────────────────────────────────────────────────
+echo ""
+echo -e "''${CYAN}━━ Claude Code + Discord Session ━━''${NC}"
+info "Projeto:  $(basename "$PROJECT_DIR")"
+info "Diretório: $PROJECT_DIR"
+info "Branch:   $(git -C "$PROJECT_DIR" branch --show-current 2>/dev/null || echo 'desconhecida')"
+echo ""
+
+# Verificar arquivos .env não commitados (aviso de segurança)
+if git -C "$PROJECT_DIR" status --short 2>/dev/null | grep -q "\.env"; then
+  warn "ATENÇÃO: há arquivos .env modificados no repositório."
+  warn "O agente NÃO deve ler ou modificar esses arquivos."
+  echo ""
+fi
+
+# ─── Iniciar sessão ───────────────────────────────────────────────────────────
+SESSION_NAME="claude-$(basename "$PROJECT_DIR")"
+
+if command -v zellij &>/dev/null; then
+  ok "zellij disponível — criando sessão persistente: $SESSION_NAME"
+  info "Para reconectar: zellij attach $SESSION_NAME"
+  echo ""
+  info "Iniciando: claude --channels plugin:discord@claude-plugins-official"
+  echo ""
+  cd "$PROJECT_DIR"
+  exec zellij --session "$SESSION_NAME" -- \
+    claude --channels plugin:discord@claude-plugins-official
+else
+  warn "zellij não encontrado. Iniciando sem sessão persistente."
+  warn "Instale com edição medium para sessões persistentes: zcli rebuild"
+  echo ""
+  info "Iniciando: claude --channels plugin:discord@claude-plugins-official"
+  echo ""
+  cd "$PROJECT_DIR"
+  exec claude --channels plugin:discord@claude-plugins-official
+fi

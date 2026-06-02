@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  host,
   username,
   profile,
   ...
@@ -48,6 +49,8 @@
         ".config/mimeapps.list.backup"
       ];
     })
+    (import ./zaneyos-check.nix {inherit pkgs;})
+    (import ./zstack.nix {inherit pkgs;})
   ];
 
   xdg.desktopEntries.dropterminal = {

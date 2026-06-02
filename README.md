@@ -2,9 +2,14 @@
 
 <div align="center">
 
-## ZaneyOS 🟰 Best ❄️ NixOS Configs
+## ZaneyOS — Personal Fork / Adaptação Pessoal ❄️
 
-\*\* Updated: January 16th, 2026
+> **Fork/adaptação pessoal** do [ZaneyOS](https://gitlab.com/zaney/zaneyos), criado originalmente por **Tyler Kelley (Zaney)**.
+> Este fork preserva integralmente a interface gráfica do ZaneyOS original e adiciona uma camada de
+> **edições** (full / medium / basic / vm), ferramentas de desenvolvimento, homelab e stacks Docker.
+> Todo crédito pela estética, identidade visual e estrutura base pertence ao projeto original.
+
+\*\* Base: ZaneyOS | Fork atualizado: 2026
 
 ZaneyOS is a simple way of reproducing my configuration on any NixOS system.
 This includes the wallpaper, scripts, applications, config files, and more.
@@ -46,6 +51,18 @@ This includes the wallpaper, scripts, applications, config files, and more.
 </details>
 
 <div align="center">
+
+### Fork Docs
+
+- [Installation Guide](docs/installation.md) — automated + manual install, post-install steps
+- [Editions Guide](docs/editions.md) — vm / basic / medium / full feature matrix
+- [Homelab Guide](docs/homelab.md) — Caddy, DNS local, Portainer, Homepage, Woodpecker CI
+- [Dev Tools Guide](docs/dev-tools.md) — NVM / SDKMAN / mise coexistence
+- [Docker Stacks Reference](docs/docker-stacks.md) — all available stacks + `zstack` manager
+- [AI Tools Guide](docs/ai-tools.md) — AI coding tools by edition
+- [Woodpecker CI Guide](docs/woodpecker-ci.md) — self-hosted CI/CD with Docker
+- [Discord + Claude Workflow](docs/automation/discord-claude-workflow.md) — Claude Code Channels via Discord
+- [Akita-style AI Workflow](docs/automation/akita-style-ai-workflow.md) — safe pair programming with AI
 
 ### Cheatsheets and Guides
 
@@ -110,6 +127,32 @@ This includes the wallpaper, scripts, applications, config files, and more.
   with the title beginning with [feature request], thank you!
 - Contact us on [Discord](https://discord.gg/XhZmNTnhtp) as well, for a potentially
   faster response.
+
+## Editions
+
+This fork adds an **edition** layer on top of ZaneyOS. Set `edition` in `hosts/<hostname>/variables.nix`.
+
+| Edition | Use case |
+|---|---|
+| `vm` | Virtual machines, lightweight test environments |
+| `basic` | Development desktop + basic homelab (Caddy, DNS, Docker) |
+| `medium` | Full workstation: cloud tools, databases, kubernetes CLI |
+| `full` | Maximum: LLM (Ollama optional), Android SDK, all stacks |
+
+Each edition is **additive** — `full` includes everything from `medium`, which includes `basic`.
+
+### Storage requirements by edition
+
+| Edition | Minimum | Recommended |
+|---|---|---|
+| `vm` | 40 GB | 60 GB |
+| `basic` | 80 GB | 120 GB |
+| `medium` | 150 GB | 250 GB |
+| `full` | 250 GB | 500 GB–1 TB |
+
+See [docs/editions.md](docs/editions.md) for the full feature matrix.
+
+---
 
 # Hyprland Keybindings
 
@@ -210,114 +253,47 @@ _Available when `barChoice = "waybar"` in `variables.nix`_
 </tr>
 </table>
 
-## Installation:
+## Installation
 
-> **⚠️ IMPORTANT:** These installation methods are for **NEW INSTALLATIONS
-> ONLY**. If you already have ZaneyOS installed and want to upgrade to v2.4, see
-> the [Upgrade Instructions](#upgrading-from-zaneyos-23-to-24) below. Note:
-> There is an issue with upgrade script. It's been removed until it's fixed.
+> **⚠️ NEW INSTALLATIONS ONLY.** This installs this fork — not the original ZaneyOS.
 
-<details>
-<summary><strong> ⬇️ Install with script (NEW INSTALLATIONS ONLY)</strong></summary>
+For the complete guide (pre-requisites, edition selection, post-install, troubleshooting)
+see **[docs/installation.md](docs/installation.md)**.
 
-### 📜 Script:
+### Quick install (automated)
 
-This is the easiest and recommended way of starting out for **new
-installations**. The script is not meant to allow you to change every option
-that you can in the flake or help you install extra packages. It is simply here
-so you can get my configuration installed with as little chances of breakages
-and then fiddle to your hearts content!
-
-> **⚠️ WARNING:** This script will completely replace any existing ~/zaneyos
-> directory. Do NOT use this if you already have ZaneyOS installed and
-> configured.
-
-Simply copy this and run it:
-
-![ZaneyOS First Install Command](img/first-install-cmd.jpg)
-
-```
+```bash
+# 1. Enter shell with dependencies
 nix-shell -p git curl pciutils
+
+# 2. Run this fork's install script
+sh <(curl -L https://raw.githubusercontent.com/danielfalcaodf/my-zaneyos/main/install-zaneyos.sh)
+
+# 3. Reboot after the script completes
+reboot
 ```
 
-Then:
+The script will ask for hostname, edition (`vm`/`basic`/`medium`/`full`), timezone, and GPU profile.
 
-![ZaneyOS Install Script Command](img/install-script.jpg)
+### Manual install
 
-```
-sh <(curl -L https://gitlab.com/Zaney/zaneyos/-/raw/main/install-zaneyos.sh)
-```
-
-#### The install process will look something like this:
-
-![First Part Of Install](img/1.jpg)
-
-![Second Part Of Install](img/2.jpg)
-
-#### After the install completes your environment will probably look broken. Just reboot and you will see this as your login:
-
-![Display Manager](img/3.jpg)
-
-#### Then after login you should see a screen like this:
-
-![Desktop Example](img/4.jpg)
-
-</details>
-
-<details>
-<summary><strong> 🦽 Manual install process:  </strong></summary>
-
-1. Run this command to ensure Git & Vim are installed:
-
-```
+```bash
 nix-shell -p git vim
-```
-
-2. Clone this repo & enter it:
-
-```
-cd && git clone https://gitlab.com/zaney/zaneyos.git -b main --depth=1 ~/zaneyos
-cd zaneyos
-
-You can still run the `install.sh` script if you want to.
-```
-
-- _You should stay in this folder for the rest of the install_
-
-3. Create the host folder for your machine(s) like so:
-
-```
-cp -r hosts/default hosts/<your-desired-hostname>
-git add .
-```
-
-4. Edit `hosts/<your-desired-hostname>/variables.nix`
-   ```nixos-generate-config --show-hardware-config > hosts/<your-desired-hostname>/hardware.nix```
-
-```
-
-7. Run this to enable flakes and install the flake replacing hostname with
-   profile. I.e. `intel`, `nvidia`, `nvidia-laptop`, `amd-hybrid`, or `vm`
-
-```
-
+cd ~ && git clone https://github.com/danielfalcaodf/my-zaneyos.git -b main --depth=1 ~/zaneyos
+cd ~/zaneyos
+cp -r hosts/default hosts/<your-hostname>
+# Edit hosts/<your-hostname>/variables.nix
+nixos-generate-config --show-hardware-config > hosts/<your-hostname>/hardware.nix
 NIX_CONFIG="experimental-features = nix-command flakes"
-sudo nixos-rebuild switch --flake .#profile
-
+sudo nixos-rebuild boot --flake .#<gpu-profile>
+reboot
 ```
 
-Now when you want to rebuild the configuration you have access to an alias
-called `fr` that will rebuild the flake and you do not have to be in the
-`zaneyos` folder for it to work.
+GPU profiles: `amd`, `nvidia`, `nvidia-laptop`, `amd-nvidia-hybrid`, `intel`, `vm`
 
-### Special Recognitions:
-
-Thank you for all your assistance
+### Special Recognitions
 
 - KoolDots  https://github.com/LinuxBeginnings
 - JakKoolit  https://github.com/Jakoolit
 - Justaguylinux https://codeberg.org/Justaguylinux
 - Jerry Starke https://github.com/JerrySM64
-
-## Hope you enjoy!
-```

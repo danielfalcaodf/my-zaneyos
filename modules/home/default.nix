@@ -61,6 +61,8 @@ in {
       #./zen-browser.nix
       ./zoxide.nix
       ./zsh
+      # Edition home-manager extras (shell integration, NVM, SDKMAN, mise)
+      ./editions
     ]
     ++ (
       if helixEnable

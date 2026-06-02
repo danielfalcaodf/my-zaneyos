@@ -209,6 +209,7 @@ sed -i "/^[[:space:]]*username[[:space:]]*=[[:space:]]*\"/ s/\"[^\"]*\"/\"$insta
 
 print_header "Generating Hardware Configuration -- Ignore ERROR: cannot access /bin"
 sudo nixos-generate-config --show-hardware-config > ./hosts/$hostName/hardware.nix
+git add -f ./hosts/$hostName/hardware.nix
 
 print_header "Setting Nix Configuration"
 NIX_CONFIG="experimental-features = nix-command flakes"

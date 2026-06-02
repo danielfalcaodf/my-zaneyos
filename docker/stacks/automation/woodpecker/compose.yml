@@ -1,0 +1,46 @@
+services:
+  woodpecker-server:
+    image: woodpeckerci/woodpecker-server:v3
+    container_name: woodpecker-server
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${WOODPECKER_SERVER_PORT:-8000}:8000"
+    volumes:
+      - woodpecker-server-data:/var/lib/woodpecker/
+    environment:
+      - WOODPECKER_OPEN=${WOODPECKER_OPEN:-true}
+      - WOODPECKER_HOST=${WOODPECKER_HOST}
+      - WOODPECKER_ADMIN=${WOODPECKER_ADMIN:-daniel}
+      - WOODPECKER_GITHUB=${WOODPECKER_GITHUB:-true}
+      - WOODPECKER_GITHUB_CLIENT=${WOODPECKER_GITHUB_CLIENT}
+      - WOODPECKER_GITHUB_SECRET=${WOODPECKER_GITHUB_SECRET}
+      - WOODPECKER_AGENT_SECRET=${WOODPECKER_AGENT_SECRET}
+    networks:
+      - woodpecker
+
+  woodpecker-agent:
+    image: woodpeckerci/woodpecker-agent:v3
+    container_name: woodpecker-agent
+    command: agent
+    restart: unless-stopped
+    depends_on:
+      - woodpecker-server
+    volumes:
+      - woodpecker-agent-config:/etc/woodpecker
+      # AVISO DE SEGURANÇA: montar /var/run/docker.sock concede ao agent
+      # controle total sobre o daemon Docker do host. Use apenas em ambientes
+      # controlados. Nunca exponha o agent publicamente.
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WOODPECKER_SERVER=woodpecker-server:9000
+      - WOODPECKER_AGENT_SECRET=${WOODPECKER_AGENT_SECRET}
+    networks:
+      - woodpecker
+
+volumes:
+  woodpecker-server-data:
+  woodpecker-agent-config:
+
+networks:
+  woodpecker:
+    driver: bridge

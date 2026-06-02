@@ -1,0 +1,30 @@
+# Secrets — never commit real .env files
+docker/**/.env
+
+# AI Tools — secrets and personal config (never commit)
+.env
+*.env
+openrouter.env
+.envrc.local
+.config/ai-tools/openrouter.env
+.config/claude/openrouter.env
+.hermes/.env
+.codex/secrets.toml
+
+# Hardware config — generated per-machine, contains UUIDs and device paths
+# Only hosts/default/hardware.nix (empty template) is allowed in the repo
+hosts/*/hardware.nix
+!hosts/default/hardware.nix
+
+# Install script logs
+install_*.log
+
+# Nix result symlinks
+result
+result-*
+
+# Editor / OS artifacts
+.DS_Store
+*.swp
+*.swo
+.direnv/

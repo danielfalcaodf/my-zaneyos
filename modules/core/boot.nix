@@ -1,8 +1,12 @@
 {
   pkgs,
   config,
+  host,
   ...
-}: {
+}: let
+  vars = import ../../hosts/${host}/variables.nix;
+  edition = vars.edition or "basic";
+in {
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;
     kernelModules = ["v4l2loopback"];
@@ -19,6 +23,7 @@
       mask = ''\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff'';
       magicOrExtension = ''\x7fELF....AI\x02'';
     };
-    plymouth.enable = true;
+    # Plymouth disabled for vm edition (lighter boot, no GPU animation)
+    plymouth.enable = edition != "vm";
   };
 }

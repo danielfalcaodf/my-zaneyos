@@ -3,6 +3,17 @@
   gitUsername = "Don Williams";
   gitEmail = "don.e.williams@gmail.com";
 
+  # ============================================================
+  # Edition — controls which feature layer is activated
+  # Options: "full" | "medium" | "basic" | "vm"
+  # The install script will update this automatically.
+  # ============================================================
+  edition = "basic";
+
+  # System locale and timezone (moved from modules/core/system.nix)
+  timeZone = "America/Sao_Paulo";
+  locale = "pt_BR.UTF-8";
+
   # Set Displau Manager
   # `tui` for Text login
   # `sddm` for graphical GUI (default)
@@ -68,9 +79,9 @@
   # Setting it here does not enable it. Kitty is installed by default
   terminal = "kitty"; # Set Default System Terminal
 
-  keyboardLayout = "us";
+  keyboardLayout = "br";
   keyboardVariant = "";
-  consoleKeyMap = "us";
+  consoleKeyMap = "br-abnt2";
 
   # For hybrid support (Intel/NVIDIA Prime or AMD/NVIDIA)
   intelID = "PCI:1:0:0";
@@ -145,4 +156,30 @@
   # Set network hostId if required (needed for zfs)
   # Otherwise leave as-is
   hostId = "5ab03f50";
+
+  # ===========================================================
+  # Homelab Network — filled by install-zaneyos.sh or manually
+  # ===========================================================
+
+  # Local domain used for all homelab services.
+  # Use .lan (not .local, which conflicts with mDNS/Bonjour on Apple devices).
+  # Example: portainer.homelab.lan
+  localDomain = "homelab.lan";
+
+  # LAN IP of this machine — must be a static IP or DHCP reservation.
+  # Set to your actual LAN IP so other devices on the network can reach it.
+  # The install script detects this automatically.
+  lanIP = "127.0.0.1";
+
+  # Primary network interface (e.g., eth0, enp3s0, wlan0).
+  # Used by Blocky to bind DNS on the correct interface.
+  networkInterface = "eth0";
+
+  # Enable Tailscale VPN for remote access to this homelab.
+  # After enabling and rebuilding, run: sudo tailscale up
+  tailscaleEnable = false;
+
+  # No-IP DDNS hostname — reserved for future external access.
+  # Example: "myhome.ddns.net". Leave empty if not using No-IP.
+  noIpHostname = "";
 }

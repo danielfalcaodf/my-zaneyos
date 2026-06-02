@@ -212,6 +212,10 @@ in
       echo "  doom remove     - Remove Doom Emacs installation."
       echo "  doom update     - Update Doom Emacs (runs doom sync)."
       echo ""
+      echo "Network:"
+      echo "  net-status      - Show DNS, Caddy, and Blocky status."
+      echo "                    Verifies homelab DNS resolution and HTTPS access."
+      echo ""
       echo "  help            - Show this help message."
     }
 
@@ -404,6 +408,75 @@ in
       help)
         print_help
         ;;
+      net-status)
+        # Load domain from host variables.nix
+        HOST_VARS="$HOME/$PROJECT/hosts/$(${pkgs.nettools}/bin/hostname)/variables.nix"
+        NET_DOMAIN="homelab.lan"
+        NET_LAN_IP=""
+        if [ -f "$HOST_VARS" ]; then
+          NET_DOMAIN=$(${pkgs.gnugrep}/bin/grep -Po '(?<=localDomain = ")[^"]+' "$HOST_VARS" 2>/dev/null || echo "homelab.lan")
+          NET_LAN_IP=$(${pkgs.gnugrep}/bin/grep -Po '(?<=lanIP = ")[^"]+' "$HOST_VARS" 2>/dev/null || echo "")
+        fi
+
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "  🌐  Homelab Network Status"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo ""
+
+        # Service status
+        for svc in blocky caddy tailscaled; do
+          if ${pkgs.systemd}/bin/systemctl is-active --quiet "$svc" 2>/dev/null; then
+            echo "  ✔  $svc"
+          else
+            echo "  ✗  $svc (inactive)"
+          fi
+        done
+
+        echo ""
+        echo "  Domain : $NET_DOMAIN"
+
+        # LAN IP
+        LAN_IP=$(${pkgs.iproute2}/bin/ip route get 1.1.1.1 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i=="src") print $(i+1)}' | head -1)
+        echo "  LAN IP : ''${LAN_IP:-unknown}"
+        if [ -n "$NET_LAN_IP" ] && [ "$LAN_IP" != "$NET_LAN_IP" ]; then
+          echo "  ⚠  variables.nix lanIP ($NET_LAN_IP) differs from current LAN IP ($LAN_IP)"
+          echo "     Update lanIP in variables.nix and rebuild if needed."
+        fi
+
+        echo ""
+        echo "  DNS resolution test:"
+        if command -v ${pkgs.bind}/bin/dig &>/dev/null; then
+          RESOLVED=$(${pkgs.bind}/bin/dig +short "portainer.$NET_DOMAIN" @127.0.0.1 2>/dev/null | head -1)
+          if [ -n "$RESOLVED" ]; then
+            echo "    portainer.$NET_DOMAIN → $RESOLVED"
+          else
+            echo "    portainer.$NET_DOMAIN → (no answer — is Blocky running?)"
+          fi
+        else
+          echo "    dig not available; install bind to enable DNS tests"
+        fi
+
+        echo ""
+        echo "  HTTPS access test:"
+        if ${pkgs.curl}/bin/curl --silent --insecure --max-time 3 -o /dev/null -w "%{http_code}" "https://portainer.$NET_DOMAIN" 2>/dev/null | ${pkgs.gnugrep}/bin/grep -q "^[23]"; then
+          echo "    https://portainer.$NET_DOMAIN → OK"
+        else
+          echo "    https://portainer.$NET_DOMAIN → unreachable (service down or cert not trusted)"
+        fi
+
+        echo ""
+        echo "  Root CA certificate path:"
+        CA_PATH="/var/lib/caddy/.local/share/caddy/pki/authorities/local/root.crt"
+        if [ -f "$CA_PATH" ]; then
+          echo "    ✔  $CA_PATH"
+        else
+          echo "    ✗  $CA_PATH (not yet generated — start Caddy once)"
+        fi
+
+        echo ""
+        echo "  For installation instructions: docs/network.md"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        ;;
       list-gens)
         echo "--- User Generations ---"
         ${pkgs.nix}/bin/nix-env --list-generations || echo "Could not list user generations."
@@ -421,6 +494,9 @@ in
         echo "Starting NixOS rebuild for host: $(${pkgs.nettools}/bin/hostname)"
         if eval "${pkgs.nh}/bin/nh os switch --diff always --hostname '$PROFILE' $extra_args"; then
           echo "Rebuild finished successfully"
+          echo ""
+          echo "Running post-rebuild validation..."
+          zaneyos-check || true
         else
           echo "Rebuild Failed" >&2
           exit 1
@@ -465,6 +541,9 @@ in
         echo "Updating flake and rebuilding system for host: $(${pkgs.nettools}/bin/hostname)"
         if eval "${pkgs.nh}/bin/nh os switch --diff always --hostname '$PROFILE' --update $extra_args"; then
           echo "Update and rebuild finished successfully"
+          echo ""
+          echo "Running post-rebuild validation..."
+          zaneyos-check || true
         else
           echo "Update and rebuild Failed" >&2
           exit 1
