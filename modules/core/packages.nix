@@ -43,7 +43,8 @@ in {
 
   environment.systemPackages = with pkgs;
     [
-      inputs.awww.packages.${pkgs.stdenv.hostPlatform.system}.awww
+      awww
+      inputs.synfetch.packages.${pkgs.stdenv.hostPlatform.system}.default
     ]
     ++ noctaliaPkgs
     ++ [
@@ -52,6 +53,7 @@ in {
       appimage-run # Needed For AppImage Support
       brave # Brave Browser
       brightnessctl # For Screen Brightness Control
+      cliamp # terminal music player
       cliphist # Clipboard manager using rofi menu
       cmatrix # Matrix Movie Effect In Terminal
       cowsay # Great Fun Terminal Program

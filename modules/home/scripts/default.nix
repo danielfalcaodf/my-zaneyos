@@ -1,7 +1,6 @@
 {
   config,
   pkgs,
-  inputs,
   host,
   username,
   profile,
@@ -21,7 +20,7 @@
     (import ./task-waybar.nix {inherit pkgs;})
     (import ./DropTerminal.nix {inherit pkgs;})
     (import ./wallsetter.nix {
-      inherit pkgs inputs;
+      inherit pkgs;
       inherit username;
     })
     (import ./web-search.nix {inherit pkgs;})
@@ -34,8 +33,8 @@
     (import ./qs-vid-wallpapers-apply.nix {inherit pkgs;})
     (import ./qs-vid-wallpapers-watchdog.nix {inherit pkgs;})
     (import ./qs-wallpapers.nix {inherit pkgs;})
-    (import ./qs-wallpapers-apply.nix {inherit pkgs inputs;})
-    (import ./qs-wallpapers-restore.nix {inherit pkgs inputs;})
+    (import ./qs-wallpapers-apply.nix {inherit pkgs;})
+    (import ./qs-wallpapers-restore.nix {inherit pkgs;})
     (import ./qs-wlogout.nix {inherit pkgs;})
     (import ./qs-docs.nix {inherit pkgs;})
     (import ./docs-parser.nix {inherit pkgs;})
