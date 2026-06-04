@@ -7,6 +7,35 @@
 
 # 🚀 **Current Release - ZaneyOS v2.6.1**
 
+- Fix: `nixvim` eval error regarding nixpkgs
+  - commented out the `follows nixpkgs line`
+  ```nix
+   # Checking nixvim to see if it's better
+   nixvim = {
+     url = "github:nix-community/nixvim";
+     # inputs.nixpkgs.follows = "nixpkgs";
+   };
+  ```
+- Fix: `gtk.nix` error regarding `null`
+
+  ```nix
+  {config, pkgs, lib, ...}: {
+    gtk = {
+      gtk4.theme = lib.mkForce null;
+  ```
+
+- Fix: `kmscon` error
+  - `zaneyos/modules/core/stylix.nix`
+  - Added: `targets.kmscon.enable = false;`
+    ```nix
+    stylix = {
+     enable = true;
+     image = stylixImage;
+     targets.kmscon.enable = false;
+    ```
+- Updated to NixOS v26.11
+- Disabled `plymouth` by default
+
 - Chg: `awww` from flake input to `pkgs.awww`
   - This resolves build errors
 - Add: `synfetch`
