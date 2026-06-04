@@ -5,7 +5,7 @@
 
 ---
 
-# 🚀 **Current Release - ZaneyOS v2.6.1**
+# 🚀 **Current Release - ZaneyOS v2.6.2**
 
 - Fix: `nixvim` eval error regarding nixpkgs
   - commented out the `follows nixpkgs line`
