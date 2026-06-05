@@ -5,6 +5,7 @@
     alacrittyEnable
     barChoice
     ghosttyEnable
+    lanMouseEnable
     tmuxEnable
     waybarChoice
     weztermEnable
@@ -105,6 +106,11 @@ in {
     ++ (
       if alacrittyEnable
       then [./terminals/alacritty.nix]
+      else []
+    )
+    ++ (
+      if lanMouseEnable
+      then [./lan-mouse.nix]
       else []
     );
 }
