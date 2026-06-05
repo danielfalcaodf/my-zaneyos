@@ -8,14 +8,7 @@
 # 🚀 **Current Release - ZaneyOS v2.6.2**
 
 - Fix: `nixvim` eval error regarding nixpkgs
-  - commented out the `follows nixpkgs line`
-  ```nix
-   # Checking nixvim to see if it's better
-   nixvim = {
-     url = "github:nix-community/nixvim";
-     # inputs.nixpkgs.follows = "nixpkgs";
-   };
-  ```
+  - Proper fix is add `nixpkgs.source = inputs.nixpkgs;`
 - Fix: `gtk.nix` error regarding `null`
 
   ```nix
