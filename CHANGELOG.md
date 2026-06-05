@@ -8,7 +8,12 @@
 # 🚀 **Current Release - ZaneyOS v2.6.2**
 
 - Fix: `nixvim` eval error regarding nixpkgs
-  - Proper fix is add `nixpkgs.source = inputs.nixpkgs;`
+  - Proper fix is add this to `nixvim.nix`
+
+  ```nix
+   nixpkgs.source = inputs.nixpkgs;
+  ```
+
 - Fix: `gtk.nix` error regarding `null`
 
   ```nix
