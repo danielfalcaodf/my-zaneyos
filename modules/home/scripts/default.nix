@@ -49,7 +49,10 @@
         ".config/mimeapps.list.backup"
       ];
     })
-    (import ./zaneyos-check.nix {inherit pkgs;})
+    (import ./zaneyos-check.nix {
+inherit pkgs;
+      inherit host;
+})
     (import ./zstack.nix {inherit pkgs;})
   ];
 

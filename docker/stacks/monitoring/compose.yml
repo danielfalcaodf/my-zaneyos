@@ -1,0 +1,76 @@
+# Monitoring stack — sobe Grafana, Loki e Prometheus de uma vez.
+#
+# A rede "monitoring" é definida aqui. Os composes individuais de
+# loki/ e prometheus/ usam external: true — suba este root compose
+# primeiro, ou suba grafana/ individualmente para criar a rede.
+#
+# Pré-requisito:
+#   zstack init monitoring        # cria ./grafana/.env
+#   cp monitoring/prometheus/prometheus.yml.example \
+#      monitoring/prometheus/prometheus.yml
+#
+# Uso:
+#   zstack up monitoring          # sobe tudo
+#   zstack up monitoring/grafana  # sobe apenas o grafana (via sub-pasta)
+services:
+
+  # ─── Grafana ─────────────────────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    env_file:
+      - "./grafana/.env"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GF_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_ADMIN_PASSWORD:-changeme}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - monitoring
+
+  # ─── Loki ────────────────────────────────────────────────────────────────────
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3100:3100"
+    volumes:
+      - loki_data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - monitoring
+
+  # ─── Prometheus ──────────────────────────────────────────────────────────────
+  # Requer prometheus.yml em ./prometheus/prometheus.yml
+  # Copie de prometheus.yml.example antes de subir.
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+    networks:
+      - monitoring
+
+volumes:
+  grafana_data:
+  loki_data:
+  prometheus_data:
+
+networks:
+  monitoring:
+    name: monitoring
+    driver: bridge

@@ -7,27 +7,71 @@ Todos os stacks ficam em `docker/stacks/`. Cada um segue as mesmas convenções:
 
 ---
 
+## Estrutura de diretórios
+
+Cada categoria segue o mesmo padrão do `homelab/`:
+
+```
+docker/stacks/
+  homelab/
+    compose.yml              ← ROOT: sobe caddy + portainer + homepage juntos
+    caddy/compose.yml        ← standalone: apenas o caddy
+    portainer/compose.yml    ← standalone: apenas o portainer
+    homepage/compose.yml     ← standalone: apenas o homepage
+  automation/
+    compose.yml              ← ROOT: sobe todos os serviços de automação
+    mailpit/compose.yml      ← standalone
+    n8n/compose.yml          ← standalone
+    uptime-kuma/compose.yml  ← standalone
+    woodpecker/compose.yml   ← standalone
+  databases/
+    compose.yml              ← ROOT: sobe todos os bancos
+    postgres/   mysql/   redis/   sqlserver/   adminer/   cloudbeaver/
+  monitoring/
+    compose.yml              ← ROOT: sobe grafana + loki + prometheus
+    grafana/   loki/   prometheus/
+  storage/
+    compose.yml              ← ROOT: minio
+    minio/
+  llm/
+    compose.yml              ← ROOT: open-webui
+    open-webui/
+```
+
+**Root compose** → sobe tudo da categoria de uma vez: `zstack up automation`
+**Standalone** → sobe apenas um serviço: `zstack up automation/n8n`
+
+---
+
 ## Usando o script `zstack` (recomendado)
 
 O `zstack` é o gerenciador de stacks integrado ao ZaneyOS (disponível após `zcli rebuild`):
 
 ```bash
-# Listar todas as stacks e status de .env
+# Listar todas as stacks (mostra root composes com [ROOT])
 zstack list
 
 # Listar apenas uma categoria
 zstack list --category automation
 
 # Inicializar .env a partir de .env.example (sem sobrescrever existentes)
-zstack init
-zstack init automation/woodpecker
-zstack init homelab/homepage
+zstack init                         # todas as categorias
+zstack init automation              # apenas serviços de automation/
+zstack init automation/woodpecker   # apenas woodpecker
 
-# Gerenciar stacks
+# Subir uma categoria inteira (root compose)
+zstack up automation
+zstack up databases
+zstack up monitoring
+
+# Subir apenas um serviço (standalone)
 zstack up homelab/homepage
-zstack down homelab/homepage
-zstack restart automation/woodpecker
-zstack logs homelab/homepage
+zstack up automation/n8n
+
+# Outros comandos (funcionam para root e standalone)
+zstack down automation
+zstack restart homelab/homepage
+zstack logs automation/n8n
 
 # Ver status de todos os containers
 zstack ps
@@ -36,7 +80,7 @@ zstack ps
 zstack doctor
 
 # Atualizar imagens e recriar
-zstack update llm/open-webui
+zstack update llm
 
 # Ver volumes que precisam backup
 zstack backup-info
@@ -47,7 +91,12 @@ zstack backup-info
 ## Como usar manualmente (alternativa)
 
 ```bash
-cd ~/zaneyos/docker/stacks/<categoria>/<stack>
+# Subir o root compose de uma categoria
+cd ~/zaneyos/docker/stacks/automation
+docker compose up -d
+
+# Subir apenas um serviço
+cd ~/zaneyos/docker/stacks/automation/n8n
 cp .env.example .env
 # Edite o .env com suas senhas reais
 docker compose up -d
@@ -97,10 +146,14 @@ docker compose up -d
 zstack init homelab/homepage
 # Edite o .env com seus hosts permitidos:
 nano docker/stacks/homelab/homepage/.env
+# Configure serviços (copie o exemplo e personalize):
+cp docker/stacks/homelab/homepage/config/services.yaml.example docker/stacks/homelab/homepage/config/services.yaml
+nano docker/stacks/homelab/homepage/config/services.yaml
 zstack up homelab/homepage
 ```
 
-Dashboard configurável para homelab. Adicione serviços em `config/services.yaml`.
+Dashboard configurável para homelab. Personalize serviços em `config/services.yaml` (use `services.yaml.example` como base).
+Veja também: `config/bookmarks.yaml`, `config/widgets.yaml`, `config/settings.yaml`.
 
 > **Erro "Host validation failed"?** Veja a seção de troubleshooting abaixo.
 
@@ -323,24 +376,25 @@ docker compose up -d
 
 ## Referência de portas
 
-| Serviço | Porta | URL local |
-|---|---|---|
-| Portainer | 9000 | http://portainer.localhost |
-| Caddy | 80 | — |
-| Homepage | 3003 | http://home.localhost |
-| PostgreSQL | 5432 | — |
-| MySQL | 3306 | — |
-| SQL Server | 1433 | — |
-| Redis | 6379 | — |
-| Adminer | 8082 | http://db.localhost |
-| CloudBeaver | 8978 | http://cloudbeaver.localhost |
-| Grafana | 3000 | http://grafana.localhost |
-| Prometheus | 9090 | — |
-| Loki | 3100 | — |
-| n8n | 5678 | http://n8n.localhost |
-| Uptime Kuma | 3001 | http://uptime.localhost |
-| Mailpit UI | 8025 | http://mail.localhost |
-| Mailpit SMTP | 1025 | — |
-| MinIO API | 9001 | http://minio.localhost |
-| MinIO Console | 9002 | — |
-| Open WebUI | 8080 | — |
+| Serviço | Porta | URL local (https) | URL Docker standalone (http) |
+|---|---|---|---|
+| Homepage | 3003 | https://home.homelab.lan | http://home.localhost |
+| Portainer | 9000 | https://portainer.homelab.lan | http://portainer.localhost |
+| Caddy | 80/443 | — | — |
+| PostgreSQL | 5432 | — | — |
+| MySQL | 3306 | — | — |
+| SQL Server | 1433 | — | — |
+| Redis | 6379 | — | — |
+| Adminer | 8082 | https://db.homelab.lan | http://db.localhost |
+| CloudBeaver | 8978 | https://cloudbeaver.homelab.lan | http://cloudbeaver.localhost |
+| Grafana | 3000 | https://grafana.homelab.lan | http://grafana.localhost |
+| Prometheus | 9090 | https://prometheus.homelab.lan | http://prometheus.localhost |
+| Loki | 3100 | — | — |
+| n8n | 5678 | https://n8n.homelab.lan | http://n8n.localhost |
+| Uptime Kuma | 3001 | https://uptime.homelab.lan | http://uptime.localhost |
+| Mailpit UI | 8025 | https://mail.homelab.lan | http://mail.localhost |
+| Mailpit SMTP | 1025 | — | — |
+| Woodpecker CI | 8000 | https://woodpecker.homelab.lan | http://woodpecker.localhost |
+| MinIO API | 9001 | https://minio.homelab.lan | http://minio.localhost |
+| MinIO Console | 9002 | — | — |
+| Open WebUI | 8080 | https://openwebui.homelab.lan | http://openwebui.localhost |

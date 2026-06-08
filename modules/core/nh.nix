@@ -15,5 +15,6 @@
   environment.systemPackages = with pkgs; [
     nix-output-monitor
     nvd
+    nix-init # scaffolda derivações NixOS (usado por: zcli pkg scaffold)
   ];
 }

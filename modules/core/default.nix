@@ -9,9 +9,12 @@
   tailscaleEnable = vars.tailscaleEnable or false;
   # Select the system-level edition module
   editionModule =
-    if edition == "full" then ../../modules/editions/full.nix
-    else if edition == "medium" then ../../modules/editions/medium.nix
-    else if edition == "vm" then ../../modules/editions/vm.nix
+    if edition == "full"
+    then ../../modules/editions/full.nix
+    else if edition == "medium"
+    then ../../modules/editions/medium.nix
+    else if edition == "vm"
+    then ../../modules/editions/vm.nix
     else ../../modules/editions/basic.nix; # default: basic
 in {
   imports =
@@ -38,6 +41,7 @@ in {
       ./stylix.nix
       ./syncthing.nix
       ./system.nix
+      ./secrets.nix
       ./thunar.nix
       ./user.nix
       ./virtualisation.nix

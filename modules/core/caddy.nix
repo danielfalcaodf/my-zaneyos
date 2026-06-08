@@ -29,15 +29,37 @@ in {
       local_certs
     '';
     virtualHosts = {
+      # ── Homelab ────────────────────────────────────────────────────
+      "home.${domain}" = mkProxy 3003;
       "portainer.${domain}" = mkProxy 9000;
-      "db.${domain}" = mkProxy 8082;
-      "cloudbeaver.${domain}" = mkProxy 8978;
+      # ── Bancos ─────────────────────────────────────────────────────
+      "db.${domain}" = mkProxy 8083;
+      "cloudbeaver.${domain}" = mkProxy 8979;
+      # ── Monitoring ─────────────────────────────────────────────────
+      "grafana.${domain}" = mkProxy 3000;
+      "prometheus.${domain}" = mkProxy 9090;
+      # ── Automação ──────────────────────────────────────────────────
       "n8n.${domain}" = mkProxy 5678;
       "uptime.${domain}" = mkProxy 3001;
       "mail.${domain}" = mkProxy 8025;
+      "woodpecker.${domain}" = mkProxy 8000;
+      # ── Storage ────────────────────────────────────────────────────
       "minio.${domain}" = mkProxy 9001;
-      "grafana.${domain}" = mkProxy 3000;
-      "home.${domain}" = mkProxy 3003;
+      # ── Registry ───────────────────────────────────────────────────
+      "registry.${domain}" = {
+        extraConfig = ''
+          reverse_proxy 127.0.0.1:5000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote}
+            header_up X-Forwarded-For {remote}
+            header_up X-Forwarded-Proto {scheme}
+          }
+        '';
+      };
+      # ── DNS Management ─────────────────────────────────────────────
+      "dns.${domain}" = mkProxy 5380;
+      # ── LLM / IA ───────────────────────────────────────────────────
+      "openwebui.${domain}" = mkProxy 8080;
     };
   };
 

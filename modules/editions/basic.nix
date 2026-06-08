@@ -38,6 +38,9 @@
     ncdu
     jq
     yq-go
+    #config vscode crip
+    libsecret
+    seahorse # Interface gráfica para você ver se as chaves estão sendo salvas
   ];
 
   # Docker enabled for Basic

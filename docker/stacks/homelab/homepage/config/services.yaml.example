@@ -1,0 +1,120 @@
+---
+# Homepage Services Configuration — Template
+# Copie para services.yaml e personalize: cp services.yaml.example services.yaml
+# Documentação completa: https://gethomepage.dev/configs/services/
+#
+# Estrutura:
+# - Categoria (ex: "Homelab", "Monitoring", "Bancos de Dados")
+#   - Grupo de serviços (ex: "Infraestrutura", "Ferramentas")
+#     - Serviço individual
+#         href: URL do serviço (use HTTPS via Caddy)
+#         description: Descrição curta exibida no card
+#         icon: Nome do ícone (arquivo em public/icons/ ou nome do ícone do homepage)
+#         widget: (opcional) Configuração de widget para status/métricas
+#
+# Domínios usam o sufixo configurado em hosts/<hostname>/variables.nix → localDomain (padrão: homelab.lan)
+# O Caddy (modules/core/caddy.nix) gerencia TLS automático via CA local.
+
+- Homelab:
+    - Infraestrutura:
+        - Homepage:
+            href: https://home.SEUDOMINIO.lan
+            description: Dashboard principal do homelab
+            icon: homepage.png
+        - Portainer:
+            href: https://portainer.SEUDOMINIO.lan
+            description: Gerenciador visual de containers Docker
+            icon: portainer.png
+        - DNS Manager (Technitium):
+            href: https://dns.SEUDOMINIO.lan
+            description: Gerenciador DNS com interface web
+            icon: technitium-dns.png
+
+- Bancos de Dados:
+    - Gerenciadores:
+        - Adminer:
+            href: https://db.SEUDOMINIO.lan
+            description: Gerenciador web leve (PostgreSQL, MySQL, SQLite)
+            icon: adminer.png
+        - CloudBeaver:
+            href: https://cloudbeaver.SEUDOMINIO.lan
+            description: IDE web enterprise para bancos de dados
+            icon: dbeaver.png
+
+- Monitoring:
+    - Métricas & Logs:
+        - Grafana:
+            href: https://grafana.SEUDOMINIO.lan
+            description: Dashboards e visualização de métricas
+            icon: grafana.png
+        - Prometheus:
+            href: https://prometheus.SEUDOMINIO.lan
+            description: Coleta e consulta de métricas (PromQL)
+            icon: prometheus.png
+        # - Loki:
+        #     href: https://loki.SEUDOMINIO.lan
+        #     description: Agregação de logs
+        #     icon: loki.png
+
+- Automação:
+    - Workflows & CI/CD:
+        - n8n:
+            href: https://n8n.SEUDOMINIO.lan
+            description: Automação de workflows (low-code)
+            icon: n8n.png
+        - Uptime Kuma:
+            href: https://uptime.SEUDOMINIO.lan
+            description: Monitor de uptime para serviços internos/externos
+            icon: uptime-kuma.png
+        - Mailpit:
+            href: https://mail.SEUDOMINIO.lan
+            description: Servidor SMTP local para desenvolvimento/testes
+            icon: mailpit.png
+        - Woodpecker CI:
+            href: https://woodpecker.SEUDOMINIO.lan
+            description: Plataforma CI/CD open source (GitHub/Gitea)
+            icon: woodpecker-ci.png
+
+- Storage:
+    - Object Storage:
+        - MinIO Console:
+            href: https://minio.SEUDOMINIO.lan
+            description: Console de gerenciamento S3-compatível
+            icon: minio.png
+        # - MinIO API:
+        #     href: https://minio-api.SEUDOMINIO.lan
+        #     description: Endpoint da API S3 (porta 9001)
+        #     icon: minio.png
+
+- LLM / IA:
+    - Interfaces:
+        - Open WebUI:
+            href: https://openwebui.SEUDOMINIO.lan
+            description: Interface web para modelos Ollama locais
+            icon: ollama.png
+        # - Ollama API:
+        #     href: https://ollama.SEUDOMINIO.lan
+        #     description: API REST do Ollama (porta 11434)
+        #     icon: ollama.png
+
+# Exemplos de widgets (opcional - requer configuração em widgets.yaml)
+# - Homelab:
+#     - Infraestrutura:
+#         - Homepage:
+#             href: https://home.SEUDOMINIO.lan
+#             description: Dashboard principal do homelab
+#             icon: homepage.png
+#             widget:
+#                 type: homepage
+#                 url: https://home.SEUDOMINIO.lan/api/status
+
+# Para adicionar ícones personalizados:
+# 1. Coloque arquivos .png/.svg em docker/stacks/homelab/homepage/config/public/icons/
+# 2. Referencie apenas o nome do arquivo (ex: "meu-servico.png")
+# 3. Ou use ícones built-in: https://gethomepage.dev/configs/services/#icons
+
+# Dicas:
+# - Mantenha SEUDOMINIO.lan consistente com seu variables.nix (localDomain)
+# - Comente serviços que não usa com # no início da linha
+# - Ordenação: categorias e serviços aparecem na ordem definida neste arquivo
+# - Para widgets de status, veja: https://gethomepage.dev/configs/info-widgets/

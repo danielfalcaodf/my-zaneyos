@@ -1,4 +1,7 @@
 {profile, ...}: {
+  # Disable PulseAudio — PipeWire's pulse compatibility replaces it
+  services.pulseaudio.enable = false;
+
   # Services to start
   services = {
     upower.enable = true; # noctalia shell battery
@@ -10,7 +13,7 @@
       enable = true; # Enable SSH
       settings = {
         PermitRootLogin = "no";
-        PasswordAuthentication = false;
+        PasswordAuthentication = true;
         KbdInteractiveAuthentication = false;
       };
       ports = [22];
@@ -32,6 +35,7 @@
       alsa.support32Bit = true;
       pulse.enable = true;
       jack.enable = true;
+      wireplumber.enable = true;
       extraConfig.pipewire."92-low-latency" = {
         "context.properties" = {
           "default.clock.rate" = 48000;

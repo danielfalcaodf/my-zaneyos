@@ -35,6 +35,8 @@ descriptions:
 || doom status   | ✅   | Checks if Doom Emacs is installed and shows version information.                                                                                     | `zcli doom status`                      |
 || doom remove   | 🗑️   | Completely removes Doom Emacs installation (with safety confirmation).                                                                               | `zcli doom remove`                      |
 || doom update   | 🔄   | Updates Doom Emacs packages and configuration via doom sync.                                                                                         | `zcli doom update`                      |
+|| pkg scaffold  | 📦   | Scaffolds a NixOS package derivation from a GitHub URL using `nix-init`. Outputs to `~/zaneyos/pkgs/<name>/default.nix`. | `zcli pkg scaffold https://github.com/owner/repo` |
+|| pkg list      | 📋   | Lists custom packages already scaffolded in `~/zaneyos/pkgs/`.                                                           | `zcli pkg list`                         |
 
 ## Advanced Build Options
 
@@ -147,3 +149,63 @@ zcli update --dry --verbose --cores 4
 - **Doom Emacs Integration:** The built-in Doom Emacs management eliminates the need
   for manual installation and configuration, providing a streamlined experience for
   this popular Emacs distribution.
+
+---
+
+## Criando Pacotes NixOS Customizados
+
+Use `zcli pkg` para criar pacotes NixOS a partir de repositórios GitHub que ainda não estão no nixpkgs.
+
+### Por que usar?
+
+Às vezes você encontra uma ferramenta no GitHub que funciona no Linux, mas ainda não tem um pacote NixOS oficial (ex: ferramentas novas, forks, agentes de IA). O `zcli pkg scaffold` usa o **nix-init** para gerar automaticamente a estrutura correta.
+
+### Como usar
+
+```bash
+# Scaffoldar um novo pacote
+zcli pkg scaffold https://github.com/owner/repo
+
+# Exemplo real:
+zcli pkg scaffold https://github.com/Kagi-Ryu/hermes-agent
+
+# Listar pacotes customizados criados
+zcli pkg list
+```
+
+### Fluxo completo
+
+```bash
+# 1. Gerar o pacote (nix-init é interativo — responda as perguntas)
+zcli pkg scaffold https://github.com/owner/my-tool
+
+# 2. Verificar o arquivo gerado
+cat ~/zaneyos/pkgs/my-tool/default.nix
+
+# 3. Editar se necessário (ajustar versão, hash, deps)
+$EDITOR ~/zaneyos/pkgs/my-tool/default.nix
+
+# 4. Expor o pacote no aggregador
+$EDITOR ~/zaneyos/pkgs/default.nix
+# Adicione: my-tool = pkgs.callPackage ./my-tool {};
+
+# 5. Adicionar ao seu packages.nix ou modules/home/default.nix
+# home.packages = with pkgs; [ my-tool ];
+
+# 6. Rebuild
+zcli rebuild
+```
+
+### Estrutura de arquivos
+
+```
+~/zaneyos/pkgs/
+  default.nix         ← aggregador (importado por overlays.nix)
+  my-tool/
+    default.nix       ← derivação gerada pelo nix-init
+  hermes-agent/
+    default.nix
+```
+
+> **Nota:** `nix-init` é instalado automaticamente via `modules/core/nh.nix` após o rebuild.
+> Ele auto-detecta a linguagem do projeto (Go, Rust, Python, Node.js) e preenche o template.

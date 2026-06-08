@@ -1,12 +1,18 @@
 {
-	# Disable automatic HTTPS — using .localhost domains on loopback only
+	# Disable automatic HTTPS — using .homelab.lan domains on loopback only
 	auto_https off
+}
+
+# ── Homelab ────────────────────────────────────────────────────────────────────
+home.localhost {
+	reverse_proxy 127.0.0.1:3003
 }
 
 portainer.localhost {
 	reverse_proxy 127.0.0.1:9000
 }
 
+# ── Bancos ────────────────────────────────────────────────────────────────────
 db.localhost {
 	reverse_proxy 127.0.0.1:8082
 }
@@ -15,6 +21,16 @@ cloudbeaver.localhost {
 	reverse_proxy 127.0.0.1:8978
 }
 
+# ── Monitoring ────────────────────────────────────────────────────────────────
+grafana.localhost {
+	reverse_proxy 127.0.0.1:3000
+}
+
+prometheus.localhost {
+	reverse_proxy 127.0.0.1:9090
+}
+
+# ── Automação ────────────────────────────────────────────────────────────────
 n8n.localhost {
 	reverse_proxy 127.0.0.1:5678
 }
@@ -27,14 +43,16 @@ mail.localhost {
 	reverse_proxy 127.0.0.1:8025
 }
 
+woodpecker.localhost {
+	reverse_proxy 127.0.0.1:8000
+}
+
+# ── Storage ───────────────────────────────────────────────────────────────────
 minio.localhost {
 	reverse_proxy 127.0.0.1:9001
 }
 
-grafana.localhost {
-	reverse_proxy 127.0.0.1:3000
-}
-
-home.localhost {
-	reverse_proxy 127.0.0.1:3003
+# ── LLM / IA ─────────────────────────────────────────────────────────────────
+openwebui.localhost {
+	reverse_proxy 127.0.0.1:8080
 }

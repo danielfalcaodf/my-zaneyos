@@ -11,6 +11,16 @@
     stylix.url = "github:danth/stylix/master";
     nix-flatpak.url = "github:gmodena/nix-flatpak?ref=latest";
 
+    systems.url = "github:nix-systems/x86_64-linux";
+
+    nix-ai-tools.url = "github:numtide/nix-ai-tools";
+    nix-ai-tools.inputs.systems.follows = "systems";
+    nix-ai-tools.inputs.blueprint.inputs.systems.follows = "systems";
+
+    sops-nix.url = "github:Mic92/sops-nix";
+    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
+
+    hermes-agent.url = "github:NousResearch/hermes-agent";
     noctalia = {
       url = "github:noctalia-dev/noctalia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -48,6 +58,8 @@
     nixvim,
     nix-flatpak,
     alejandra,
+    hermes-agent,
+    sops-nix,
     ...
   } @ inputs: let
     system = "x86_64-linux";
@@ -69,6 +81,8 @@
           ./modules/core/overlays.nix
           ./profiles/${gpuProfile}
           nix-flatpak.nixosModules.nix-flatpak
+          hermes-agent.nixosModules.default
+          sops-nix.nixosModules.sops
         ];
       };
   in {

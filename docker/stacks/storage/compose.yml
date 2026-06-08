@@ -1,0 +1,36 @@
+# Storage stack — MinIO object storage compatível com S3.
+#
+# Pré-requisito:
+#   zstack init storage
+#
+# Uso:
+#   zstack up storage
+services:
+
+  # ─── MinIO ───────────────────────────────────────────────────────────────────
+  # API S3: 127.0.0.1:9001  |  Console web: 127.0.0.1:9002
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${MINIO_API_PORT:-9001}:9000"
+      - "127.0.0.1:${MINIO_CONSOLE_PORT:-9002}:9001"
+    env_file:
+      - "./minio/.env"
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-minioadmin}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD é obrigatório — configure ./minio/.env}
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - storage
+
+volumes:
+  minio_data:
+
+networks:
+  storage:
+    name: storage
+    driver: bridge

@@ -76,11 +76,28 @@ in
       fi
 
       section "Stacks disponíveis"
-      if [[ -n "$category" ]]; then
-        local cat_dir="$STACKS_ROOT/$category"
-        [[ -d "$cat_dir" ]] || die "Categoria não encontrada: $category"
-        echo -e "''${CYAN}$category''${NC}"
-        for stack_dir in "$cat_dir"/*/; do
+
+      list_category() {
+        local cat_dir="$1"
+        local cat
+        cat="$(basename "$cat_dir")"
+        echo -e "''${CYAN}$cat/''${NC}"
+
+        # Root compose da categoria (ex: automation/compose.yml)
+        local root_compose
+        root_compose="$(find_compose "$cat_dir")"
+        if [[ -n "$root_compose" ]]; then
+          local has_env=""
+          if find "$cat_dir"* -maxdepth 1 -name ".env" -type f 2>/dev/null | grep -q .; then
+            has_env="''${GREEN}[.env OK]''${NC}"
+          else
+            has_env="''${YELLOW}[inicie com: zstack init $cat]''${NC}"
+          fi
+          echo -e "  ├─ ''${BLUE}[ROOT]''${NC}  ''${GREEN}[compose]''${NC}  $has_env  → zstack up $cat"
+        fi
+
+        # Stacks individuais (sub-pastas com compose.yml)
+        for stack_dir in "$cat_dir"*/; do
           [[ -d "$stack_dir" ]] || continue
           local stack
           stack="$(basename "$stack_dir")"
@@ -89,27 +106,19 @@ in
           local has_env=""
           [[ -f "$stack_dir/.env" ]] && has_env="''${GREEN}[.env OK]''${NC}" || has_env="''${YELLOW}[sem .env]''${NC}"
           local has_compose=""
-          [[ -n "$compose_file" ]] && has_compose="''${GREEN}[compose OK]''${NC}" || has_compose="''${RED}[sem compose]''${NC}"
+          [[ -n "$compose_file" ]] && has_compose="''${GREEN}[compose]''${NC}" || has_compose="''${RED}[sem compose]''${NC}"
           echo -e "  ├─ $stack  $has_compose  $has_env"
         done
+      }
+
+      if [[ -n "$category" ]]; then
+        local cat_dir="$STACKS_ROOT/$category"
+        [[ -d "$cat_dir" ]] || die "Categoria não encontrada: $category"
+        list_category "$cat_dir"
       else
         for cat_dir in "$STACKS_ROOT"/*/; do
           [[ -d "$cat_dir" ]] || continue
-          local cat
-          cat="$(basename "$cat_dir")"
-          echo -e "''${CYAN}$cat/''${NC}"
-          for stack_dir in "$cat_dir"*/; do
-            [[ -d "$stack_dir" ]] || continue
-            local stack
-            stack="$(basename "$stack_dir")"
-            local compose_file
-            compose_file="$(find_compose "$stack_dir")"
-            local has_env=""
-            [[ -f "$stack_dir/.env" ]] && has_env="''${GREEN}[.env OK]''${NC}" || has_env="''${YELLOW}[sem .env]''${NC}"
-            local has_compose=""
-            [[ -n "$compose_file" ]] && has_compose="''${GREEN}[compose]''${NC}" || has_compose="''${RED}[sem compose]''${NC}"
-            echo -e "  ├─ $stack  $has_compose  $has_env"
-          done
+          list_category "$cat_dir"
         done
       fi
     }
@@ -168,7 +177,7 @@ in
     }
 
     cmd_up() {
-      [[ $# -ge 1 ]] || die "Uso: zstack up <categoria/stack>"
+      [[ $# -ge 1 ]] || die "Uso: zstack up <categoria> | <categoria/stack>"
       local stack_dir
       stack_dir="$(resolve_stack_dir "$1")"
       section "Subindo $1"
@@ -177,7 +186,7 @@ in
     }
 
     cmd_down() {
-      [[ $# -ge 1 ]] || die "Uso: zstack down <categoria/stack>"
+      [[ $# -ge 1 ]] || die "Uso: zstack down <categoria> | <categoria/stack>"
       local stack_dir
       stack_dir="$(resolve_stack_dir "$1")"
       section "Derrubando $1"
@@ -186,7 +195,7 @@ in
     }
 
     cmd_restart() {
-      [[ $# -ge 1 ]] || die "Uso: zstack restart <categoria/stack>"
+      [[ $# -ge 1 ]] || die "Uso: zstack restart <categoria> | <categoria/stack>"
       local stack_dir
       stack_dir="$(resolve_stack_dir "$1")"
       section "Reiniciando $1"
@@ -196,7 +205,7 @@ in
     }
 
     cmd_logs() {
-      [[ $# -ge 1 ]] || die "Uso: zstack logs <categoria/stack>"
+      [[ $# -ge 1 ]] || die "Uso: zstack logs <categoria> | <categoria/stack>"
       local stack_dir
       stack_dir="$(resolve_stack_dir "$1")"
       section "Logs de $1"
@@ -210,6 +219,18 @@ in
         [[ -d "$cat_dir" ]] || continue
         local cat
         cat="$(basename "$cat_dir")"
+
+        # Root compose da categoria
+        local root_compose
+        root_compose="$(find_compose "$cat_dir")"
+        if [[ -n "$root_compose" ]]; then
+          found=1
+          echo -e "\n''${BLUE}$cat [ROOT]''${NC}"
+          (cd "$cat_dir" && docker compose -f "$(basename "$root_compose")" ps --format table 2>/dev/null) || \
+            warn "$cat: falha ao consultar status do root compose"
+        fi
+
+        # Stacks individuais (sub-pastas)
         for stack_dir in "$cat_dir"*/; do
           [[ -d "$stack_dir" ]] || continue
           local stack
@@ -313,28 +334,43 @@ in
       cat <<'HELP'
     zstack — Gerenciador de Docker Stacks para ZaneyOS Homelab
 
+    Padrão de diretórios:
+      docker/stacks/<categoria>/compose.yml          Root compose (sobe todos os serviços da categoria)
+      docker/stacks/<categoria>/<stack>/compose.yml  Compose individual (sobe só aquele serviço)
+
     Uso:
-      zstack list [--category <cat>]          Lista stacks disponíveis
+      zstack list [--category <cat>]          Lista stacks e root composes disponíveis
       zstack init [<cat>/<stack>|<cat>]       Cria .env a partir de .env.example
-      zstack up   <cat>/<stack>               Sobe a stack (docker compose up -d)
-      zstack down <cat>/<stack>               Derruba a stack
-      zstack restart <cat>/<stack>            Reinicia a stack
-      zstack logs <cat>/<stack>               Mostra logs (-f)
-      zstack ps                               Status de todas as stacks
+      zstack up   <cat> | <cat>/<stack>       Sobe o root compose ou stack individual
+      zstack down <cat> | <cat>/<stack>       Derruba
+      zstack restart <cat> | <cat>/<stack>    Reinicia
+      zstack logs <cat> | <cat>/<stack>       Mostra logs (-f)
+      zstack ps                               Status de todos os containers
       zstack doctor                           Valida ambiente, .env e Docker
-      zstack update <cat>/<stack>             Pull de imagens + recreate
+      zstack update <cat> | <cat>/<stack>     Pull de imagens + recreate
       zstack backup-info                      Mostra volumes que precisam backup
 
     Exemplos:
       zstack list
       zstack list --category automation
-      zstack init
-      zstack init automation/woodpecker
+      zstack init                             Inicializa .env de TODAS as stacks
+      zstack init automation                  Inicializa .env de todas as stacks em automation/
+      zstack init automation/woodpecker       Inicializa .env apenas do woodpecker
+      zstack up automation                    Sobe todos os serviços de automação (root compose)
+      zstack up automation/n8n                Sobe apenas o n8n (compose individual)
       zstack up homelab/homepage
       zstack logs homelab/homepage
       zstack doctor
 
-    As stacks ficam em: ~/zaneyos/docker/stacks/<categoria>/<stack>/
+    Stacks disponíveis:
+      homelab/     → portainer, caddy, homepage
+      automation/  → mailpit, n8n, uptime-kuma, woodpecker
+      databases/   → postgres, mysql, redis, sqlserver, adminer, cloudbeaver
+      monitoring/  → grafana, loki, prometheus
+      storage/     → minio
+      llm/         → open-webui
+
+    As stacks ficam em: ~/zaneyos/docker/stacks/<categoria>/
     Cada stack deve ter compose.yml (ou docker-compose.yml) e .env.example.
     HELP
     }

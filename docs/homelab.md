@@ -21,15 +21,18 @@ Celular / outro PC na rede local
     │  TLS: CA local (Caddy internal CA — local_certs)
     │  HTTP :80 → redireciona para HTTPS :443
     │
-    ├── portainer.homelab.lan  →  127.0.0.1:9000  (Portainer)
-    ├── db.homelab.lan         →  127.0.0.1:8082  (Adminer)
-    ├── cloudbeaver.homelab.lan→  127.0.0.1:8978  (CloudBeaver)
-    ├── n8n.homelab.lan        →  127.0.0.1:5678  (n8n)
-    ├── uptime.homelab.lan     →  127.0.0.1:3001  (Uptime Kuma)
-    ├── mail.homelab.lan       →  127.0.0.1:8025  (Mailpit)
-    ├── minio.homelab.lan      →  127.0.0.1:9001  (MinIO)
-    ├── grafana.homelab.lan    →  127.0.0.1:3000  (Grafana)
-    └── home.homelab.lan       →  127.0.0.1:3003  (Homepage)
+    ├── home.homelab.lan          →  127.0.0.1:3003  (Homepage)
+    ├── portainer.homelab.lan     →  127.0.0.1:9000  (Portainer)
+    ├── db.homelab.lan            →  127.0.0.1:8082  (Adminer)
+    ├── cloudbeaver.homelab.lan   →  127.0.0.1:8978  (CloudBeaver)
+    ├── grafana.homelab.lan       →  127.0.0.1:3000  (Grafana)
+    ├── prometheus.homelab.lan    →  127.0.0.1:9090  (Prometheus)
+    ├── n8n.homelab.lan           →  127.0.0.1:5678  (n8n)
+    ├── uptime.homelab.lan        →  127.0.0.1:3001  (Uptime Kuma)
+    ├── mail.homelab.lan          →  127.0.0.1:8025  (Mailpit)
+    ├── woodpecker.homelab.lan    →  127.0.0.1:8000  (Woodpecker CI)
+    ├── minio.homelab.lan         →  127.0.0.1:9001  (MinIO)
+    └── openwebui.homelab.lan     →  127.0.0.1:8080  (Open WebUI)
 
 Acesso remoto (Tailscale VPN — opcional):
     Dispositivo remoto
@@ -123,12 +126,15 @@ Stack: `docker/stacks/homelab/homepage/`
 zstack init homelab/homepage
 # Edite o .env com os hosts permitidos
 nano docker/stacks/homelab/homepage/.env
+# Configure serviços (copie o exemplo e personalize):
+cp docker/stacks/homelab/homepage/config/services.yaml.example docker/stacks/homelab/homepage/config/services.yaml
+nano docker/stacks/homelab/homepage/config/services.yaml
 zstack up homelab/homepage
 ```
 
 Acesse em: https://home.homelab.lan
 
-Personalize adicionando serviços em `config/services.yaml` e `config/bookmarks.yaml`.
+Personalize serviços em `config/services.yaml` (use `services.yaml.example` como template), bookmarks em `config/bookmarks.yaml`, e widgets em `config/widgets.yaml`.
 Veja a documentação completa em: https://gethomepage.dev
 
 > **Erro "Host validation failed"?** Configure `HOMEPAGE_ALLOWED_HOSTS` no `.env`.
@@ -167,16 +173,18 @@ Veja o guia completo em: [`docs/woodpecker-ci.md`](woodpecker-ci.md)
 
 | Serviço | URL local |
 |---|---|
+| Homepage | https://home.homelab.lan |
 | Portainer | https://portainer.homelab.lan |
 | Adminer | https://db.homelab.lan |
 | CloudBeaver | https://cloudbeaver.homelab.lan |
+| Grafana | https://grafana.homelab.lan |
+| Prometheus | https://prometheus.homelab.lan |
 | n8n | https://n8n.homelab.lan |
 | Uptime Kuma | https://uptime.homelab.lan |
 | Mailpit | https://mail.homelab.lan |
-| MinIO Console | https://minio.homelab.lan |
-| Grafana | https://grafana.homelab.lan |
-| Homepage | https://home.homelab.lan |
-| Woodpecker CI | http://woodpecker.homelab.lan |
+| Woodpecker CI | https://woodpecker.homelab.lan |
+| MinIO | https://minio.homelab.lan |
+| Open WebUI | https://openwebui.homelab.lan |
 
 > O domínio `homelab.lan` pode ser trocado em `hosts/<hostname>/variables.nix` (`localDomain`).
 > Veja [docs/network.md](network.md) para o guia completo de rede, TLS e VPN.

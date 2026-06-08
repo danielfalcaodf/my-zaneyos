@@ -4,7 +4,12 @@
 # Ollama service is already toggled via services.ollama.enable in full.nix.
 # Open WebUI is deployed as a Docker stack (see docker/stacks/).
 #
-{pkgs, ...}: {
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}: {
   environment.systemPackages = with pkgs; [
     # llama.cpp — local LLM inference CLI (CPU + GPU)
     # Usage: llama-cli -m model.gguf -p "prompt"
@@ -14,6 +19,14 @@
     # https://opencode.ai / https://search.nixos.org/packages?query=opencode-desktop
     # opencode CLI já está em tier2/medium; aqui entra a UI desktop (full only)
     opencode-desktop
+    #Browser automation tool for AI workflows
+    inputs.nix-ai-tools.packages.${pkgs.system}.agent-browser
+    #Prompt and workflow toolkit for local AI usage
+    fabric-ai
+
+    inputs.nix-ai-tools.packages.${pkgs.system}.openspec
+
+    inputs.nix-ai-tools.packages.${pkgs.system}.openskills
   ];
 
   # Tabby: self-hosted AI code completion server
