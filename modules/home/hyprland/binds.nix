@@ -10,18 +10,18 @@
   noctaliaBind =
     if barChoice == "noctalia"
     then [
-      "$modifier,D, Noctalia Launcher, exec, noctalia-shell ipc call launcher toggle"
-      "$modifier SHIFT,Return, Noctalia Launcher, exec, noctalia-shell ipc call launcher toggle"
-      "$modifier,M, Noctalia Notifications, exec,  noctalia-shell ipc call notifications toggleHistory"
-      "$modifier,V, Noctalia Clipboard, exec,  noctalia-shell ipc call launcher clipboard"
-      "$modifier ALT,P, Noctalia Settings, exec, noctalia-shell ipc call settings toggle"
-      "$modifier SHIFT,comma, Noctalia Settings, exec, noctalia-shell ipc call settings toggle"
-      "$modifier CTRL,L, Noctalia Lock Screen, exec,  noctalia-shell ipc call sessionMenu lockscreen lock"
-      "$modifier SHIFT,W, Noctalia Wallpaper, exec, noctalia-shell ipc call wallpaper toggle"
-      "$modifier,X, Noctalia Power Menu, exec,  noctalia-shell ipc call sessionMenu toggle"
-      "$modifier,C, Noctalia Control Center, exec,  noctalia-shell ipc call controlCenter toggle"
-      "$modifier CTRL,R, Noctalia Screen Recorder, exec,  noctalia-shell ipc call screenRecorder toggle"
-      "$modifier SHIFT,R, Restart Noctalia shell, exec,  restart.noctalia"
+      "$modifier,D, Noctalia Launcher, exec, noctalia msg panel-toggle launcher"
+      "$modifier SHIFT,Return, Noctalia Launcher, exec, noctalia msg panel-toggle launcher"
+      "$modifier,M, Noctalia Notifications, exec, noctalia msg panel-toggle control-center notifications"
+      "$modifier,V, Noctalia Clipboard, exec, noctalia msg panel-toggle clipboard"
+      "$modifier ALT,P, Noctalia Settings, exec, noctalia msg settings-toggle"
+      "$modifier SHIFT,comma, Noctalia Settings, exec, noctalia msg settings-toggle"
+      "$modifier CTRL,L, Noctalia Lock Screen, exec, noctalia msg session lock"
+      "$modifier SHIFT,W, Noctalia Wallpaper, exec, noctalia msg panel-toggle wallpaper"
+      "$modifier,X, Noctalia Power Menu, exec, noctalia msg panel-toggle session"
+      "$modifier,C, Noctalia Control Center, exec, noctalia msg panel-toggle control-center"
+      "$modifier CTRL,R, Noctalia Screenshot Region, exec, noctalia msg screenshot-region"
+      "$modifier SHIFT,R, Restart Noctalia shell, exec, restart.noctalia"
     ]
     else [];
   # Rofi launcher bindings (only included when barChoice != "noctalia")
