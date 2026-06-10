@@ -581,9 +581,8 @@
 - Added `vscode.nix` from ddubsOS.
   - Pre-configured with many useful plugins
   - Also works as template to add more
-- Added `antigravity` IDE from Google based on vscodium
 - Created `modules/core/overlays.nix`
-  - Currently only has `antigravity` but more maybe be needed later
+  - Added package override support
 - Fixed gestures errors from Hyprland Upgrade
 - Added Noctalia Shell as default
 - Added Additional waybars from dddubsOS
@@ -604,7 +603,6 @@
     - tmux
     - Wezterm
   - Editors
-    - antigravity
     - emacs
     - evil-helix
     - nixvim

@@ -11,7 +11,6 @@
     vscodeEnable
     helixEnable
     doomEmacsEnable
-    antigravityEnable
     ;
   # Select bar module based on barChoice
   barModule =
@@ -70,11 +69,6 @@ in {
     ++ (
       if vscodeEnable
       then [./editors/vscode.nix]
-      else []
-    )
-    ++ (
-      if antigravityEnable
-      then [./editors/antigravity.nix]
       else []
     )
     ++ (

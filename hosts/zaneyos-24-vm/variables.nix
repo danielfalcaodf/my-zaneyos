@@ -15,7 +15,6 @@
   weztermEnable = true;
   ghosttyEnable = true;
   vscodeEnable = true;
-  antigravityEnable = false; # Google port of vscodium
   # Note: This is evil-helix with VIM keybindings by default
   helixEnable = false;
   #To install: Enable here, zcli rebuild, then run zcli doom install
