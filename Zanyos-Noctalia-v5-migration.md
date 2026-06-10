@@ -1,17 +1,130 @@
-# ZaneyOS Noctalia v5 migration (manual/backport guide)
-This guide is for users on older ZaneyOS revisions who **cannot or do not want to pull the fixed branch** but still want to migrate from the old Noctalia shell integration to Noctalia v5.
+# ZaneyOS Noctalia v5 migration (automated first, manual fallback)
+This guide is for users on older/custom ZaneyOS branches who want to move from legacy Noctalia Shell integration to Noctalia v5 safely.
 
-Noctalia v5 is a rewrite and uses:
+Noctalia v5 uses:
 
 - standalone binary: `noctalia`
 - IPC command style: `noctalia msg <command>`
 - config directory: `~/.config/noctalia` (not `~/.config/quickshell/noctalia-shell`)
 
+## Preferred path: use the migration scripts
+If your repository contains these scripts, use this flow:
+
+- `modules/src/noctalia-v5-prepare.sh`
+- `modules/src/noctalia-v5-finalize.sh`
+
+The script flow is designed to be safer and more repeatable than manual edits.
+
+### Step A) Prepare test branch from `origin/noctaliav5`
+Run from repo root:
+
+```bash
+./modules/src/noctalia-v5-prepare.sh
+```
+
+Default behavior:
+
+- verifies repo/rebase/merge state
+- stashes local changes (tracked + untracked) if needed
+- fetches `origin/noctaliav5`
+- creates local test branch `local/noctalia-v5-test` tracking `origin/noctaliav5`
+- writes state to `.git/noctalia-v5-migration.state`
+
+Useful options:
+
+```bash
+# Different remote/source branch:
+./modules/src/noctalia-v5-prepare.sh --remote origin --source-branch noctaliav5
+
+# Different local test branch name:
+./modules/src/noctalia-v5-prepare.sh --test-branch local/my-noctalia-v5-test
+
+# Refuse dirty tree instead of auto-stashing:
+./modules/src/noctalia-v5-prepare.sh --no-stash
+
+# Reset an already-existing test branch to latest remote branch:
+./modules/src/noctalia-v5-prepare.sh --force-reset-test-branch
+```
+
+### Step B) Validate on the test branch
+While on the test branch, run validation/build:
+
+```bash
+zcli rebuild --dry
+```
+
+Then do your normal live test build flow, for example:
+
+```bash
+fr
+```
+
+or:
+
+```bash
+zcli rebuild
+```
+
+### Step C) Merge tested branch back to your original branch
+If testing passes:
+
+```bash
+./modules/src/noctalia-v5-finalize.sh
+```
+
+Default behavior:
+
+- reads `.git/noctalia-v5-migration.state`
+- switches back to your original branch
+- merges in the tested branch (`--no-ff --no-edit`)
+- restores prep stash if one was created
+- removes state file on success
+
+Useful options:
+
+```bash
+# Require fast-forward only merge:
+./modules/src/noctalia-v5-finalize.sh --ff-only
+
+# Keep stash untouched (restore manually later):
+./modules/src/noctalia-v5-finalize.sh --no-restore-stash
+
+# Delete local test branch after successful merge:
+./modules/src/noctalia-v5-finalize.sh --drop-test-branch
+```
+
+### Scripted flow rollback / abort
+If you prepared but want to stop before finalizing:
+
+```bash
+# Load saved branch names:
+source .git/noctalia-v5-migration.state
+
+# Return to your original branch:
+git switch "$ORIGINAL_BRANCH"
+
+# Optionally delete the local test branch:
+git branch -D "$TEST_BRANCH"
+
+# Restore stashed work manually if needed:
+git stash list
+git stash apply stash@{N}
+
+# Remove script state file:
+rm -f .git/noctalia-v5-migration.state
+```
+
+---
+
+## Manual/backport fallback (file-by-file)
+Use this if you cannot use the scripts.
+
 ## Step 0) Safety first
 From your ZaneyOS repo root:
 
 ```bash
-git checkout -b noctalia-v5-manual-migration
+# Optional isolated branch for manual migration:
+git switch -c local/noctalia-v5-migration 2>/dev/null || git switch local/noctalia-v5-migration
 git status
 ```
 
