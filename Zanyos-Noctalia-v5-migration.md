@@ -92,6 +92,31 @@ Useful options:
 # Delete local test branch after successful merge:
 ./modules/src/noctalia-v5-finalize.sh --drop-test-branch
 ```
+### Step D) Publish the updated branch (usually your primary branch)
+`noctalia-v5-finalize.sh` merges back into the branch you started from (`ORIGINAL_BRANCH`), which may or may not be `main`.
+
+Publish whichever branch was updated:
+
+```bash
+# Confirm the currently checked-out branch (this should be your updated branch)
+git branch --show-current
+
+# Push that branch
+git push origin "$(git branch --show-current)"
+```
+
+If you tested from one branch but publish from another (typically `main`), merge it explicitly:
+
+```bash
+# Replace these with your branch names
+UPDATED_BRANCH="<branch-with-noctalia-v5-fixes>"
+PUBLISH_BRANCH="<branch-you-release-from>"   # typically main
+
+git switch "$PUBLISH_BRANCH"
+git pull --ff-only origin "$PUBLISH_BRANCH"
+git merge --ff-only "$UPDATED_BRANCH" || git merge "$UPDATED_BRANCH"
+git push origin "$PUBLISH_BRANCH"
+```
 
 ### Scripted flow rollback / abort
 If you prepared but want to stop before finalizing:
@@ -338,6 +363,18 @@ zcli rebuild
 - Settings opens with `noctalia msg settings-toggle`.
 - Lock command works (`noctalia msg session lock`).
 - Control Center, clipboard, wallpaper, and session panel binds all respond.
+## Step 10) Publish your updated branch
+Same idea as scripted Step D: push whichever branch you actually updated (typically `main`, but many users release from a stable/custom branch).
+
+```bash
+# Confirm your updated branch
+git branch --show-current
+
+# Push that branch
+git push origin "$(git branch --show-current)"
+```
+
+If you need to publish from a different branch, merge first (for example into `main`) and then push that publish branch.
 
 ## Rollback
 If needed:
