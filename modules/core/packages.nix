@@ -68,7 +68,8 @@ in {
       icu # dep for gearlever
       gimp # Great Photo Editor
       gnumake # Needed for emacs
-      gpu-screen-recorder # needed for nnoctalia-shell
+      google-chrome # default browser
+      gpu-screen-recorder # needed for noctalia-shell
       power-profiles-daemon # needed for noctalia-shell power cycle
       mesa-demos # needed for inxi diag util
       tuigreet # The Login Manager (Sometimes Referred To As Display Manager)
