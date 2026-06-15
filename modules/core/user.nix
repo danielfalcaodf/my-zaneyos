@@ -7,10 +7,7 @@
   profile,
   ...
 }: let
-  zaneyos =
-    if config ? zaneyos
-    then config.zaneyos
-    else import ../../hosts/${host}/variables.nix;
+  zaneyos = import ../../hosts/${host}/variables.nix;
   inherit (zaneyos) gitUsername;
 in {
   imports = [inputs.home-manager.nixosModules.home-manager];
