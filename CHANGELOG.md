@@ -5,6 +5,11 @@
 
 ---
 
+# 🚀 **Current Release - ZaneyOS v2.6.3**
+
+- Fix: bindings for noctalia-shell v5.0.0
+- Upd: Flake URL for noctalia-shell
+
 # 🚀 **Current Release - ZaneyOS v2.6.2**
 
 - Fix: `nixvim` eval error regarding nixpkgs
