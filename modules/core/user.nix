@@ -7,7 +7,11 @@
   profile,
   ...
 }: let
-  inherit (config.zaneyos) gitUsername;
+  zaneyos =
+    if config ? zaneyos
+    then config.zaneyos
+    else import ../../hosts/${host}/variables.nix;
+  inherit (zaneyos) gitUsername;
 in {
   imports = [inputs.home-manager.nixosModules.home-manager];
   home-manager = {
@@ -15,8 +19,7 @@ in {
     useGlobalPkgs = false;
     backupFileExtension = "backup";
     extraSpecialArgs = {
-      inherit inputs username host profile pkgs;
-      inherit (config) zaneyos;
+      inherit inputs username host profile pkgs zaneyos;
     };
     users.${username} = {
       imports = [./../home];
