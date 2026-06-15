@@ -1,10 +1,5 @@
-{host, ...}: let
-  vars = import ../../../hosts/${host}/variables.nix;
-  inherit
-    (vars)
-    barChoice
-    stylixImage
-    ;
+{zaneyos, ...}: let
+  inherit (zaneyos) barChoice stylixImage;
   # Noctalia-specific startup commands
   noctaliaExec =
     if barChoice == "noctalia"
@@ -13,6 +8,8 @@
       "pkill waybar"
       "killall -q swaync"
       "pkill swaync"
+      "systemctl --user stop noctalia || true"
+      "pkill -x noctalia || true"
       "noctalia"
     ]
     else [];
@@ -23,6 +20,8 @@
       "killall -q awww;sleep .5 && awww-daemon"
       "killall -q waybar;sleep .5 && waybar"
       "killall -q swaync;sleep .5 && swaync"
+      "systemctl --user stop noctalia || true"
+      "pkill -x noctalia || true"
       "nm-applet --indicator"
       # Delayed-only restore so Stylix finishes first, then user's wallpaper wins with a single change
       "sh -lc 'sleep 2 && (qs-wallpapers-restore || waypaper --wallpaper ${stylixImage} --backend awww) >/dev/null 2>&1 || true'"
