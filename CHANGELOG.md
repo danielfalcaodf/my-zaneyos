@@ -9,6 +9,7 @@
 
 - Fix: bindings for noctalia-shell v5.0.0
 - Upd: Flake URL for noctalia-shell
+- Add: CLI utils - bottom - cointop - netscanner - gotop - lstr - ttop - isd - zenith
 
 # 🚀 **Current Release - ZaneyOS v2.6.2**
 

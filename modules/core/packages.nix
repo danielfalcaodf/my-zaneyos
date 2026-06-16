@@ -100,6 +100,7 @@ in {
       ripgrep # Improved Grep
       sqlite # needed for emaacs
       socat # Needed For Screenshots
+      ttop # top with histogram
       unrar # Tool For Handling .rar Files
       unzip # Tool For Handling .zip Files
       usbutils # Good Tools For USB Devices
@@ -111,5 +112,12 @@ in {
       wget # Tool For Fetching Files With Links
       ytmdl # Tool For Downloading Audio From YouTube
       python3 # Python 3 programming language
+      zenith # like htop but more
+      isd # system util
+      netscanner # find devices on network
+      lstr # Tree alternative
+      cointop # top for ctrypto
+      bottom # top alternative
+      gotop # Another top
     ];
 }
