@@ -5,64 +5,15 @@
 }: let
   inherit (pkgs.lib) attrByPath;
 
-  # Optional versions; set these to real versions to enable marketplace fetches.
-  hyprlangVer = "0.0.3"; # fireblast.hyprlang-vscode
-  hyprlsVer = "0.1.2"; # ewen-lbh.vscode-hyprls
-  neroHyprlandVer = "0.0.2"; # amarcos1337.nero-hyprland
-  codeRunnerVer = "0.12.4"; # formulahendry.code-runner
-
-  # Helper: prefer Open VSX (pkgs.vscode-extensions). If missing and a version is
-  # provided, fetch from the VSCode Marketplace using extensionsFromVscodeMarketplace.
-  extOrMarketplace = {
-    publisher,
-    name,
-    version ? null,
-    sha256 ? null,
-  }: let
-    fromOpenVSX = attrByPath [publisher name] null pkgs.vscode-extensions;
-  in
-    if fromOpenVSX != null
-    then [fromOpenVSX]
-    else if version == null
-    then []
-    else
-      pkgs.vscode-utils.extensionsFromVscodeMarketplace [
-        {
-          inherit name publisher version;
-          sha256 =
-            if sha256 == null
-            then pkgs.lib.fakeSha256
-            else sha256;
-        }
-      ];
-
-  hyprlangExts = extOrMarketplace {
-    publisher = "fireblast";
-    name = "hyprlang-vscode";
-    version = hyprlangVer;
-    sha256 = "sha256-iMCyomgMGGUXaVqq1l7bgyvFgZa/W/eWHaqkA5RmExE=";
-  };
-  hyprlsExts = extOrMarketplace {
-    publisher = "ewen-lbh";
-    name = "vscode-hyprls";
-    version = hyprlsVer;
-    sha256 = "sha256-pTg8ZyfhZj31Rv8gxhPbQ+CYzb5MXYdaI46JQHPU9ng=";
-  };
-  neroHyprlandExts = extOrMarketplace {
-    publisher = "amarcos1337";
-    name = "nero-hyprland";
-    version = neroHyprlandVer;
-    sha256 = "sha256-3RiSYmJK/xODCvUi9c2xtvEIWSBABVHk6QYCAFoqsa8=";
-  };
-  codeRunnerExts = extOrMarketplace {
-    publisher = "formulahendry";
-    name = "code-runner";
-    version = codeRunnerVer;
-    sha256 = pkgs.lib.fakeSha256;
-  };
+  # Extensions not in nixpkgs — defined as empty lists (install via VSCode Marketplace)
+  hyprlangExts = [];
+  hyprlsExts = [];
+  neroHyprlandExts = [];
+  codeRunnerExts = [];
 in {
   programs.vscode = {
     enable = true;
+    package = pkgs.vscode;
     profiles = {
       default = {
         extensions =
@@ -72,7 +23,7 @@ in {
             kamadorueda.alejandra
             jeff-hykin.better-nix-syntax
             ms-vscode.cpptools-extension-pack
-            vscodevim.vim
+
             mads-hartmann.bash-ide-vscode
             tamasfe.even-better-toml
             zainchen.json
@@ -92,17 +43,20 @@ in {
           ++ hyprlsExts
           ++ neroHyprlandExts
           ++ codeRunnerExts;
-        userSettings = lib.mkForce {
-          "workbench.colorTheme" = "Nero Hyprland";
-          "workbench.iconTheme" = "catppuccin-mocha";
-          "editor.formatOnSave" = true;
-          "editor.defaultFormatter" = "esbenp.prettier-vscode";
-          "[nix]" = {"editor.defaultFormatter" = "kamadorueda.alejandra";};
-          "[python]" = {"editor.defaultFormatter" = "ms-python.python";};
-        };
+
+        # FOI REMOVIDO DAQUI O: userSettings = lib.mkDefault baseSettings;
+        # Agora o Home Manager não vai mais sequestrar o settings.json.
+        # O VSCode Settings Sync poderá criar e modificar esse arquivo livremente!
       };
     };
   };
+
+  # Mantém o suporte para o armazenamento do Token do Sync
+  home.packages = with pkgs; [
+    libsecret
+    seahorse
+  ];
+
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.permittedInsecurePackages = [ "openssl-1.1.1w" ];
+  nixpkgs.config.permittedInsecurePackages = ["openssl-1.1.1w"];
 }

@@ -1,4 +1,4 @@
-{host, ...}: let
+{host, pkgs, ...}: let
   vars = import ../../hosts/${host}/variables.nix;
   inherit
     (vars)
@@ -27,6 +27,7 @@ in {
       ./bashrc-personal.nix
       ./overview.nix
       ./python.nix
+      ./node.nix
       ./cli/bat.nix
       ./cli/btop.nix
       ./cli/bottom.nix
@@ -42,6 +43,7 @@ in {
       ./hyprland
       ./terminals/kitty.nix
       ./cli/lazygit.nix
+      ./cli/nvtop.nix
       ./obs-studio.nix
       #./editors/nvf.nix
       ./editors/nixvim.nix
@@ -113,4 +115,9 @@ in {
       then [./lan-mouse.nix]
       else []
     );
+
+  # Ensure VSCode binary is in PATH for Hyprland keybinds
+  home.sessionPath = [
+    "${pkgs.vscode}/bin"
+  ];
 }
