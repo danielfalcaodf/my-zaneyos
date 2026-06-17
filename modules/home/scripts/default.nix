@@ -50,10 +50,16 @@
       ];
     })
     (import ./zaneyos-check.nix {
-inherit pkgs;
+      inherit pkgs;
       inherit host;
-})
-    (import ./zstack.nix {inherit pkgs;})
+    })
+    (import ./zstack.nix {inherit host pkgs;})
+    (import ./woodpecker-trigger.nix {inherit pkgs;})
+    (import ./git-woodpecker-hook.nix {inherit pkgs;})
+    (import ./hyprland-keybinds-yad.nix {inherit pkgs;})
+    (import ./hyprland-keybinds-copy.nix {inherit pkgs;})
+    (import ./hyprland-keybinds.nix {inherit pkgs;})
+    (import ./waybar-scripts.nix {inherit pkgs;})
   ];
 
   xdg.desktopEntries.dropterminal = {
