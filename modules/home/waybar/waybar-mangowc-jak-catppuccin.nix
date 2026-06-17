@@ -118,6 +118,8 @@
       "custom/separator#line"
       "custom/weather"
       "custom/separator#line"
+      "custom/nvidia-gpu"
+      "custom/separator#line"
       "group/audio"
       "custom/separator#line"
       "custom/power"
@@ -259,6 +261,16 @@
       tooltip = true;
       "tooltip-format" = "{used:0.1f}GB/{total:0.1f}G";
       "on-click-right" = "$HOME/.config/hypr/scripts/WaybarScripts.sh --btop";
+    };
+
+    # Custom NVIDIA GPU Module (RTX 3060 12GB)
+    "custom/nvidia-gpu" = {
+      interval = 2;
+      return-type = "json";
+      exec = "~/.config/mangowc/waybar/scripts/gpu-monitor.sh";
+      tooltip = true;
+      "on-click" = "$HOME/.config/hypr/scripts/WaybarScripts.sh --nvtop";
+      "on-click-right" = "nvtop";
     };
 
     network = {
@@ -541,6 +553,9 @@
     #pulseaudio { color: @blue; }
     #clock { color: @green; }
     #custom-playerctl { color: @lavender; }
+    #custom-nvidia-gpu { color: @green; }
+    #custom-nvidia-gpu.critical { color: @red; }
+    #custom-nvidia-gpu.warning { color: @yellow; }
   '';
 
   mangowcWaybar = pkgs.writeShellScriptBin "mangowc-waybar" ''

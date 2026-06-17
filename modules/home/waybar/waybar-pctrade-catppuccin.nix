@@ -53,6 +53,7 @@ in
             "custom/notification"
             "idle_inhibitor"
             "pulseaudio"
+            "custom/gpu"
             "custom/power"
           ];
 
@@ -170,6 +171,15 @@ in
             "tooltip-format" = "Power menu: Left-click for QS logout";
             format = " ⏻ ";
             on-click = "qs-wlogout";
+          };
+
+          # GPU monitoring (NVIDIA RTX 3060)
+          "custom/gpu" = {
+            return-type = "json";
+            interval = 2;
+            exec = "~/.config/waybar/scripts/gpu-monitor.sh";
+            tooltip = true;
+            on-click = "WaybarScripts --nvtop";
           };
 
           # Weather widget (uses existing ddubsos Weather.py script if present)
@@ -320,6 +330,35 @@ in
             color: @text;
             font-size: 14px;
           }
+          /* GPU monitor — inherits the same 3D shaded look */
+          #custom-gpu {
+            background: linear-gradient(to bottom, @bg-alt3, @bg);
+            padding: 6px 10px;
+            margin: 2px;
+            border-radius: 6px;
+            border-top: 1px solid @border;
+            border-bottom: 2px solid @bg-alt;
+            box-shadow: 0px 12px 4px 1px rgba(0, 0, 0, 0.2);
+            text-shadow: -1px -1px 1px rgba(205, 214, 244, 0.1), 0px 2px 3px rgba(0, 0, 0, 0.3);
+            color: @text;
+            font-size: 14px;
+            font-weight: bold;
+          }
+          /* Alert states driven by the "class" key from the JSON output */
+          #custom-gpu.critical {
+            color: @red;
+            border-top: 1px solid @red;
+            text-shadow: 0px 0px 8px @red;
+          }
+          #custom-gpu.warning {
+            color: #f9e2af;
+            border-top: 1px solid #f9e2af;
+          }
+          #custom-gpu.unavailable {
+            color: @red;
+            opacity: 0.6;
+          }
+
           /* Make icons slightly larger for clarity */
           #custom-startmenu, #idle_inhibitor, #custom-power, #custom-notification { font-size: 16px; }
           #battery.warning, #battery.critical, #battery.urgent { color: @red; }
