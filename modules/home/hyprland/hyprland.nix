@@ -219,6 +219,8 @@ in {
       monitor=,preferred,auto,auto
       monitor=Virtual-1,1920x1080@60,auto,1
       ${extraMonitorSettings}
+      # Special workspace for minimizing windows
+      workspace = special:minimize, onCreatedEmpty, destroy
       # To enable blur on waybar uncomment the line below
       # Thanks to SchotjeChrisman
       #layerrule = blur,waybar

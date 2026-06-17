@@ -59,6 +59,7 @@ in {
         "$modifier ALT,W, Web Search, exec, web-search"
         "$modifier SHIFT,W, QS Wallpaper Setter, exec, qs-wallpapers-apply"
         "$modifier SHIFT,N, Notification Reset, exec, swaync-client -rs"
+        "$modifier SHIFT,V, VSCode, exec, code"
         "$modifier,W, Web Browser, exec, ${browser}"
         "$modifier,Y, File Manager, exec, kitty -e yazi"
         "$modifier,E, Emoji Picker, exec, emopicker9000"
@@ -80,6 +81,8 @@ in {
         "$modifier,F, Maximize, fullscreen,"
         "$modifier SHIFT,F, Toggle Floating, togglefloating,"
         "$modifier ALT,F, Float All Windows, exec, hyprland-float-all"
+        "$modifier,MINUS, Minimize Window, movetoworkspace, special:minimize"
+        "$modifier SHIFT,MINUS, Restore Minimized, togglespecialworkspace, minimize"
         # ============= LAYOUTS =============
         "$modifier ALT,L, Toggle Layouts, exec, hyprland-change-layout toggle"
         "$modifier ALT,1, Layout Dwindle, exec, hyprland-change-layout dwindle"
