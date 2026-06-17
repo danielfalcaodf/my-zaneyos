@@ -161,11 +161,15 @@ Veja o guia completo em: [`docs/woodpecker-ci.md`](woodpecker-ci.md)
 ## Regras de segurança
 
 1. **Nunca exponha bancos na rede** — use apenas `127.0.0.1:PORT:PORT`
-2. **Nunca commite `.env`** — apenas `.env.example` fica no repositório
-3. **Use senhas fortes** — substitua todos os `changeme` no `.env` antes de usar
-4. **Firewall** — portas 22, 53, 80, 443 abertas; bancos NÃO abertos no firewall
-5. **SSH key-only** — configurado em `modules/core/services.nix`
-6. **Root CA** — não distribua a chave privada (`root.key`); apenas o cert público (`root.crt`)
+2. **Nunca commite `.env`** — arquivos `.env` são gerados automaticamente pelo sops-nix
+3. **Nunca commite `.sops.age.key`** — a chave privada deve ficar só na máquina
+4. **Use `zstack secrets-init`** para gerar senhas aleatórias (evita senhas fracas)
+5. **Use `zstack secrets-init-encrypt`** em produção (evita plaintext no repositório)
+6. **Firewall** — portas 22, 53, 80, 443 abertas; bancos NÃO abertos no firewall
+7. **SSH key-only** — configurado em `modules/core/services.nix`
+8. **Root CA** — não distribua a chave privada (`root.key`); apenas o cert público (`root.crt`)
+
+Veja [`docs/secrets.md`](secrets.md) para o guia completo de gerenciamento de segredos.
 
 ---
 

@@ -220,16 +220,29 @@ Após configurar DNS e instalar o cert:
 
 ## Usando os Docker Stacks
 
-Todos os stacks ficam em `~/zaneyos/docker/stacks/`. Para iniciar um stack:
+Todos os stacks ficam em `~/zaneyos/docker/stacks/`:
 
 ```bash
-cd ~/zaneyos/docker/stacks/databases/postgres
-cp .env.example .env
-# Edite .env com suas senhas reais
-docker compose up -d
+# 1. Gerar segredos (senhas aleatórias)
+zstack secrets-init
+
+# 2. Mostrar configuração para variables.nix
+zstack secrets-show
+# Copie o bloco exibido para hosts/<hostname>/variables.nix
+
+# 3. Rebuild para gerar .env files automaticamente
+zcli rebuild
+
+# 4. Atualizar .env files a partir de /run/secrets/
+zstack secrets-refresh
+
+# 5. Subir os stacks
+zstack up databases
+zstack up homelab
 ```
 
-> Veja [docs/docker-stacks.md](docker-stacks.md) para a referência completa de todos os stacks.
+Veja [`docs/docker-stacks.md`](docker-stacks.md) para a referência completa.
+Veja [`docs/secrets.md`](secrets.md) para o guia completo de secrets com sops-nix.
 
 ---
 

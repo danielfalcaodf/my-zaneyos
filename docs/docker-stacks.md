@@ -191,15 +191,22 @@ docker compose up -d --force-recreate
 ## Bancos de dados
 
 > ⚠️ Todos os bancos ficam em `127.0.0.1` — nunca expostos na rede.
+>
+> As senhas são gerenciadas via **sops-nix** e os `.env` files são criados
+> automaticamente no rebuild. Veja [`docs/secrets.md`](secrets.md) para o guia
+> completo de configuração.
 
 ### PostgreSQL
 **Diretório:** `databases/postgres/` | **Porta:** `5432` | **Edição:** basic+
 
 ```bash
-cp .env.example .env  # Defina POSTGRES_PASSWORD
-docker compose up -d
+# O .env é gerado automaticamente pelo sops-nix (após zstack secrets-init + rebuild)
+zstack up databases/postgres
 # Conectar: psql -h 127.0.0.1 -U postgres
 ```
+
+> Senha definida em `secrets.yaml` → gerada via `zstack secrets-init` → `.env` criado automaticamente.
+> Veja [`docs/secrets.md`](secrets.md).
 
 ---
 
@@ -207,8 +214,7 @@ docker compose up -d
 **Diretório:** `databases/mysql/` | **Porta:** `3306` | **Edição:** medium+
 
 ```bash
-cp .env.example .env  # Defina MYSQL_ROOT_PASSWORD
-docker compose up -d
+zstack up databases/mysql
 # Conectar: mysql -h 127.0.0.1 -u root -p
 ```
 
@@ -218,8 +224,7 @@ docker compose up -d
 **Diretório:** `databases/sqlserver/` | **Porta:** `1433` | **Edição:** medium+
 
 ```bash
-cp .env.example .env  # Defina SA_PASSWORD (mín. 8 chars, 1 maiúscula, 1 número, 1 especial)
-docker compose up -d
+zstack up databases/sqlserver
 ```
 
 ---
@@ -228,7 +233,7 @@ docker compose up -d
 **Diretório:** `databases/redis/` | **Porta:** `6379` | **Edição:** medium+
 
 ```bash
-docker compose up -d
+zstack up databases/redis
 # Conectar: redis-cli -h 127.0.0.1
 ```
 

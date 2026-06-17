@@ -31,6 +31,8 @@ Cada edição é **aditiva**: `full` inclui tudo do `medium`, que inclui tudo do
 | Docker | opt | ✅ | ✅ | ✅ |
 | Caddy (reverse proxy local) | ❌ | ✅ | ✅ | ✅ |
 | DNS local (`*.localhost`) | ❌ | ✅ | ✅ | ✅ |
+| Secrets (sops-nix + zstack secrets) | ❌ | ✅ | ✅ | ✅ |
+| Docker Registry (local) | ❌ | opt | opt | opt |
 | **Dev — Node / Python** | | | | |
 | Node.js 22 + pnpm | ✅ | ✅ | ✅ | ✅ |
 | Python 3 + uv + ruff | ✅ | ✅ | ✅ | ✅ |
@@ -149,6 +151,29 @@ zcli rebuild
 
 O módulo de edição é carregado automaticamente em `modules/core/default.nix`
 com base no valor de `vars.edition`.
+
+---
+
+## Secrets e SOPS (edições Basic+)
+
+As edições `basic`, `medium` e `full` habilitam automaticamente:
+
+- **Secrets** gerenciados via `zstack init` (age encryption disponível via `zstack encrypt`)
+
+**Setup inicial (após rebuild):**
+
+```bash
+# 1. Gerar senhas aleatórias
+zstack secrets-init
+
+# 2. Copiar configuração para variables.nix
+zstack secrets-show
+
+# 3. Rebuild para aplicar
+zcli rebuild
+```
+
+Veja [`docs/secrets.md`](secrets.md) para o guia completo.
 
 ---
 
