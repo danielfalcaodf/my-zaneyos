@@ -16,6 +16,7 @@
     aichat
     # Utilities
     distrobox
+    anydesk
   ];
 
   # Ollama configuration for LLM (manual model management)
@@ -44,7 +45,23 @@
 
   services.hermes-agent = {
     enable = true;
-    settings.model.default = "anthropic/claude-sonnet-4";
     addToSystemPackages = true;
+    settings = {
+      model.default = "anthropic/claude-sonnet-4";
+      terminal.backend = "local";
+    };
+    # Allow interactive users to run hermes without sudo
+    container.enable = false;
+  };
+  # Cria o serviço em segundo plano que o AnyDesk exige
+  systemd.services.anydesk = {
+    description = "AnyDesk Daemon";
+    wantedBy = ["multi-user.target"];
+    after = ["network.target"];
+    serviceConfig = {
+      ExecStart = "${pkgs.anydesk}/bin/anydesk --service";
+      Restart = "always";
+      User = "root";
+    };
   };
 }
