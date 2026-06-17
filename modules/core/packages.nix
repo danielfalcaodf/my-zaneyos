@@ -62,6 +62,7 @@ in {
       dysk # Disk space util nice formattting
       eza # Beautiful ls Replacement
       ffmpeg # Terminal Video / Audio Editing
+      e2fsprogs # ext2/ext3/ext4 filesystem utilities (mkfs, fsck, resize2fs, etc.)
       file-roller # Archive Manager
       fd # find util needed for emacs but good util regardless vs. find
       gearlever # Manage / run Appimages
@@ -72,6 +73,14 @@ in {
       power-profiles-daemon # needed for noctalia-shell power cycle
       mesa-demos # needed for inxi diag util
       tuigreet # The Login Manager (Sometimes Referred To As Display Manager)
+      # lm-studio # LM Studio - Local LLM GUI (distributed as AppImage, not in nixpkgs)
+      discord # Discord client
+      spotify # Spotify client
+      # Homebrew (linuxbrew) - install via nixpkgs for NixOS compatibility
+      # Note: On NixOS, use nixpkgs packages instead of Homebrew when possible.
+      # For Homebrew-only packages, use: nix run nixpkgs#homebrew install <package>
+    ]
+    ++ [
       htop # Simple Terminal Based System Monitor
       eog # For Image Viewing
       inxi # CLI System Information Tool
@@ -109,5 +118,6 @@ in {
       wget # Tool For Fetching Files With Links
       ytmdl # Tool For Downloading Audio From YouTube
       python3 # Python 3 programming language
+      age # Encryption tool for zstack encrypt/decrypt
     ];
 }

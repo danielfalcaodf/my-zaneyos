@@ -19,34 +19,44 @@
 in {
   imports =
     [
+      ./blocky.nix
       ./boot.nix
+      ./btrfs.nix
+      ./cachix.nix
+      ./caddy.nix
+      #./cloudflare-tunnel.nix
+      ./docker-registry.nix
+      # ./dns.nix
       ./flatpak.nix
       ./fonts.nix
       ./hardware.nix
       ./network.nix
       ./nfs.nix
       ./nh.nix
-      ./quickshell.nix
+      ./overlays.nix
       ./packages.nix
       ./printing.nix
+      ./quickshell.nix
       # Conditionally import the display manager module
       (
         if vars.displayManager == "tui"
         then ./ly.nix
+        else if vars.displayManager == "greetd"
+        then ./greetd.nix
         else ./sddm.nix
       )
       ./security.nix
       ./services.nix
+      ./starfish.nix
       ./steam.nix
       ./stylix.nix
       ./syncthing.nix
       ./system.nix
-      ./secrets.nix
+      ./technitium-dns.nix
       ./thunar.nix
       ./user.nix
       ./virtualisation.nix
       ./xserver.nix
-      ./cachix.nix
       inputs.stylix.nixosModules.stylix
       # Edition feature layer (non-visual, additive)
       editionModule

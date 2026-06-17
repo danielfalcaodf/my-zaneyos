@@ -70,17 +70,27 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    # Create data directory with BTRFS nodatacow
+    # Create data directory (BTRFS nodatacow applied post-creation via systemd service)
     systemd.tmpfiles.rules = [
-      {
-        path = cfg.dataDir;
-        type = "d";
-        mode = "0755";
-        user = "root";
-        group = "root";
-        argument = "!/bin/bash -c 'if [ ! -d \"${cfg.dataDir}\" ]; then btrfs subvolume create -o nodatacow \"${cfg.dataDir}\"; fi'";
-      }
+      "d ${cfg.dataDir} 0755 root root - -"
     ];
+
+    # Ensure BTRFS nodatacow attribute is set on the data directory
+    systemd.services.technitium-dns-nodatacow = {
+      description = "Set BTRFS nodatacow on Technitium DNS data directory";
+      wantedBy = ["multi-user.target"];
+      before = ["docker.service"];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        ExecStart = pkgs.writeScript "technitium-nodatacow" ''
+          #!/bin/sh
+          if [ -d "${cfg.dataDir}" ]; then
+            chattr +C "${cfg.dataDir}" 2>/dev/null || true
+          fi
+        '';
+      };
+    };
 
     # Technitium DNS via Docker (no native NixOS package yet)
     virtualisation.docker.enable = true;
