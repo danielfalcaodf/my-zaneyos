@@ -78,27 +78,27 @@ services:
 
   # ─── SQL Server ───────────────────────────────────────────────────────────────
   # AVISO: requer mínimo 2 GB RAM. Comente este bloco em hosts com pouca memória.
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    restart: unless-stopped
-    env_file:
-      - "./sqlserver/.env"
-    environment:
-      ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?MSSQL_SA_PASSWORD é obrigatório}
-      MSSQL_PID: ${MSSQL_PID:-Developer}
-    ports:
-      - "127.0.0.1:${MSSQL_PORT:-1434}:1433"
-    volumes:
-      - sqlserver_data:/var/opt/mssql
-    networks:
-      - databases
-    healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -Q 'SELECT 1' -C || exit 1"]
-      interval: 15s
-      timeout: 10s
-      retries: 10
-      start_period: 30s
+  # sqlserver:
+  #   image: mcr.microsoft.com/mssql/server:2022-latest
+  #   restart: unless-stopped
+  #   env_file:
+  #     - "./sqlserver/.env"
+  #   environment:
+  #     ACCEPT_EULA: "Y"
+  #     MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?MSSQL_SA_PASSWORD é obrigatório}
+  #     MSSQL_PID: ${MSSQL_PID:-Developer}
+  #   ports:
+  #     - "127.0.0.1:${MSSQL_PORT:-1434}:1433"
+  #   volumes:
+  #     - sqlserver_data:/var/opt/mssql
+  #   networks:
+  #     - databases
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -Q 'SELECT 1' -C || exit 1"]
+  #     interval: 15s
+  #     timeout: 10s
+  #     retries: 10
+  #     start_period: 30s
 
   # ─── Adminer (gerenciador web leve) ──────────────────────────────────────────
   adminer:
