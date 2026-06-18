@@ -1,4 +1,30 @@
-_: {
+{pkgs, ...}: {
+  programs.nix-ld = {
+    enable = true;
+    libraries = with pkgs; [
+      stdenv.cc.cc
+      zlib
+      openssl
+      curl
+      glib
+      util-linux
+      libGL
+      glibc
+      xorg.libX11
+      xorg.libXcursor
+      xorg.libXrandr
+      xorg.libXi
+      freetype
+      fontconfig
+      dbus
+      expat
+      nspr
+      nss
+      libdrm
+      mesa
+    ];
+  };
+
   security = {
     rtkit.enable = true;
     polkit = {

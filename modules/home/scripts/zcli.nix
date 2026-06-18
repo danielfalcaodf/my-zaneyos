@@ -240,6 +240,59 @@ in
           done
         }
 
+        sync_vscode_settings() {
+          local VSCODE_LIVE="$HOME/.config/Code/User/settings.json"
+          local HOST_SETTINGS="$HOME/$PROJECT/hosts/$(${pkgs.nettools}/bin/hostname)/vscode-settings.json"
+          local DEFAULT_SETTINGS="$HOME/$PROJECT/modules/home/editors/vscode-settings.json"
+          local SKIP_FLAG="$HOME/.cache/zaneyos/vscode-settings-skip"
+
+          [ -f "$VSCODE_LIVE" ] || return 0
+
+          local active_config config_label
+          if [ -f "$HOST_SETTINGS" ]; then
+            active_config="$HOST_SETTINGS"
+            config_label="host config ($HOST_SETTINGS)"
+          elif [ -f "$DEFAULT_SETTINGS" ]; then
+            active_config="$DEFAULT_SETTINGS"
+            config_label="default config ($DEFAULT_SETTINGS)"
+          else
+            return 0
+          fi
+
+          if ! ${pkgs.diffutils}/bin/diff -q "$VSCODE_LIVE" "$active_config" > /dev/null 2>&1; then
+            echo ""
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "  VSCode settings changed since last rebuild"
+            echo ""
+
+            # Pergunta 1: salvar settings atuais no host config?
+            read -p "  Sync current VSCode settings to host config? [y/N] " -n 1 -r
+            echo ""
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+              cp "$VSCODE_LIVE" "$HOST_SETTINGS"
+              echo "  ✔ Settings saved to: $HOST_SETTINGS"
+              echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              echo ""
+              return 0
+            fi
+
+            # Pergunta 2: aplicar o config do host/default no VSCode no rebuild?
+            echo ""
+            read -p "  Apply $config_label to your VSCode on rebuild? [y/N] " -n 1 -r
+            echo ""
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+              echo "  ✔ $config_label will be applied on rebuild"
+            else
+              ${pkgs.coreutils}/bin/mkdir -p "$(dirname "$SKIP_FLAG")"
+              ${pkgs.coreutils}/bin/touch "$SKIP_FLAG"
+              echo "  → VSCode settings will NOT be modified this rebuild"
+            fi
+
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo ""
+          fi
+        }
+
         detect_gpu_profile() {
           local detected_profile=""
           local has_nvidia=false
@@ -491,6 +544,7 @@ in
             ;;
           rebuild)
             verify_hostname
+            sync_vscode_settings
             handle_backups
 
             # Parse additional arguments
@@ -509,6 +563,7 @@ in
             ;;
           rebuild-boot)
             verify_hostname
+            sync_vscode_settings
             handle_backups
 
             # Parse additional arguments
@@ -538,6 +593,7 @@ in
             ;;
           update)
             verify_hostname
+            sync_vscode_settings
             handle_backups
 
             # Parse additional arguments

@@ -1,0 +1,12 @@
+{
+  "editor.fontFamily": "'JetBrainsMono Nerd Font', 'monospace'",
+  "editor.fontSize": 14,
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "editor.bracketPairColorization.enabled": true,
+  "files.autoSave": "afterDelay",
+  "workbench.colorTheme": "Catppuccin Macchiato",
+  "[nix]": {
+    "editor.defaultFormatter": "kamadorueda.alejandra"
+  }
+}
