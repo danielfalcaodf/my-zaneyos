@@ -34,6 +34,11 @@
 
     # mise (global fallback — activate last so NVM/SDKMAN per-project take precedence)
     eval "$(mise activate zsh)"
+    export PATH="$HOME/.local/bin:$PATH"
+    export BUN_INSTALL="$HOME/.bun"
+    export PATH="$BUN_INSTALL/bin:$PATH"
+    alias clauderc="~/.local/bin/claude --remote-control"
+
   '';
 
   # Fish shell: NVM and SDKMAN don't natively support fish.

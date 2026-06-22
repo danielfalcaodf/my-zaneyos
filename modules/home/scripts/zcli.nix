@@ -217,9 +217,11 @@ in
           echo "                    Verifies homelab DNS resolution and HTTPS access."
           echo ""
           echo "Pacotes NixOS customizados:"
-          echo "  pkg scaffold <github-url>  - Scaffolda pacote NixOS usando nix-init."
-          echo "                               Gera ~/zaneyos/pkgs/<nome>/default.nix"
-          echo "  pkg list                   - Lista pacotes customizados em ~/zaneyos/pkgs/"
+          echo "  pkg add <github-url>       - Instala pacote do GitHub automaticamente."
+          echo "                               Gera derivação, registra overlay e adiciona ao sistema."
+          echo "  pkg remove <nome>          - Remove pacote instalado via zcli."
+          echo "  pkg scaffold <github-url>  - Gera derivação apenas (modo manual/avançado)."
+          echo "  pkg list                   - Lista pacotes e status (instalado/scaffolded)."
           echo ""
           echo "  help            - Show this help message."
         }
@@ -863,24 +865,195 @@ in
             shift 2>/dev/null || true
             ZANEYOS_DIR="$HOME/zaneyos"
             PKGS_DIR="$ZANEYOS_DIR/pkgs"
+            PKGS_FILE="$PKGS_DIR/default.nix"
+            CURRENT_HOST="$(hostname)"
+            HOST_DIR="$ZANEYOS_DIR/hosts/$CURRENT_HOST"
+            CUSTOM_PKGS_FILE="$HOST_DIR/custom-packages.nix"
+            HOST_DEFAULT="$HOST_DIR/default.nix"
 
             # Garante que pkgs/default.nix existe
             ensure_pkgs_dir() {
               mkdir -p "$PKGS_DIR"
-              if [[ ! -f "$PKGS_DIR/default.nix" ]]; then
-                cat > "$PKGS_DIR/default.nix" <<'NIXEOF'
-    # pkgs/default.nix — Aggregador de pacotes customizados do ZaneyOS
-    # Adicione entradas aqui após rodar: zcli pkg scaffold <github-url>
-    {pkgs}: {
-      # Exemplo (descomente após criar o pacote):
-      # hermes-agent = pkgs.callPackage ./hermes-agent {};
-    }
-    NIXEOF
-                echo "✔  Criado: $PKGS_DIR/default.nix"
+              if [[ ! -f "$PKGS_FILE" ]]; then
+                cat > "$PKGS_FILE" <<'NIXEOF'
+# pkgs/default.nix — Aggregador de pacotes customizados do ZaneyOS
+# Adicione entradas aqui após rodar: zcli pkg scaffold <github-url>
+{pkgs}: {
+  # Exemplo (descomente após criar o pacote):
+  # hermes-agent = pkgs.callPackage ./hermes-agent {};
+}
+NIXEOF
+                echo "✔  Criado: $PKGS_FILE"
+              fi
+            }
+
+            # Garante que custom-packages.nix existe e está importado em default.nix
+            ensure_custom_pkgs() {
+              if [[ ! -f "$CUSTOM_PKGS_FILE" ]]; then
+                cat > "$CUSTOM_PKGS_FILE" <<'NIXEOF'
+# Gerenciado por: zcli pkg add/remove — não edite manualmente
+{pkgs, ...}: {
+  environment.systemPackages = with pkgs; [
+    # ZCLI-PKGS-SYS-START
+    # ZCLI-PKGS-SYS-END
+  ];
+}
+NIXEOF
+                echo "  ↳ Criado: $CUSTOM_PKGS_FILE"
+
+                # Adiciona import em hosts/<hostname>/default.nix se necessário
+                if [[ -f "$HOST_DEFAULT" ]] && ! grep -q "custom-packages.nix" "$HOST_DEFAULT"; then
+                  ${pkgs.gnused}/bin/sed -i 's|imports = \[|imports = [\n    ./custom-packages.nix|' "$HOST_DEFAULT"
+                  echo "  ↳ Import adicionado em: $HOST_DEFAULT"
+                fi
               fi
             }
 
             case "$pkg_subcommand" in
+              add)
+                GITHUB_URL="''${1:-}"
+                [[ -n "$GITHUB_URL" ]] || {
+                  echo "Erro: URL do repositório GitHub é obrigatória." >&2
+                  echo "Uso: zcli pkg add <github-url> [--rebuild]" >&2
+                  echo "Exemplo: zcli pkg add https://github.com/owner/repo" >&2
+                  exit 1
+                }
+                shift
+
+                # Parse flags
+                DO_REBUILD=false
+                while [[ $# -gt 0 ]]; do
+                  case "$1" in
+                    --rebuild) DO_REBUILD=true ;;
+                    *) echo "Opção desconhecida: $1" >&2; exit 1 ;;
+                  esac
+                  shift
+                done
+
+                # Verifica se nix-init está disponível
+                if ! command -v nix-init &>/dev/null; then
+                  echo "✘  nix-init não encontrado no PATH." >&2
+                  echo "   Adicione 'pkgs.nix-init' ao seu packages.nix e rode: zcli rebuild" >&2
+                  exit 1
+                fi
+
+                PKG_NAME="$(basename "$GITHUB_URL" .git)"
+                PKG_DIR="$PKGS_DIR/$PKG_NAME"
+
+                echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                echo "  📦  zcli pkg add"
+                echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                echo ""
+                echo "  Repositório : $GITHUB_URL"
+                echo "  Nome        : $PKG_NAME"
+                echo "  Host        : $CURRENT_HOST"
+                echo ""
+
+                # [1/3] Gera derivação
+                echo "  [1/3] Gerando derivação Nix via nix-init..."
+                echo "  (Se perguntar versão, pressione Enter para usar a latest)"
+                echo ""
+                ensure_pkgs_dir
+                mkdir -p "$PKG_DIR"
+                nix-init -u "$GITHUB_URL" "$PKG_DIR/default.nix"
+                echo ""
+
+                # [2/3] Registra no overlay pkgs/default.nix
+                echo "  [2/3] Registrando no overlay pkgs/default.nix..."
+                if grep -qF "$PKG_NAME = pkgs.callPackage" "$PKGS_FILE" 2>/dev/null; then
+                  echo "  ↳ Já registrado (pulando)"
+                else
+                  awk -v entry="  $PKG_NAME = pkgs.callPackage ./$PKG_NAME {};" \
+                    '/^}$/ { print entry }; { print }' \
+                    "$PKGS_FILE" > "$PKGS_FILE.tmp" && mv "$PKGS_FILE.tmp" "$PKGS_FILE"
+                  echo "  ↳ Adicionado: $PKG_NAME = pkgs.callPackage ./$PKG_NAME {};"
+                fi
+
+                # [3/3] Adiciona a hosts/<hostname>/custom-packages.nix
+                echo ""
+                echo "  [3/3] Adicionando a hosts/$CURRENT_HOST/custom-packages.nix..."
+                ensure_custom_pkgs
+                if grep -qF "    $PKG_NAME" "$CUSTOM_PKGS_FILE" 2>/dev/null; then
+                  echo "  ↳ Já presente (pulando)"
+                else
+                  ${pkgs.gnused}/bin/sed -i "s|# ZCLI-PKGS-SYS-START|# ZCLI-PKGS-SYS-START\n    $PKG_NAME|" "$CUSTOM_PKGS_FILE"
+                  echo "  ↳ Adicionado: $PKG_NAME"
+                fi
+
+                echo ""
+                echo "  Concluído! Alterações realizadas:"
+                echo "  • pkgs/$PKG_NAME/default.nix  — derivação gerada"
+                echo "  • pkgs/default.nix             — registrado no overlay"
+                echo "  • hosts/$CURRENT_HOST/custom-packages.nix  — adicionado ao sistema"
+                echo ""
+                echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+                if $DO_REBUILD; then
+                  echo ""
+                  zcli rebuild
+                else
+                  read -r -p "  Reconstruir agora? [s/N] " REBUILD_INPUT
+                  case "''${REBUILD_INPUT,,}" in
+                    s|sim|y|yes) zcli rebuild ;;
+                    *) echo "  ℹ  Execute 'zcli rebuild' quando estiver pronto." ;;
+                  esac
+                fi
+                ;;
+
+              remove)
+                PKG_NAME="''${1:-}"
+                [[ -n "$PKG_NAME" ]] || {
+                  echo "Erro: nome do pacote é obrigatório." >&2
+                  echo "Uso: zcli pkg remove <nome>" >&2
+                  echo "     zcli pkg list  # para ver pacotes instalados" >&2
+                  exit 1
+                }
+
+                echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                echo "  📦  zcli pkg remove: $PKG_NAME"
+                echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                echo ""
+
+                # Remove de custom-packages.nix
+                if [[ -f "$CUSTOM_PKGS_FILE" ]]; then
+                  if grep -qF "    $PKG_NAME" "$CUSTOM_PKGS_FILE"; then
+                    ${pkgs.gnused}/bin/sed -i "/^    $PKG_NAME$/d" "$CUSTOM_PKGS_FILE"
+                    echo "  ↳ Removido de: hosts/$CURRENT_HOST/custom-packages.nix"
+                  else
+                    echo "  ↳ Não encontrado em custom-packages.nix"
+                  fi
+                fi
+
+                # Remove de pkgs/default.nix
+                if [[ -f "$PKGS_FILE" ]]; then
+                  if grep -qF "$PKG_NAME = pkgs.callPackage" "$PKGS_FILE"; then
+                    ${pkgs.gnused}/bin/sed -i "/$PKG_NAME = pkgs.callPackage/d" "$PKGS_FILE"
+                    echo "  ↳ Removido de: pkgs/default.nix"
+                  fi
+                fi
+
+                # Oferecer remoção da derivação
+                PKG_DIR="$PKGS_DIR/$PKG_NAME"
+                if [[ -d "$PKG_DIR" ]]; then
+                  read -r -p "  Remover derivação em pkgs/$PKG_NAME/? [s/N] " DEL_INPUT
+                  case "''${DEL_INPUT,,}" in
+                    s|sim|y|yes)
+                      rm -rf "$PKG_DIR"
+                      echo "  ↳ Removido: pkgs/$PKG_NAME/"
+                      ;;
+                    *) echo "  ↳ Derivação mantida em pkgs/$PKG_NAME/" ;;
+                  esac
+                fi
+
+                echo ""
+                echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                read -r -p "  Reconstruir agora? [s/N] " REBUILD_INPUT
+                case "''${REBUILD_INPUT,,}" in
+                  s|sim|y|yes) zcli rebuild ;;
+                  *) echo "  ℹ  Execute 'zcli rebuild' quando estiver pronto." ;;
+                esac
+                ;;
+
               scaffold)
                 GITHUB_URL="''${1:-}"
                 [[ -n "$GITHUB_URL" ]] || {
@@ -897,12 +1070,11 @@ in
                   exit 1
                 fi
 
-                # Extrai o nome do pacote da URL (último segmento do path)
                 PKG_NAME="$(basename "$GITHUB_URL" .git)"
                 PKG_DIR="$PKGS_DIR/$PKG_NAME"
 
                 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-                echo "  📦  zcli pkg scaffold"
+                echo "  📦  zcli pkg scaffold (modo manual)"
                 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
                 echo ""
                 echo "  Repositório : $GITHUB_URL"
@@ -919,21 +1091,17 @@ in
 
                 echo ""
                 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-                echo "  ✔  Pacote gerado em: $PKG_DIR/default.nix"
+                echo "  ✔  Derivação gerada em: $PKG_DIR/default.nix"
                 echo ""
-                echo "  Próximos passos:"
+                echo "  Para instalar automaticamente use:"
+                echo "    zcli pkg add $GITHUB_URL"
                 echo ""
-                echo "  1. Edite o pacote se necessário:"
-                echo "     \$EDITOR $PKG_DIR/default.nix"
-                echo ""
-                echo "  2. Adicione ao aggregador pkgs/default.nix:"
+                echo "  Ou manualmente:"
+                echo "  1. Edite se necessário: \$EDITOR $PKG_DIR/default.nix"
+                echo "  2. Registre no overlay pkgs/default.nix:"
                 echo "     $PKG_NAME = pkgs.callPackage ./$PKG_NAME {};"
-                echo ""
-                echo "  3. Adicione ao seu packages.nix ou modules/home/default.nix:"
-                echo "     pkgs.$PKG_NAME"
-                echo ""
-                echo "  4. Rebuild:"
-                echo "     zcli rebuild"
+                echo "  3. Adicione a hosts/$CURRENT_HOST/custom-packages.nix"
+                echo "  4. Rebuild: zcli rebuild"
                 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
                 ;;
 
@@ -944,31 +1112,317 @@ in
                 if [[ ! -d "$PKGS_DIR" ]]; then
                   echo "  (nenhum pacote ainda)"
                   echo ""
-                  echo "  Crie o primeiro com:"
-                  echo "    zcli pkg scaffold https://github.com/owner/repo"
+                  echo "  Instale o primeiro com:"
+                  echo "    zcli pkg add https://github.com/owner/repo"
                 else
                   found_pkgs=0
                   for pkg_dir in "$PKGS_DIR"/*/; do
                     [[ -d "$pkg_dir" ]] || continue
                     pname="$(basename "$pkg_dir")"
                     if [[ -f "$pkg_dir/default.nix" ]]; then
-                      echo "  ✔  $pname"
+                      if [[ -f "$CUSTOM_PKGS_FILE" ]] && grep -qF "    $pname" "$CUSTOM_PKGS_FILE" 2>/dev/null; then
+                        echo "  ✔  $pname  (instalado)"
+                      else
+                        echo "  ○  $pname  (scaffolded — não instalado)"
+                      fi
                       found_pkgs=$((found_pkgs + 1))
                     fi
                   done
                   if [[ $found_pkgs -eq 0 ]]; then
                     echo "  (nenhum pacote ainda)"
                     echo ""
-                    echo "  Crie o primeiro com:"
-                    echo "    zcli pkg scaffold https://github.com/owner/repo"
+                    echo "  Instale o primeiro com:"
+                    echo "    zcli pkg add https://github.com/owner/repo"
                   fi
                 fi
                 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
                 ;;
 
+              installer)
+                installer_subcommand="''${1:-list}"
+                shift 2>/dev/null || true
+                INSTALLER_MANIFEST_DIR="$HOME/.local/share/zcli/installers"
+
+                case "$installer_subcommand" in
+                  add)
+                    INSTALLER_URL="''${1:-}"
+                    [[ -n "$INSTALLER_URL" ]] || {
+                      echo "Erro: URL do instalador é obrigatória." >&2
+                      echo "Uso: zcli pkg installer add <url> [--name <nome>] [--yes]" >&2
+                      echo "Exemplo: zcli pkg installer add https://example.com/install.sh" >&2
+                      exit 1
+                    }
+                    shift
+
+                    INSTALLER_NAME=""
+                    INSTALLER_YES=false
+                    while [[ $# -gt 0 ]]; do
+                      case "$1" in
+                        --name) shift; INSTALLER_NAME="''${1:-}" ;;
+                        --yes|-y) INSTALLER_YES=true ;;
+                        *) echo "Opção desconhecida: $1" >&2; exit 1 ;;
+                      esac
+                      shift
+                    done
+
+                    if [[ -z "$INSTALLER_NAME" ]]; then
+                      INSTALLER_NAME="$(basename "$INSTALLER_URL" .sh)"
+                      INSTALLER_NAME="$(basename "$INSTALLER_NAME" .bash)"
+                    fi
+
+                    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                    echo "  📦  zcli pkg installer add"
+                    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                    echo ""
+                    echo "  URL    : $INSTALLER_URL"
+                    echo "  Nome   : $INSTALLER_NAME"
+                    echo "  Destino: $HOME/.local/bin/"
+                    echo ""
+
+                    INSTALLER_TMPFILE="$(mktemp /tmp/zcli-installer-XXXXXX.sh)"
+                    echo "  Baixando instalador..."
+                    if ! ${pkgs.curl}/bin/curl -fsSL "$INSTALLER_URL" -o "$INSTALLER_TMPFILE"; then
+                      echo "✘  Falha ao baixar: $INSTALLER_URL" >&2
+                      rm -f "$INSTALLER_TMPFILE"
+                      exit 1
+                    fi
+
+                    echo ""
+                    echo "  ── Preview do script (primeiras 30 linhas) ──"
+                    echo ""
+                    head -n 30 "$INSTALLER_TMPFILE" | ${pkgs.gnused}/bin/sed 's/^/  /'
+                    echo ""
+                    echo "  ──────────────────────────────────────────────"
+                    echo ""
+                    echo "  ⚠  Variáveis de ambiente definidas ao rodar:"
+                    echo "     PREFIX=\$HOME/.local"
+                    echo "     INSTALL_DIR=\$HOME/.local/bin"
+                    echo "     BIN_DIR=\$HOME/.local/bin"
+                    echo ""
+
+                    if ! $INSTALLER_YES; then
+                      read -r -p "  Continuar com a instalação? [s/N] " CONFIRM_INPUT
+                      case "''${CONFIRM_INPUT,,}" in
+                        s|sim|y|yes) ;;
+                        *) echo "  Instalação cancelada."; rm -f "$INSTALLER_TMPFILE"; exit 0 ;;
+                      esac
+                    fi
+
+                    mkdir -p "$HOME/.local/bin"
+                    echo ""
+                    echo "  Executando instalador..."
+                    echo ""
+
+                    # Substitui temporariamente shell rcs gerenciados pelo Nix (symlinks read-only)
+                    # por cópias graváveis, para que o instalador possa escrever neles sem erro.
+                    # As adições ao rc são descartadas ao restaurar o symlink original.
+                    NIX_RC_LINKS=()
+                    for _rc in "$HOME/.zshrc" "$HOME/.bashrc" "$HOME/.bash_profile" "$HOME/.profile"; do
+                      if [[ -L "$_rc" ]]; then
+                        _target="$(readlink "$_rc")"
+                        cp "$(readlink -f "$_rc")" "$_rc.zcli-tmp"
+                        unlink "$_rc"
+                        mv "$_rc.zcli-tmp" "$_rc"
+                        NIX_RC_LINKS+=("$_rc:$_target")
+                      fi
+                    done
+
+                    restore_nix_rcs() {
+                      for _entry in "''${NIX_RC_LINKS[@]}"; do
+                        _f="''${_entry%%:*}"
+                        _t="''${_entry#*:}"
+                        rm -f "$_f"
+                        ln -sf "$_t" "$_f"
+                      done
+                    }
+
+                    INSTALLER_EXIT=0
+                    PREFIX="$HOME/.local" \
+                    INSTALL_DIR="$HOME/.local/bin" \
+                    BIN_DIR="$HOME/.local/bin" \
+                    bash "$INSTALLER_TMPFILE" || INSTALLER_EXIT=$?
+                    rm -f "$INSTALLER_TMPFILE"
+                    restore_nix_rcs
+
+                    # O binário pode ter sido instalado mesmo que o script tenha falhado
+                    INSTALLER_BIN_PATH="$HOME/.local/bin/$INSTALLER_NAME"
+                    if [[ -x "$INSTALLER_BIN_PATH" ]] || command -v "$INSTALLER_NAME" &>/dev/null; then
+                      mkdir -p "$INSTALLER_MANIFEST_DIR"
+                      echo "$INSTALLER_URL" > "$INSTALLER_MANIFEST_DIR/$INSTALLER_NAME.url"
+                      echo ""
+                      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                      if [[ $INSTALLER_EXIT -ne 0 ]]; then
+                        echo "  ✔  Binário instalado (script saiu com erro $INSTALLER_EXIT)"
+                        echo "     No NixOS, é normal — o shell rc é read-only (gerenciado pelo Home Manager)."
+                      else
+                        echo "  ✔  Instalador concluído: $INSTALLER_NAME"
+                      fi
+                      echo ""
+                      echo "  Manifesto salvo em:"
+                      echo "    $INSTALLER_MANIFEST_DIR/$INSTALLER_NAME.url"
+                      echo ""
+                      if command -v "$INSTALLER_NAME" &>/dev/null; then
+                        echo "  ✔  Binário disponível no PATH: $(command -v "$INSTALLER_NAME")"
+                      else
+                        echo "  ℹ  Binário em: $INSTALLER_BIN_PATH"
+                        echo "     Verifique se \$HOME/.local/bin está no PATH:"
+                        echo "     echo \$PATH | tr ':' '\\n' | grep local"
+                        echo "     Ou abra um novo terminal."
+                      fi
+                      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                    else
+                      echo ""
+                      echo "✘  Instalador falhou (código $INSTALLER_EXIT) e binário não foi encontrado." >&2
+                      echo "   Tente rodar manualmente: bash <(curl -fsSL \"$INSTALLER_URL\")" >&2
+                      exit "$INSTALLER_EXIT"
+                    fi
+                    ;;
+
+                  list)
+                    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                    echo "  📦  Instaladores rastreados"
+                    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                    if [[ ! -d "$INSTALLER_MANIFEST_DIR" ]] || [[ -z "$(ls -A "$INSTALLER_MANIFEST_DIR" 2>/dev/null)" ]]; then
+                      echo "  (nenhum instalador rastreado ainda)"
+                      echo ""
+                      echo "  Instale o primeiro com:"
+                      echo "    zcli pkg installer add <url>"
+                    else
+                      for manifest in "$INSTALLER_MANIFEST_DIR"/*.url; do
+                        [[ -f "$manifest" ]] || continue
+                        iname="$(basename "$manifest" .url)"
+                        iurl="$(cat "$manifest")"
+                        if command -v "$iname" &>/dev/null; then
+                          echo "  ✔  $iname"
+                        else
+                          echo "  ✗  $iname  (binário ausente — rode: zcli pkg installer reinstall $iname)"
+                        fi
+                        echo "     $iurl"
+                      done
+                    fi
+                    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                    ;;
+
+                  remove)
+                    INSTALLER_NAME="''${1:-}"
+                    [[ -n "$INSTALLER_NAME" ]] || {
+                      echo "Erro: nome do instalador é obrigatório." >&2
+                      echo "Uso: zcli pkg installer remove <nome>" >&2
+                      echo "     zcli pkg installer list  # para ver instaladores" >&2
+                      exit 1
+                    }
+
+                    INSTALLER_MANIFEST="$INSTALLER_MANIFEST_DIR/$INSTALLER_NAME.url"
+                    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                    echo "  📦  zcli pkg installer remove: $INSTALLER_NAME"
+                    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                    echo ""
+
+                    if [[ -f "$INSTALLER_MANIFEST" ]]; then
+                      rm -f "$INSTALLER_MANIFEST"
+                      echo "  ✔  Manifesto removido: $INSTALLER_MANIFEST"
+                    else
+                      echo "  ✗  Manifesto não encontrado: $INSTALLER_MANIFEST" >&2
+                      exit 1
+                    fi
+
+                    INSTALLER_BIN="$(command -v "$INSTALLER_NAME" 2>/dev/null || true)"
+                    if [[ -n "$INSTALLER_BIN" ]]; then
+                      read -r -p "  Remover binário em $INSTALLER_BIN? [s/N] " DEL_BIN_INPUT
+                      case "''${DEL_BIN_INPUT,,}" in
+                        s|sim|y|yes)
+                          rm -f "$INSTALLER_BIN"
+                          echo "  ✔  Binário removido: $INSTALLER_BIN"
+                          ;;
+                        *) echo "  ↳ Binário mantido em $INSTALLER_BIN" ;;
+                      esac
+                    else
+                      echo "  ℹ  Binário não encontrado no PATH (já removido ou nunca instalado)"
+                    fi
+                    echo ""
+                    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                    ;;
+
+                  reinstall)
+                    REINSTALL_TARGET="''${1:-}"
+                    REINSTALL_ALL=false
+                    [[ "$REINSTALL_TARGET" == "--all" ]] && { REINSTALL_ALL=true; REINSTALL_TARGET=""; }
+
+                    if [[ -z "$REINSTALL_TARGET" ]] && ! $REINSTALL_ALL; then
+                      REINSTALL_ALL=true
+                    fi
+
+                    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                    echo "  📦  zcli pkg installer reinstall"
+                    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                    echo ""
+
+                    do_reinstall() {
+                      local rname="$1"
+                      local rmanifest="$INSTALLER_MANIFEST_DIR/$rname.url"
+                      if [[ ! -f "$rmanifest" ]]; then
+                        echo "  ✗  Manifesto não encontrado para: $rname" >&2
+                        return 1
+                      fi
+                      local rurl
+                      rurl="$(cat "$rmanifest")"
+                      echo "  Reinstalando: $rname"
+                      echo "  URL: $rurl"
+                      echo ""
+                      local rtmp
+                      rtmp="$(mktemp /tmp/zcli-reinstall-XXXXXX.sh)"
+                      if ! ${pkgs.curl}/bin/curl -fsSL "$rurl" -o "$rtmp"; then
+                        echo "  ✘  Falha ao baixar instalador de $rurl" >&2
+                        rm -f "$rtmp"
+                        return 1
+                      fi
+                      mkdir -p "$HOME/.local/bin"
+                      if PREFIX="$HOME/.local" \
+                         INSTALL_DIR="$HOME/.local/bin" \
+                         BIN_DIR="$HOME/.local/bin" \
+                         bash "$rtmp"; then
+                        rm -f "$rtmp"
+                        echo "  ✔  Reinstalado: $rname"
+                      else
+                        local rc=$?
+                        rm -f "$rtmp"
+                        echo "  ✘  Falha ao reinstalar: $rname (código $rc)" >&2
+                        return "$rc"
+                      fi
+                    }
+
+                    if $REINSTALL_ALL; then
+                      if [[ ! -d "$INSTALLER_MANIFEST_DIR" ]] || [[ -z "$(ls -A "$INSTALLER_MANIFEST_DIR" 2>/dev/null)" ]]; then
+                        echo "  (nenhum instalador rastreado)"
+                        exit 0
+                      fi
+                      for manifest in "$INSTALLER_MANIFEST_DIR"/*.url; do
+                        [[ -f "$manifest" ]] || continue
+                        iname="$(basename "$manifest" .url)"
+                        read -r -p "  Reinstalar '$iname'? [s/N] " RI_CONFIRM
+                        case "''${RI_CONFIRM,,}" in
+                          s|sim|y|yes) do_reinstall "$iname" || true ;;
+                          *) echo "  ↳ Pulando $iname" ;;
+                        esac
+                        echo ""
+                      done
+                    else
+                      do_reinstall "$REINSTALL_TARGET"
+                    fi
+                    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                    ;;
+
+                  *)
+                    echo "Error: Subcomando installer inválido: '$installer_subcommand'" >&2
+                    echo "Uso: zcli pkg installer [add <url>|list|remove <nome>|reinstall [<nome>|--all]]" >&2
+                    exit 1
+                    ;;
+                esac
+                ;;
+
               *)
                 echo "Error: Invalid pkg subcommand '$pkg_subcommand'" >&2
-                echo "Usage: zcli pkg [scaffold <github-url>|list]" >&2
+                echo "Usage: zcli pkg [add <github-url>|remove <nome>|scaffold <github-url>|list|installer <subcomando>]" >&2
                 exit 1
                 ;;
             esac
