@@ -17,6 +17,7 @@
     # Utilities
     distrobox
     anydesk
+    qbittorrent # Cliente BitTorrent (GUI Qt)
   ];
 
   # Ollama configuration for LLM (manual model management)

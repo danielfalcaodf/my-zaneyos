@@ -18,6 +18,11 @@
     # Cloud CLIs
     awscli2
     google-cloud-sdk
+
+    tmux
+
+    # OpenSSL — corrige detecção de libssl do Prisma e fornece libssl.so.3 em runtime
+    openssl
   ];
 
   # NVM: source NVM if installed (installer puts it at ~/.nvm)
@@ -39,6 +44,9 @@
     export PATH="$BUN_INSTALL/bin:$PATH"
     alias clauderc="~/.local/bin/claude --remote-control"
 
+    # Prisma/NixOS — libssl.so.3 localizável p/ o engine baixado pelo Prisma
+    export LD_LIBRARY_PATH="${pkgs.openssl.out}/lib:$LD_LIBRARY_PATH"
+
   '';
 
   # Fish shell: NVM and SDKMAN don't natively support fish.
@@ -56,6 +64,9 @@
     if command -q mise
       mise activate fish | source
     end
+
+    # Prisma/NixOS — libssl.so.3 localizável p/ o engine do Prisma
+    set -x LD_LIBRARY_PATH "${pkgs.openssl.out}/lib:$LD_LIBRARY_PATH"
   '';
 
   home.sessionVariables = {

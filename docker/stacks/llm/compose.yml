@@ -1,7 +1,8 @@
-# LLM stack — Open WebUI para interagir com modelos via Ollama.
+# LLM stack — Open WebUI para interagir com modelos via Ollama + AIO Sandbox para agentes de IA.
 #
 # Pré-requisito:
 #   zstack init llm
+#   mkdir -p ~/repos
 #   # Ollama deve estar rodando no host (ativo via modules/editions/full.nix)
 #
 # Uso:
@@ -28,10 +29,42 @@ services:
     networks:
       - llm
 
+  # ─── AIO Sandbox ─────────────────────────────────────────────────────────────
+  # Ambiente all-in-one (browser, terminal, VSCode, Jupyter, MCP) para agentes de IA.
+  # Acesso: https://sandbox.homelab.lan após zcli rebuild
+  aio-sandbox:
+    image: ghcr.io/agent-infra/sandbox:latest
+    container_name: aio-sandbox
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${SANDBOX_HOST_PORT:-8090}:8080"
+    env_file:
+      - "./aio-sandbox/.env"
+    environment:
+      WORKSPACE: ${WORKSPACE:-/home/gem/repos}
+      TZ: ${TZ:-America/Sao_Paulo}
+      PROXY_SERVER: ${PROXY_SERVER:-}
+      JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY:-}
+      DNS_OVER_HTTPS_TEMPLATES: ${DNS_OVER_HTTPS_TEMPLATES:-}
+      BROWSER_EXTRA_ARGS: ${BROWSER_EXTRA_ARGS:-}
+      WAIT_PORTS: ${WAIT_PORTS:-}
+    volumes:
+      - "${REPOS_DIR:-${HOME}/repos}:/home/gem/repos"
+    security_opt:
+      - seccomp:unconfined
+    shm_size: "2gb"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - aio-sandbox
+
 volumes:
   open_webui_data:
 
 networks:
   llm:
     name: llm
+    driver: bridge
+  aio-sandbox:
+    name: aio-sandbox
     driver: bridge

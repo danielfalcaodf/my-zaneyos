@@ -60,6 +60,7 @@ in {
       "dns.${domain}" = mkProxy 5380;
       # ── LLM / IA ───────────────────────────────────────────────────
       "openwebui.${domain}" = mkProxy 8080;
+      "sandbox.${domain}" = mkProxy 8090;
     };
   };
 
