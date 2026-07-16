@@ -7,6 +7,7 @@
 
 # 🚀 **Current Release - ZaneyOS v2.6.4**
 
+- Hardened zsh config to resolve "corrupt .zsh_history" errors
 - Moved noctalia to a user systemd service
   - It would sometimes crash at startup
   - Or after a rebuild
