@@ -5,12 +5,24 @@
 
 ---
 
-# 🚀 **Current Release - ZaneyOS v2.6.3**
+# 🚀 **Current Release - ZaneyOS v2.6.4**
+
+- Fix:
+  - `doom-dashboard` changed to `dashboard`
+    - Resolves `ui` error on `zcli doom upgrade`
+  - `doom doctor` error
+
+  ```txt
+    > :tools lsp
+      ! Couldn't find npm. `lsp-mode' needs npm to auto-install some LSP servers. For more information, see https://emacs-lsp.github.io/lsp-mode/page/languages/.
+  ```
 
 - Removed:
   - overlays for glaze and tumbler
     - `overlay.nix` is now empty template
-      Updated:
+    - Reduces rebuild time and better `cacheix` hits
+
+- Updated:
   - Set default login mgr to `ly`
   - Hyprland config moved to LUA
 
