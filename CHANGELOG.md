@@ -7,6 +7,15 @@
 
 # 🚀 **Current Release - ZaneyOS v2.6.3**
 
+- Removed:
+  - overlays for glaze and tumbler
+    - `overlay.nix` is now empty template
+      Updated:
+  - Set default login mgr to `ly`
+  - Hyprland config moved to LUA
+
+# 🚀 **Current Release - ZaneyOS v2.6.3**
+
 - Fix: bindings for noctalia-shell v5.0.0
 - Upd: Flake URL for noctalia-shell
 - Add: CLI utils - bottom - cointop - netscanner - gotop - lstr - ttop - isd - zenith
