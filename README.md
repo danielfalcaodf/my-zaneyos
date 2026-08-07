@@ -4,7 +4,9 @@
 
 ## ZaneyOS 🟰 Best ❄️ NixOS Configs
 
-\*\* Updated: January 16th, 2026
+\*\* Updated: August 7th, 2026
+
+| Note: As of release v2.6.4+ Hyprland config files are in LUA format
 
 ZaneyOS is a simple way of reproducing my configuration on any NixOS system.
 This includes the wallpaper, scripts, applications, config files, and more.
@@ -292,7 +294,7 @@ git add .
 ```
 
 4. Edit `hosts/<your-desired-hostname>/variables.nix`
-   ```nixos-generate-config --show-hardware-config > hosts/<your-desired-hostname>/hardware.nix```
+   `nixos-generate-config --show-hardware-config > hosts/<your-desired-hostname>/hardware.nix`
 
 ```
 
