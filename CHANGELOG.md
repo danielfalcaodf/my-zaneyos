@@ -8,8 +8,10 @@
 # 🚀 **Current Release - ZaneyOS v2.6.4**
 
 - Fix:
-  - `doom-dashboard` changed to `dashboard`
-    - Resolves `ui` error on `zcli doom upgrade`
+
+- `zcli doom sync and upgrade` fixed
+- `doom-dashboard` changed to `dashboard`
+  - Resolves `ui` error on `zcli doom upgrade`
   - `doom doctor` error
 
   ```txt
@@ -18,7 +20,7 @@
   ```
 
 - Added:
-  - Overly for dwarfs build error
+  - Overlay for dwarfs build error
 
 - Removed:
   - overlays for glaze and tumbler
