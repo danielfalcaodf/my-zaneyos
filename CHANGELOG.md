@@ -5,9 +5,9 @@
 
 ---
 
-# 🚀 **Current Release - ZaneyOS v2.6.4**
+# 🚀 **Current Release - ZaneyOS v2.6.5**
 
-- Fix:
+- Fixed:
 
 - `pkexec` failed b/c polkit not enabled
 - `zcli doom sync and upgrade` fixed
@@ -32,6 +32,12 @@
   - Updated yazi to current cfg
   - Set default login mgr to `ly`
   - Hyprland config moved to LUA
+
+# 🚀 **Current Release - ZaneyOS v2.6.4**
+
+- Updated:
+  - Moved Noctalia to systemd service
+    - Fixes startup issues
 
 # 🚀 **Current Release - ZaneyOS v2.6.3**
 
