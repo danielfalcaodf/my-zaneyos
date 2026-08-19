@@ -28,6 +28,7 @@
     - Reduces rebuild time and better `cacheix` hits
 
 - Updated:
+  - Updated yazi to current cfg
   - Set default login mgr to `ly`
   - Hyprland config moved to LUA
 
