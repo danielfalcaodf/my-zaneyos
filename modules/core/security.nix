@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{pkgs, lib, ...}: {
   security = {
     rtkit.enable = true;
     polkit = {
@@ -16,7 +16,7 @@
       '';
     };
     wrappers.pkexec = {
-      enable = true;
+      enable = lib.mkForce true;
       source = "${pkgs.polkit.bin}/bin/pkexec";
       owner = "root";
       group = "root";
