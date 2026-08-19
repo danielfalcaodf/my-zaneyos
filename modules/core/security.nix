@@ -3,6 +3,7 @@
     rtkit.enable = true;
     polkit = {
       enable = true;
+      enablePkexecWrapper = true;
       extraConfig = ''
         polkit.addRule(function(action, subject) {
           if ( subject.isInGroup("users") && (
@@ -14,13 +15,6 @@
           { return polkit.Result.YES; }
         })
       '';
-    };
-    wrappers.pkexec = {
-      enable = lib.mkForce true;
-      source = "${pkgs.polkit.bin}/bin/pkexec";
-      owner = "root";
-      group = "root";
-      setuid = true;
     };
     pam.services.swaylock = {
       text = ''auth include login '';
