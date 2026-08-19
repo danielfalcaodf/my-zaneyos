@@ -16,6 +16,7 @@
       '';
     };
     wrappers.pkexec = {
+      enable = true;
       source = "${pkgs.polkit.bin}/bin/pkexec";
       owner = "root";
       group = "root";
