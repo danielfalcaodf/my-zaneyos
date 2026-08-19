@@ -1,4 +1,4 @@
-_: {
+{pkgs, ...}: {
   security = {
     rtkit.enable = true;
     polkit = {
@@ -14,6 +14,12 @@ _: {
           { return polkit.Result.YES; }
         })
       '';
+    };
+    wrappers.pkexec = {
+      source = "${pkgs.polkit.bin}/bin/pkexec";
+      owner = "root";
+      group = "root";
+      setuid = true;
     };
     pam.services.swaylock = {
       text = ''auth include login '';

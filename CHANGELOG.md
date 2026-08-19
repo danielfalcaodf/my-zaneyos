@@ -9,6 +9,7 @@
 
 - Fix:
 
+- `pkexec` failed b/c polkit not enabled
 - `zcli doom sync and upgrade` fixed
 - `doom-dashboard` changed to `dashboard`
   - Resolves `ui` error on `zcli doom upgrade`
