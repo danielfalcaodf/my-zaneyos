@@ -319,18 +319,7 @@
           run = "file";
         }
       ];
-      prepend_fetchers = [
-        {
-          id = "git";
-          name = "*";
-          run = "git";
-        }
-        {
-          id = "git";
-          name = "*/";
-          run = "git";
-        }
-      ];
+      prepend_fetchers = [];
     };
     input = {
       cursor_blink = false;

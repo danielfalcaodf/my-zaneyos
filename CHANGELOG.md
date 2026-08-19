@@ -7,6 +7,7 @@
 
 # 🚀 **Current Release - ZaneyOS v2.6.4**
 
+- Fixed yazi startup and git errors
 - Fixed HL / GLAZE build errors with overlay
 - Fixed `zcli doom` detection code
 - Updated `doom eamcs` Dashboard ui error
