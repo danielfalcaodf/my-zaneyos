@@ -10,6 +10,7 @@
   zaneyos = import ../../hosts/${host}/variables.nix;
   inherit (zaneyos) gitUsername;
 in {
+  programs.zsh.enable = true;
   imports = [inputs.home-manager.nixosModules.home-manager];
   home-manager = {
     useUserPackages = true;
