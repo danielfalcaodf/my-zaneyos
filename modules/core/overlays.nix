@@ -20,6 +20,11 @@
         };
         cmakeFlags = (old.cmakeFlags or []) ++ ["-DENABLE_WERROR=OFF"];
       });
+      obs-studio-plugins = prev.obs-studio-plugins // {
+        obs-move-transition = prev.obs-studio-plugins.obs-move-transition.overrideAttrs (old: {
+          NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or "") + " -Wno-error=deprecated-declarations";
+        });
+      };
     })
   ];
 }
