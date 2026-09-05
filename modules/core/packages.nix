@@ -3,20 +3,23 @@
   pkgs,
   host,
   ...
-}: let
+}:
+let
   vars = import ../../hosts/${host}/variables.nix;
   inherit (vars) barChoice;
   # Noctalia-specific packages
   noctaliaPkgs =
-    if barChoice == "noctalia"
-    then
-      with pkgs; [
+    if barChoice == "noctalia" then
+      with pkgs;
+      [
         matugen # color palette generator needed for noctalia-shell
         app2unit # launcher for noctalia-shell
         gpu-screen-recorder # needed for nnoctalia-shell
       ]
-    else [];
-in {
+    else
+      [ ];
+in
+{
   programs = {
     neovim = {
       enable = true;
@@ -39,9 +42,10 @@ in {
   };
 
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.permittedInsecurePackages = ["openssl-1.1.1w"];
+  nixpkgs.config.permittedInsecurePackages = [ "openssl-1.1.1w" ];
 
-  environment.systemPackages = with pkgs;
+  environment.systemPackages =
+    with pkgs;
     [
       awww
       inputs.synfetch.packages.${pkgs.stdenv.hostPlatform.system}.default
@@ -64,7 +68,7 @@ in {
       ffmpeg # Terminal Video / Audio Editing
       file-roller # Archive Manager
       fd # find util needed for emacs but good util regardless vs. find
-      gearlever # Manage / run Appimages
+      #gearlever # Manage / run Appimages  # Causes install to fail b/c overlay
       icu # dep for gearlever
       gimp # Great Photo Editor
       gnumake # Needed for emacs
@@ -107,7 +111,7 @@ in {
       upower # noctalia shell battery
       uwsm # Universal Wayland Session Manager (optional must be enabled)
       v4l-utils # Used For Things Like OBS Virtual Camera
-      waybar #
+      waybar
       waypaper # Change wallpaper
       wget # Tool For Fetching Files With Links
       ytmdl # Tool For Downloading Audio From YouTube
