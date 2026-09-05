@@ -23,8 +23,8 @@ pkgs.writeShellScriptBin "qs-wallpapers-restore" ''
   fi
 
   if [ -z "''${PATH_J:-}" ] || [ ! -f "$PATH_J" ]; then
-    log "No valid saved wallpaper path; exiting"
-    exit 0
+    log "No valid saved wallpaper path; signaling failure so callers can fall back"
+    exit 1
   fi
 
   # Update hyprlock wallpaper link if tool is available
