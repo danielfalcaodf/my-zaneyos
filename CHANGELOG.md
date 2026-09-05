@@ -36,6 +36,8 @@
 # 🚀 **Current Release - ZaneyOS v2.6.4**
 
 - Updated:
+  - Removed Redundant fonts from `fonts.nix` 
+   - Changed `wezterm` default font to match new font config
   - Moved Noctalia to systemd service
     - Fixes startup issues
 
