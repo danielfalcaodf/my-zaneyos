@@ -48,7 +48,7 @@ in {
     ++ [
       alejandra # nix formatter
       amfora # Fancy Terminal Browser For Gemini Protocol
-      brave # Brave Browser
+      brave-origin # Brave Browser
       brightnessctl # For Screen Brightness Control
       cliamp # terminal music player
       cliphist # Clipboard manager using rofi menu
