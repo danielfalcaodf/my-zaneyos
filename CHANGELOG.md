@@ -29,6 +29,9 @@
     - Reduces rebuild time and better `cacheix` hits
 
 - Updated:
+  - Getting `noctalia` from nixpkgs
+    - No long builds.
+    - Left flake input and pkgs input code commented in case need to build from source
   - Updated yazi to current cfg
   - Set default login mgr to `ly`
   - Hyprland config moved to LUA
@@ -36,8 +39,8 @@
 # 🚀 **Current Release - ZaneyOS v2.6.4**
 
 - Updated:
-  - Removed Redundant fonts from `fonts.nix` 
-   - Changed `wezterm` default font to match new font config
+  - Removed Redundant fonts from `fonts.nix`
+  - Changed `wezterm` default font to match new font config
   - Moved Noctalia to systemd service
     - Fixes startup issues
 
