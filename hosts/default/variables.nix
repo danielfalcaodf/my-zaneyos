@@ -7,13 +7,13 @@
   # `tui` for Text login
   # `sddm` for graphical GUI (default)
   # SDDM background is set with stylixImage
-  displayManager = "tui";
+  displayManager = "sddm";
 
   # Emable/disable bundled applications
   tmuxEnable = false;
   alacrittyEnable = false;
   weztermEnable = false;
-  ghosttyEnable = false;
+  ghosttyEnable = true;
   vscodeEnable = false;
   # Note: This is evil-helix with VIM keybindings by default
   helixEnable = false;
