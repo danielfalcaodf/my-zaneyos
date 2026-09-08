@@ -34,7 +34,7 @@
 
   # Bar/Shell Settings
   # Choose between noctalia or waybar
-  barChoice = "waybar";
+  barChoice = "noctalia";
 
   # Waybar Settings (used when barChoice = "waybar")
   clock24h = false;
@@ -44,7 +44,7 @@
   # This does NOT install your browser
   # You need to install it by adding it to the `packages.nix`
   # or as a flatpak
-  browser = "brave";
+  browser = "brave-origin";
 
   # Host-level default applications (picked up by Home Manager xdg.mimeApps)
   # Uncomment and adjust the .desktop IDs to set per-host defaults.
