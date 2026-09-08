@@ -9,6 +9,11 @@
 
 - Fixed:
 
+- `SDDM` uwsm conflicting with HomeMgr systemd
+  - Disabled UWSM and masked from SDDM
+- WindowRule for `noctalia` setting panel
+  - Now centered and flaoating
+- Fixed duplicate bindings for wallpaper when noctalia selected
 - `pkexec` failed b/c polkit not enabled
 - `zcli doom sync and upgrade` fixed
 - `doom-dashboard` changed to `dashboard`
