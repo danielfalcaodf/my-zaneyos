@@ -82,6 +82,15 @@ in {
     };
   };
 
+  # Mask hyprland-uwsm desktop file so it doesn't appear in SDDM
+  environment.etc."xdg/wayland-sessions/hyprland-uwsm.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=Hyprland (uwsm-managed)
+    NoDisplay=true
+    Hidden=true
+  '';
+
   # Ensure Wayland SDDM also sees XKB defaults
   systemd.services.display-manager.environment = let
     vars = import ../../hosts/${host}/variables.nix;

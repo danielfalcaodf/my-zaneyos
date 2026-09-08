@@ -23,7 +23,7 @@ in {
     firefox.enable = false; # Firefox is not installed by default
     hyprland = {
       enable = true; # set this so desktop file is created
-      withUWSM = true;
+      withUWSM = false;
     };
     dconf.enable = true;
     seahorse.enable = true;
@@ -102,7 +102,7 @@ in {
       unzip # Tool For Handling .zip Files
       usbutils # Good Tools For USB Devices
       upower # noctalia shell battery
-      uwsm # Universal Wayland Session Manager (optional must be enabled)
+      #uwsm # Universal Wayland Session Manager (optional must be enabled)
       v4l-utils # Used For Things Like OBS Virtual Camera
       waybar
       waypaper # Change wallpaper
