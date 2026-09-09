@@ -26,7 +26,15 @@
   ```
 
 - Added:
-  - Overlay for dwarfs build error
+  - Added check for no swap or low memory <=8GB
+    - Added temporary swap
+    - Sets jobs to 2 and cores to 4 max
+      - If the installed NixOS doesn't have:
+        - swap defined
+        - or zramfs not in effect yet
+  - Removed `gearlever`
+    - Causes long builds
+    - Kept Overlay for dwarfs build error in case someone adds/enables gearlever
 
 - Removed:
   - overlays for glaze and tumbler

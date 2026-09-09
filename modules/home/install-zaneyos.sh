@@ -51,6 +51,53 @@ print_failure_banner() {
   echo -e "${RED}╚═══════════════════════════════════════════════════════════════════════╝${NC}"
 }
 
+# Memory and Swap Safeguards for Low-Memory / VM Environments
+ensure_build_memory() {
+  local total_swap total_mem
+  total_swap=$(free -m 2>/dev/null | awk '/^Swap:/ {print $2}' || echo 0)
+  total_mem=$(free -m 2>/dev/null | awk '/^Mem:/ {print $2}' || echo 0)
+  total_swap=${total_swap:-0}
+  total_mem=${total_mem:-0}
+
+  if [ "$total_swap" -eq 0 ] && [ "$total_mem" -lt 16000 ]; then
+    echo -e "${YELLOW}╔═══════════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${YELLOW}║  ⚠️  Low memory ($((total_mem / 1024))GB RAM, 0 swap) detected!                       ║${NC}"
+    echo -e "${YELLOW}║  Setting up temporary swap to prevent out-of-memory errors...         ║${NC}"
+    echo -e "${YELLOW}╚═══════════════════════════════════════════════════════════════════════╝${NC}"
+    local swap_created=false
+    if command -v btrfs >/dev/null 2>&1; then
+      if sudo btrfs filesystem mkswapfile --size 8G /swapfile_install 2>/dev/null; then
+        if sudo swapon /swapfile_install 2>/dev/null; then
+          swap_created=true
+        fi
+      fi
+    fi
+    if [ "$swap_created" = false ]; then
+      if (sudo fallocate -l 4G /swapfile_install 2>/dev/null || sudo dd if=/dev/zero of=/swapfile_install bs=1M count=4096 2>/dev/null); then
+        sudo chmod 600 /swapfile_install 2>/dev/null
+        sudo mkswap /swapfile_install >/dev/null 2>&1
+        if sudo swapon /swapfile_install 2>/dev/null; then
+          swap_created=true
+        fi
+      fi
+    fi
+    if [ "$swap_created" = true ]; then
+      echo -e "${GREEN}✓ Temporary swap activated successfully.${NC}"
+    else
+      echo -e "${YELLOW}⚠️  Could not create swapfile. Build will proceed with restricted concurrency.${NC}"
+    fi
+  fi
+}
+
+get_build_flags() {
+  local total_mem
+  total_mem=$(free -m 2>/dev/null | awk '/^Mem:/ {print $2}' || echo 16000)
+  total_mem=${total_mem:-16000}
+  if [ "$total_mem" -lt 12000 ]; then
+    echo "--max-jobs 2 --cores 4"
+  fi
+}
+
 print_header "Verifying System Requirements"
 
 # Check for git
@@ -213,6 +260,10 @@ sudo nixos-generate-config --show-hardware-config > ./hosts/$hostName/hardware.n
 print_header "Setting Nix Configuration"
 NIX_CONFIG="experimental-features = nix-command flakes"
 
+# Check for low memory and create temporary swap if needed
+ensure_build_memory
+buildFlags=$(get_build_flags)
+
 print_header "Initiating NixOS Build"
 read -p "Ready to run initial build? (Y/N): " -n 1 -r
 echo
@@ -221,7 +272,10 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 1
 fi
 
-sudo nixos-rebuild boot --flake ~/zaneyos/#${profile}
+sudo nixos-rebuild boot $buildFlags --flake ~/zaneyos/#${profile}
+
+# Export newly built system binaries to PATH for subsequent steps
+export PATH="/run/current-system/sw/bin:/nix/var/nix/profiles/system/sw/bin:/etc/profiles/per-user/$USER/bin:$PATH"
 
 # Check the exit status of the last command (nixos-rebuild)
 if [ $? -eq 0 ]; then
