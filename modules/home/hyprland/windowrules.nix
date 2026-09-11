@@ -206,14 +206,23 @@ _: {
       }
 
       windowrule {
+        name = Noctalia-Settings
+        match:class = ^(dev\.noctalia\.Noctalia)$
+        center = on
+        float = on
+        size = 70% = 70%
+        tag = +settings
+      }
+
+      windowrule {
         name = IdleInhibit-fullscreen-1
-        match:class = ^(*)$
+        match:class = ^(.*)$
         idle_inhibit = fullscreen
       }
 
       windowrule {
         name = IdleInhibit-fullscreen-2
-        match:title = ^(*)$
+        match:title = ^(.*)$
         idle_inhibit = fullscreen
       }
 

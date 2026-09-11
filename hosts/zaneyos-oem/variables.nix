@@ -17,7 +17,7 @@
   # `tui` for Text login
   # `sddm` for graphical GUI
   # SDDM background is set with stylixImage
-  displayManager = "sddm";
+  displayManager = "tui";
 
   # Emable/disable bundled applications
   tmuxEnable = true;
@@ -25,7 +25,6 @@
   weztermEnable = true;
   ghosttyEnable = true;
   vscodeEnable = true;
-  antigravityEnable = false; # Google port of vscodium
   helixEnable = true;
   #To install rebuild, then run zcli doom install
   doomEmacsEnable = false;
@@ -97,7 +96,7 @@
 
   # Set Waybar
   # Available options:
-  waybarChoice = ../../modules/home/waybar/waybar-dwm-2.nix;
+  #waybarChoice = ../../modules/home/waybar/waybar-dwm-2.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-simple.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-curved.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-jerry.nix;
@@ -108,14 +107,13 @@
   #waybarChoice = ../../modules/home/waybar/waybar-tony.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-ddubsos-v1.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-mecha.nix;
-  #waybarChoice = ../../modules/home/waybar/waybar-jak-catppuccin.nix;
+  waybarChoice = ../../modules/home/waybar/waybar-jak-catppuccin.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-jak-ml4w-modern.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-jak-oglo-simple.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-jwt-catppuccin.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-jwt-transparent.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-jwt-ultradark.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-pctrade-catppuccin.nix;
-  #waybarChoice = ../../modules/home/waybar/waybar-mangowc-jak-catppuccin.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-old-ddubsos.nix;
 
   # Set Animation style

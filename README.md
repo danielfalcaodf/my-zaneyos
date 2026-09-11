@@ -11,6 +11,8 @@
 
 \*\* Base: ZaneyOS | Fork atualizado: 2026
 
+| Note: As of release v2.6.4+ Hyprland config files are in LUA format
+
 ZaneyOS is a simple way of reproducing my configuration on any NixOS system.
 This includes the wallpaper, scripts, applications, config files, and more.
 

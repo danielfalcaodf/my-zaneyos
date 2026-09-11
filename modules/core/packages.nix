@@ -12,8 +12,6 @@
     then
       with pkgs; [
         matugen # color palette generator needed for noctalia-shell
-        app2unit # launcher for noctalia-shell
-        gpu-screen-recorder # needed for nnoctalia-shell
       ]
     else [];
 in {
@@ -39,7 +37,7 @@ in {
   };
 
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.permittedInsecurePackages = ["openssl-1.1.1w"];
+  #nixpkgs.config.permittedInsecurePackages = [ "openssl-1.1.1w" ];
 
   environment.systemPackages = with pkgs;
     [
@@ -50,8 +48,7 @@ in {
     ++ [
       alejandra # nix formatter
       amfora # Fancy Terminal Browser For Gemini Protocol
-      appimage-run # Needed For AppImage Support
-      brave # Brave Browser
+      brave-origin # Brave Browser
       brightnessctl # For Screen Brightness Control
       cliamp # terminal music player
       cliphist # Clipboard manager using rofi menu
@@ -64,11 +61,12 @@ in {
       ffmpeg # Terminal Video / Audio Editing
       file-roller # Archive Manager
       fd # find util needed for emacs but good util regardless vs. find
-      gearlever # Manage / run Appimages
+      #gearlever # Manage / run Appimages  # Causes install to fail b/c overlay
       icu # dep for gearlever
       gimp # Great Photo Editor
       gnumake # Needed for emacs
-      gpu-screen-recorder # needed for nnoctalia-shell
+      google-chrome # default browser
+      gpu-screen-recorder # needed for noctalia-shell
       power-profiles-daemon # needed for noctalia-shell power cycle
       mesa-demos # needed for inxi diag util
       tuigreet # The Login Manager (Sometimes Referred To As Display Manager)
@@ -99,15 +97,24 @@ in {
       ripgrep # Improved Grep
       sqlite # needed for emaacs
       socat # Needed For Screenshots
+      ttop # top with histogram
       unrar # Tool For Handling .rar Files
       unzip # Tool For Handling .zip Files
       usbutils # Good Tools For USB Devices
       upower # noctalia shell battery
-      uwsm # Universal Wayland Session Manager (optional must be enabled)
+      #uwsm # Universal Wayland Session Manager (optional must be enabled)
       v4l-utils # Used For Things Like OBS Virtual Camera
+      waybar
       waypaper # Change wallpaper
       wget # Tool For Fetching Files With Links
       ytmdl # Tool For Downloading Audio From YouTube
       python3 # Python 3 programming language
+      zenith # like htop but more
+      isd # system util
+      netscanner # find devices on network
+      lstr # Tree alternative
+      cointop # top for ctrypto
+      bottom # top alternative
+      gotop # Another top
     ];
 }

@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
     emacs-pgtk
-    emacsPackages.npm
+    nodejs
     git
     lazygit
     ripgrep
@@ -31,7 +31,7 @@
 
      :ui
      doom
-     doom-dashboard
+     dashboard
      doom-quit
      hl-todo
      modeline

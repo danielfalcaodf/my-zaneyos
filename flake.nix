@@ -11,20 +11,16 @@
     stylix.url = "github:danth/stylix/master";
     nix-flatpak.url = "github:gmodena/nix-flatpak?ref=latest";
 
-    noctalia = {
-      url = "github:noctalia-dev/noctalia-shell";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # Now avilable in nikpkgs
+    # Leaving this in case need latest build
+    # noctalia = {
+    #   url = "github:noctalia-dev/noctalia";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
     # Checking nixvim to see if it's better
     nixvim = {
       url = "github:nix-community/nixvim";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    # Google Antigravity (IDE)
-    antigravity-nix = {
-      url = "github:jacopone/antigravity-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

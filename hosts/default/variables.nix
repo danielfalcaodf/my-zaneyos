@@ -18,15 +18,14 @@
   # `tui` for Text login
   # `sddm` for graphical GUI (default)
   # SDDM background is set with stylixImage
-  displayManager = "tui";
+  displayManager = "sddm";
 
   # Emable/disable bundled applications
   tmuxEnable = false;
   alacrittyEnable = false;
   weztermEnable = false;
-  ghosttyEnable = false;
+  ghosttyEnable = true;
   vscodeEnable = false;
-  antigravityEnable = false; # Google port of vscodium
   # Note: This is evil-helix with VIM keybindings by default
   helixEnable = false;
   #To install: Enable here, zcli rebuild, then run zcli doom install
@@ -56,7 +55,7 @@
   # This does NOT install your browser
   # You need to install it by adding it to the `packages.nix`
   # or as a flatpak
-  browser = "brave";
+  browser = "brave-origin";
 
   # Host-level default applications (picked up by Home Manager xdg.mimeApps)
   # Uncomment and adjust the .desktop IDs to set per-host defaults.
@@ -128,14 +127,13 @@
   #waybarChoice = ../../modules/home/waybar/waybar-tony.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-ddubsos-v1.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-mecha.nix;
-  #waybarChoice = ../../modules/home/waybar/waybar-jak-catppuccin.nix;
+  waybarChoice = ../../modules/home/waybar/waybar-jak-catppuccin.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-jak-ml4w-modern.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-jak-oglo-simple.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-jwt-catppuccin.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-jwt-transparent.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-jwt-ultradark.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-pctrade-catppuccin.nix;
-  waybarChoice = ../../modules/home/waybar/waybar-mangowc-jak-catppuccin.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-old-ddubsos.nix;
 
   # Set Animation style

@@ -17,17 +17,16 @@
   # `tui` for Text login
   # `sddm` for graphical GUI (default)
   # SDDM background is set with stylixImage
-  displayManager = "tui";
+   displayManager = "tui";
 
   # Emable/disable bundled applications
   tmuxEnable = true;
   alacrittyEnable = true;
   weztermEnable = true;
   ghosttyEnable = true;
-  vscodeEnable = true;
-  antigravityEnable = false; # Google port of vscodium
+  vscodeEnable = false;
   # Note: This is evil-helix with VIM keybindings by default
-  helixEnable = false;
+  helixEnable = true;
   #To install: Enable here, zcli rebuild, then run zcli doom install
   doomEmacsEnable = true;
 
@@ -56,7 +55,7 @@
   # This does NOT install your browser
   # You need to install it by adding it to the `packages.nix`
   # or as a flatpak
-  browser = "google-chrome";
+  browser = "google-chrome-stable";
 
   # Host-level default applications (picked up by Home Manager xdg.mimeApps)
   # Uncomment and adjust the .desktop IDs to set per-host defaults.
@@ -135,7 +134,6 @@
   #waybarChoice = ../../modules/home/waybar/waybar-jwt-transparent.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-jwt-ultradark.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-pctrade-catppuccin.nix;
-  #waybarChoice = ../../modules/home/waybar/waybar-mangowc-jak-catppuccin.nix;
   #waybarChoice = ../../modules/home/waybar/waybar-old-ddubsos.nix;
 
   # Set Animation style

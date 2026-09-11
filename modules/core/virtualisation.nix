@@ -36,6 +36,11 @@
     virt-manager.enable = false;
   };
 
+  systemd.services.systemd-machined = {
+    stopIfChanged = false;
+    restartIfChanged = false;
+  };
+
   environment.systemPackages = with pkgs; [
     virt-viewer # View Virtual Machines
     lazydocker

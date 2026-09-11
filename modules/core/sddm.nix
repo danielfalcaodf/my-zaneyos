@@ -63,6 +63,15 @@
   };
 in {
   services.displayManager = {
+    defaultSession = "hyprland";
+    sessionPackages = lib.mkForce [
+      (pkgs.runCommand "hyprland-session" {
+        passthru.providedSessions = ["hyprland"];
+      } ''
+        mkdir -p $out/share/wayland-sessions
+        cp ${pkgs.hyprland}/share/wayland-sessions/hyprland.desktop $out/share/wayland-sessions/
+      '')
+    ];
     sddm = {
       package = pkgs.kdePackages.sddm;
       extraPackages = [sddm-astronaut];
@@ -74,6 +83,9 @@ in {
         keyboardLayout = vars.keyboardLayout or "us";
         keyboardVariant = vars.keyboardVariant or "";
       in {
+        General = {
+          DefaultSession = "hyprland.desktop";
+        };
         X11 = {
           XkbLayout = keyboardLayout;
           XkbVariant = keyboardVariant;

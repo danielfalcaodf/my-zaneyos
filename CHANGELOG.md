@@ -5,7 +5,92 @@
 
 ---
 
-# 🚀 **Current Release - ZaneyOS v2.6.1**
+# 🚀 **Current Release - ZaneyOS v2.6.5**
+
+- Fixed:
+
+- `SDDM` uwsm conflicting with HomeMgr systemd
+  - Disabled UWSM and masked from SDDM
+- WindowRule for `noctalia` setting panel
+  - Now centered and flaoating
+- Fixed duplicate bindings for wallpaper when noctalia selected
+- `pkexec` failed b/c polkit not enabled
+- `zcli doom sync and upgrade` fixed
+- `doom-dashboard` changed to `dashboard`
+  - Resolves `ui` error on `zcli doom upgrade`
+  - `doom doctor` error
+
+  ```txt
+    > :tools lsp
+      ! Couldn't find npm. `lsp-mode' needs npm to auto-install some LSP servers. For more information, see https://emacs-lsp.github.io/lsp-mode/page/languages/.
+  ```
+
+- Added:
+  - Added check for no swap or low memory <=8GB
+    - Added temporary swap
+    - Sets jobs to 2 and cores to 4 max
+      - If the installed NixOS doesn't have:
+        - swap defined
+        - or zramfs not in effect yet
+  - Removed `gearlever`
+    - Causes long builds
+    - Kept Overlay for dwarfs build error in case someone adds/enables gearlever
+
+- Removed:
+  - overlays for glaze and tumbler
+    - `overlay.nix` is now empty template
+    - Reduces rebuild time and better `cacheix` hits
+
+- Updated:
+  - Getting `noctalia` from nixpkgs
+    - No long builds.
+    - Left flake input and pkgs input code commented in case need to build from source
+  - Updated yazi to current cfg
+  - Set default login mgr to `ly`
+  - Hyprland config moved to LUA
+
+# 🚀 **Current Release - ZaneyOS v2.6.4**
+
+- Updated:
+  - Removed Redundant fonts from `fonts.nix`
+  - Changed `wezterm` default font to match new font config
+  - Moved Noctalia to systemd service
+    - Fixes startup issues
+
+# 🚀 **Current Release - ZaneyOS v2.6.3**
+
+- Fix: bindings for noctalia-shell v5.0.0
+- Upd: Flake URL for noctalia-shell
+- Add: CLI utils - bottom - cointop - netscanner - gotop - lstr - ttop - isd - zenith
+
+# 🚀 **Current Release - ZaneyOS v2.6.2**
+
+- Fix: `nixvim` eval error regarding nixpkgs
+  - Proper fix is add this to `nixvim.nix`
+
+  ```nix
+   nixpkgs.source = inputs.nixpkgs;
+  ```
+
+- Fix: `gtk.nix` error regarding `null`
+
+  ```nix
+  {config, pkgs, lib, ...}: {
+    gtk = {
+      gtk4.theme = lib.mkForce null;
+  ```
+
+- Fix: `kmscon` error
+  - `zaneyos/modules/core/stylix.nix`
+  - Added: `targets.kmscon.enable = false;`
+    ```nix
+    stylix = {
+     enable = true;
+     image = stylixImage;
+     targets.kmscon.enable = false;
+    ```
+- Updated to NixOS v26.11
+- Disabled `plymouth` by default
 
 - Chg: `awww` from flake input to `pkgs.awww`
   - This resolves build errors
@@ -554,9 +639,8 @@
 - Added `vscode.nix` from ddubsOS.
   - Pre-configured with many useful plugins
   - Also works as template to add more
-- Added `antigravity` IDE from Google based on vscodium
 - Created `modules/core/overlays.nix`
-  - Currently only has `antigravity` but more maybe be needed later
+  - Added package override support
 - Fixed gestures errors from Hyprland Upgrade
 - Added Noctalia Shell as default
 - Added Additional waybars from dddubsOS
@@ -577,7 +661,6 @@
     - tmux
     - Wezterm
   - Editors
-    - antigravity
     - emacs
     - evil-helix
     - nixvim

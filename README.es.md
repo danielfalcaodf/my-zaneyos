@@ -4,7 +4,9 @@
 
 ## ZaneyOS 🟰 Mejores Configs ❄️ NixOS
 
-\*\* Actualizado: 16 de enero de 2026
+\*\* Actualizado: 7 de augusto de 2026
+
+| Nota: A partir de ZaneyOS v2.6.4, los archivos de configuración de Hyprland están en formato Lua.
 
 ZaneyOS es una forma sencilla de reproducir mi configuración en cualquier sistema NixOS.
 Incluye el fondo de pantalla, scripts, aplicaciones, archivos de configuración y más.
